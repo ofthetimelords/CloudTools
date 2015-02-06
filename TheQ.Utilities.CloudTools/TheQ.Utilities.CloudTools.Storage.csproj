@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CDA78EB6-28DB-459D-A181-E390E57DDE50}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TheQ.Utilities.CloudTools.Storage</RootNamespace>
+    <AssemblyName>TheQ.Utilities.CloudTools.Storage</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <OutputPath>..\Output\vLatest\</OutputPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <DocumentationFile>..\Output\vLatest\TheQ.Utilities.CloudTools.Storage.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>..\Code Analysis Rules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>..\Output\vLatest\TheQ.Utilities.CloudTools.Storage.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Blob\BlobExtensions.cs" />
+    <Compile Include="GlobalLockFramework\GlobalLockBase.cs" />
+    <Compile Include="GlobalLockFramework\ILockState.cs" />
+    <Compile Include="GlobalLockFramework\ILockStateProvider.cs" />
+    <Compile Include="GlobalLockFramework\IGlobalLock.cs" />
+    <Compile Include="GlobalLockFramework\IGlobalLockFactory.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Infrastructure\ILogService.cs" />
+    <Compile Include="Internal\CodeAnnotations.cs" />
+    <Compile Include="Internal\Guard.cs" />
+    <Compile Include="Models\ObjectModel\IAccessCondition.cs" />
+    <Compile Include="Models\ObjectModel\IBlobProperties.cs" />
+    <Compile Include="Models\ObjectModel\CloudToolsStorageException.cs" />
+    <Compile Include="Models\QueueMessageWrapper.cs" />
+    <Compile Include="Infrastructure\DataCompression.cs" />
+    <Compile Include="Infrastructure\LogHelper.cs" />
+    <Compile Include="Models\HandleMessageOptionsBase.cs" />
+    <Compile Include="Models\HandleParallelMessageOptions.cs" />
+    <Compile Include="Models\HandleBatchMessageOptions.cs" />
+    <Compile Include="Models\HandleSerialMessageOptions.cs" />
+    <Compile Include="Models\ObjectModel\IBlob.cs" />
+    <Compile Include="Models\ObjectModel\IBlobContainer.cs" />
+    <Compile Include="Models\ObjectModel\IQueueMesssage.cs" />
+    <Compile Include="Models\ObjectModel\IQueue.cs" />
+    <Compile Include="Models\ObjectModel\IQueueMessageProvider.cs" />
+    <Compile Include="Queues\QueueExtensions.Exceptions.cs" />
+    <Compile Include="Queues\QueueExtensions.ProcessBatch.cs" />
+    <Compile Include="Queues\QueueExtensions.Process.cs" />
+    <Compile Include="Queues\QueueExtensions.KeepAlive.cs" />
+    <Compile Include="Queues\QueueExtensions.Add.cs" />
+    <Compile Include="Queues\QueueExtensions.Parallel.cs" />
+    <Compile Include="Queues\QueueExtensions.Batch.cs" />
+    <Compile Include="Queues\QueueExtensions.Serial.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="key.snk" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties\ChangeLog.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  -->
+  <Target Name="AfterBuild">
+    <!--<MSBuild Condition=" '$(Framework)' == '' " Projects="$(MSBuildProjectFile)" Properties="Framework=NET40" RunEachTargetSeparately="true" />
+    <MSBuild Condition=" '$(Framework)' == 'NET40' " Projects="$(MSBuildProjectFile)" Properties="Framework=NET45" RunEachTargetSeparately="true" />-->
+  </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+</Project>

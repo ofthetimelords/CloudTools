@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FC883A72-0CF0-440A-9636-DD48FCE77088}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheQ.Utilities.CloudTools.Tests.Storage", "Testing\TheQ.Utilities.CloudTools.Tests.Storage\TheQ.Utilities.CloudTools.Tests.Storage.csproj", "{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F2AA23BC-C76D-4C5E-8192-F2CE35177500}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheQ.Utilities.CloudTools.Azure", "TheQ.Utilities.CloudTools.Azure\TheQ.Utilities.CloudTools.Azure.csproj", "{D7FF52C3-43FF-4CB1-BBA8-A32BF8AD3845}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheQ.Utilities.CloudTools.Storage", "TheQ.Utilities.CloudTools\TheQ.Utilities.CloudTools.Storage.csproj", "{CDA78EB6-28DB-459D-A181-E390E57DDE50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CDE1F188-4274-48A2-8DDA-A7D53751026D}"
+	ProjectSection(SolutionItems) = preProject
+		License.txt = License.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7FF52C3-43FF-4CB1-BBA8-A32BF8AD3845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7FF52C3-43FF-4CB1-BBA8-A32BF8AD3845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7FF52C3-43FF-4CB1-BBA8-A32BF8AD3845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7FF52C3-43FF-4CB1-BBA8-A32BF8AD3845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDA78EB6-28DB-459D-A181-E390E57DDE50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDA78EB6-28DB-459D-A181-E390E57DDE50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDA78EB6-28DB-459D-A181-E390E57DDE50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDA78EB6-28DB-459D-A181-E390E57DDE50}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77} = {FC883A72-0CF0-440A-9636-DD48FCE77088}
+	EndGlobalSection
+EndGlobal
