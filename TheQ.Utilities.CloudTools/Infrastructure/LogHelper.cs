@@ -59,7 +59,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 			[NotNull] string message,
 			[NotNull] params object[] formatArguments)
 		{
-			if (logService != null) logService.Error(exception, string.Format(CultureInfo.InvariantCulture, message, formatArguments), "TheQ/CloudTools/" + category);
+			if (logService != null) logService.Error(exception, "TheQ/CloudTools/" + category, string.Format(CultureInfo.InvariantCulture, message, formatArguments));
 		}
 	}
 }
