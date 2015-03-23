@@ -1,4 +1,8 @@
 ﻿// <copyright file="GlobalLockBase.cs" company="nett">
+
+
+
+#region Using directives
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
@@ -9,15 +13,17 @@
 // 
 // </summary>
 
+
 using System;
-using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
+#endregion
 
 
 
@@ -130,11 +136,6 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		private TLockState LockState { get; set; }
 
 
-		/// <summary>
-		///     Gets or sets the BLOB container.
-		/// </summary>
-		[NotNull]
-
 		//private TLockContainer Container { get; set; }
 		/// <summary>
 		///     Gets or sets the thread responsible for renewing a lock.
@@ -218,7 +219,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </summary>
 		public void Unlock()
 		{
-			Task.Run(() => this.UnlockAsync(true)).Wait();
+			Task.Run(() => this.UnlockAsync(true), this.CancelToken).Wait(this.CancelToken);
 		}
 
 
@@ -322,7 +323,8 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </returns>
 		public IGlobalLock TryLock(string lockName, out bool success)
 		{
-			return this.TryLock(lockName, TimeSpan.FromSeconds(60), out success);
+			success = Task.Run(() => this.TryLockInternal(lockName, null, true), this.CancelToken).Result;
+			return this;
 		}
 
 
@@ -346,18 +348,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </returns>
 		public IGlobalLock TryLock(string lockName, TimeSpan? leaseTime, out bool success)
 		{
-			Guard.NotNull(lockName, "lockName");
-			GuardLeaseTime(leaseTime);
-
-			try
-			{
-				success = Task.Run(() => this.TryLockInternal(lockName, leaseTime)).Result;
-			}
-			catch (OperationCanceledException)
-			{
-				success = false;
-			}
-
+			success = Task.Run(() => this.TryLockInternal(lockName, leaseTime, false), this.CancelToken).Result;
 			return this;
 		}
 
@@ -375,7 +366,9 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		[NotNull]
 		public Task<IGlobalLock> LockAsync(string lockName)
 		{
-			return this.LockAsync(lockName, TimeSpan.FromSeconds(60));
+			Guard.NotNull(lockName, "lockName");
+
+			return this.LockInternal(lockName, null, true, DefaultTimeBetweenLockAttempts);
 		}
 
 
@@ -395,7 +388,9 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		[NotNull]
 		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan timeBetweenAttempts)
 		{
-			return this.LockAsync(lockName, TimeSpan.FromSeconds(60), timeBetweenAttempts);
+			Guard.NotNull(lockName, "lockName");
+
+			return this.LockInternal(lockName, null, true, timeBetweenAttempts);
 		}
 
 
@@ -416,7 +411,9 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		[NotNull]
 		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime)
 		{
-			return this.LockAsync(lockName, leaseTime, DefaultTimeBetweenLockAttempts);
+			Guard.NotNull(lockName, "lockName");
+
+			return this.LockInternal(lockName, leaseTime, false, DefaultTimeBetweenLockAttempts);
 		}
 
 
@@ -435,19 +432,27 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
-		public async Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts)
+		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts)
 		{
 			Guard.NotNull(lockName, "lockName");
 
-			bool success;
-			this.TryLock(lockName, leaseTime, out success);
+			return this.LockInternal(lockName, leaseTime, false, timeBetweenAttempts);
+		}
+
+
+
+		private async Task<IGlobalLock> LockInternal(string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime, TimeSpan timeBetweenAttempts)
+		{
+			Guard.NotNull(lockName, "lockName");
+
+			var success = await this.TryLockInternal(lockName, leaseTime, isDefaultLeaseTime);
 
 			while (!success)
 			{
 				if (this.CancelToken.IsCancellationRequested) return this;
 
 				await Task.Delay((int) timeBetweenAttempts.TotalSeconds, this.CancelToken);
-				this.TryLock(lockName, leaseTime, out success);
+				success = await this.TryLockInternal(lockName, leaseTime, isDefaultLeaseTime);
 			}
 
 			return this;
@@ -463,25 +468,33 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
-		private async Task<bool> TryLockInternal([NotNull] string lockName, TimeSpan? leaseTime)
+		private async Task<bool> TryLockInternal([NotNull] string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
 			GuardLeaseTime(leaseTime);
+			Guard.NotNull(lockName, "lockName");
+			GuardLeaseTime(leaseTime);
 
-			if (this.LockState.LeaseId != null && this.LockName != null && lockName == this.LockName) return true;
+			try
+			{
+				if (this.LockState.LeaseId != null && this.LockName != null && lockName == this.LockName) return true;
 
-			this.CancelToken.ThrowIfCancellationRequested();
+				this.CancelToken.ThrowIfCancellationRequested();
 
-			await this.UnlockAsync();
+				await this.UnlockAsync();
 
-			// Allow exceptions to propagate from here.
-			await this.TryAcquireLeaseAsync(lockName, leaseTime);
+				// Allow exceptions to propagate from here.
+				await this.TryAcquireLeaseAsync(lockName, leaseTime, isDefaultLeaseTime);
 
-			this.LockState.LeaseTime = leaseTime;
-			if (this.LockState.LeaseId != null) this.CreateRenewalThreadIfApplicable(lockName, leaseTime);
-			else return false;
+				if (this.LockState.LeaseId != null) this.CreateRenewalThreadIfApplicable(lockName, leaseTime);
+				else return false;
 
-			return true;
+				return true;
+			}
+			catch (OperationCanceledException)
+			{
+				return false;
+			}
 		}
 
 
@@ -545,14 +558,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </summary>
 		/// <param name="lockName">Name of the blob to acquire the lock upon.</param>
 		/// <param name="leaseTime">The lease time.</param>
-		private async Task TryAcquireLeaseAsync([NotNull] string lockName, TimeSpan? leaseTime)
+		private async Task TryAcquireLeaseAsync([NotNull] string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
 			GuardLeaseTime(leaseTime);
 
 			try
 			{
-				this.LockState = await this.LockStateProvider.RegisterLockAsync(this.LockState, lockName, this.CancelToken);
+				this.LockState = await this.LockStateProvider.RegisterLockAsync(this.LockState, lockName, leaseTime, isDefaultLeaseTime, this.CancelToken);
 			}
 			catch (CloudToolsStorageException ex)
 			{
@@ -685,9 +698,10 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     True if the specified lease time is between 15 and 60 seconds (inclusive)
 		/// </returns>
-		private static void GuardLeaseTime(TimeSpan? leaseTime)
+		private void GuardLeaseTime(TimeSpan? leaseTime)
 		{
-			if (leaseTime.HasValue && !(leaseTime.Value.TotalSeconds >= 10 && leaseTime.Value.TotalSeconds <= 60)) throw new ArgumentException("Parameter leaseTime must be either null or between 10 and 60 seconds", "leaseTime");
+			if (!this.LockStateProvider.IsValidLeaseTime(leaseTime))
+				throw new ArgumentException("Invalid lease time specified!", "leaseTime");
 		}
 	}
 }

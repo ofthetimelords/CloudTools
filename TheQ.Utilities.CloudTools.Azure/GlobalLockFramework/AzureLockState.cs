@@ -31,8 +31,5 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		public string LeaseId { get; set; }
-
-
-		public TimeSpan? LeaseTime { get; set; }
 	}
 }

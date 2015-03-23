@@ -9,6 +9,8 @@
 // 
 // </summary>
 
+
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +31,9 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		private ILogService LogService { get; set; }
+
+
+		private const int DefaultLeaseTimeInSeconds = 60;
 
 
 
@@ -57,6 +62,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		{
 			Guard.NotNull(state, "state");
 
+
 			// TODO: What if does not exist already, Exceptions
 			if (state.LeaseId != null) await this.UnregisterLockAsync(state, cancelToken);
 			else await this.BreakLockInternal(state, cancelToken);
@@ -82,7 +88,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 
-		public async Task<AzureLockState> RegisterLockAsync(AzureLockState state, string newLockName, CancellationToken cancelToken)
+		public async Task<AzureLockState> RegisterLockAsync(AzureLockState state, string newLockName, TimeSpan? leaseTime, bool isDefaultLeaseTime, CancellationToken cancelToken)
 		{
 			Guard.NotNull(state, "state");
 
@@ -92,7 +98,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 			if (!await state.LockingBlob.ExistsAsync(cancelToken)) await state.LockingBlob.UploadFromByteArrayAsync(new byte[0], 0, 0, cancelToken);
 
-			state.LeaseId = await state.LockingBlob.AcquireLeaseAsync(state.LeaseTime, null, cancelToken);
+			state.LeaseId = await state.LockingBlob.AcquireLeaseAsync(isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime, null, cancelToken);
 			state.LockName = newLockName;
 
 			return state;
@@ -109,6 +115,17 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 			return state;
 		}
 
+		/// <summary>
+		///     Ensures that a lease time is between 15 and 60 seconds (inclusive).
+		/// </summary>
+		/// <param name="leaseTime">The lease time to validate.</param>
+		/// <returns>
+		///     True if the specified lease time is between 15 and 60 seconds (inclusive)
+		/// </returns>
+		public bool IsValidLeaseTime(TimeSpan? leaseTime)
+		{
+			return leaseTime.HasValue && !(leaseTime.Value.TotalSeconds >= 10 && leaseTime.Value.TotalSeconds <= 60);
+		}
 
 
 		private async Task<AzureLockState> BreakLockInternal(AzureLockState state, CancellationToken cancelToken)

@@ -39,9 +39,12 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		Task<T> UnregisterLockAsync(T state, CancellationToken cancelToken);
 
 
-		Task<T> RegisterLockAsync(T state, string newLockName, CancellationToken cancelToken);
+		Task<T> RegisterLockAsync(T state, string newLockName, TimeSpan? leaseTime, bool isDefaultLeaseTime, CancellationToken cancelToken);
 
 
 		Task<T> RenewLockAsync(T state, CancellationToken cancelToken);
+
+
+		bool IsValidLeaseTime(TimeSpan? leaseTime);
 	}
 }

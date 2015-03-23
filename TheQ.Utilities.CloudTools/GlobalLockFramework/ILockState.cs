@@ -22,8 +22,5 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		string LeaseId { get; set; }
-
-
-		TimeSpan? LeaseTime { get; set; }
 	}
 }
