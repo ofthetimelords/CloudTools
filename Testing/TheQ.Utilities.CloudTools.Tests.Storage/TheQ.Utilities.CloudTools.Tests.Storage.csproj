@@ -116,7 +116,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="connstrings.config" />
+    <None Include="connstrings.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="key.snk" />
     <None Include="packages.config" />
   </ItemGroup>

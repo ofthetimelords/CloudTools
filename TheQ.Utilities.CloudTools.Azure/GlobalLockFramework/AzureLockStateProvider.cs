@@ -124,7 +124,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public bool IsValidLeaseTime(TimeSpan? leaseTime)
 		{
-			return leaseTime.HasValue && !(leaseTime.Value.TotalSeconds >= 10 && leaseTime.Value.TotalSeconds <= 60);
+			return !leaseTime.HasValue || (leaseTime.Value.TotalSeconds >= 15 && leaseTime.Value.TotalSeconds <= 60);
 		}
 
 

@@ -479,7 +479,8 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 			{
 				if (this.LockState.LeaseId != null && this.LockName != null && lockName == this.LockName) return true;
 
-				this.CancelToken.ThrowIfCancellationRequested();
+				if (this.CancelToken.IsCancellationRequested)
+					return false;
 
 				await this.UnlockAsync();
 
