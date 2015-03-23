@@ -142,11 +142,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 
 			// Act
 			client.BreakAnyLeases("globallocktests4", "test_lock");
-			using (var globalLock = factory.TryCreateLock("test_lock", TimeSpan.FromSeconds(10), out isLocked))
+			using (var globalLock = factory.TryCreateLock("test_lock", TimeSpan.FromSeconds(15), out isLocked))
 			{
 				if (isLocked) result += "1";
 
-				Thread.Sleep(TimeSpan.FromSeconds(35));
+				Thread.Sleep(TimeSpan.FromSeconds(40));
 				using (var globalLockInner = factory.TryCreateLock("test_lock", out isLockedInner)) if (isLockedInner) result += "2";
 			}
 

@@ -8,9 +8,10 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
-3.0.0 | 2015/02/06
+3.0.0 | 2015/03/23
 / Converted the library to open source
 + Introducing semantic versioning v2.0.0
+! Infinite lease time bug for the Azure implementation was inadvertently introduced.
 
 
 2.5.0.0 | 2015/01/24
