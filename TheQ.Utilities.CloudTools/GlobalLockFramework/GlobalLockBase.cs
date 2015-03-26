@@ -373,27 +373,6 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 
-		/// <summary>
-		///     Attempts to create a lock with the specified name and will not return before a lock can be retrieved.
-		/// </summary>
-		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="timeBetweenAttempts">The time between lock retrieval attempts.</param>
-		/// <exception cref="OperationCanceledException">A wait for a global lock retrieval was cancelled</exception>
-		/// <exception cref="ArgumentException">
-		///     Parameter <paramref name="lockName" /> is <see langword="null" /> or empty;lockName or Parameter leaseTime must be either <see langword="null" /> or between 15 and 60 seconds;leaseTime
-		/// </exception>
-		/// <returns>
-		///     The current instance (to allow fluent usage).
-		/// </returns>
-		[NotNull]
-		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan timeBetweenAttempts)
-		{
-			Guard.NotNull(lockName, "lockName");
-
-			return this.LockInternal(lockName, null, true, timeBetweenAttempts);
-		}
-
-
 
 		/// <summary>
 		///     Attempts to create a lock with the specified name and will not return before a lock can be retrieved.

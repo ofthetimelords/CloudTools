@@ -33,7 +33,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		private ILogService LogService { get; set; }
 
 
-		private const int DefaultLeaseTimeInSeconds = 60;
+		internal const int DefaultLeaseTimeInSeconds = 60;
 
 
 

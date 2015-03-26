@@ -55,7 +55,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public IGlobalLock TryCreateLock(string lockName, out bool success)
 		{
-			return new AzureGlobalLock(new CancellationToken(), this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).TryLock(lockName, null, out success);
+			return new AzureGlobalLock(new CancellationToken(), this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).TryLock(lockName, out success);
 		}
 
 
@@ -98,7 +98,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public IGlobalLock TryCreateLock(string lockName, CancellationToken cancelToken, out bool success)
 		{
-			return new AzureGlobalLock(cancelToken, this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).TryLock(lockName, null, out success);
+			return new AzureGlobalLock(cancelToken, this.LockStateProvider, new AzureLockState { LockingBlobContainer = this.LockContainer }, this.LogService).TryLock(lockName, out success);
 		}
 
 
@@ -137,7 +137,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public IGlobalLock CreateLock(string lockName)
 		{
-			return new AzureGlobalLock(new CancellationToken(), this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).LockAsync(lockName, null).Result;
+			return new AzureGlobalLock(new CancellationToken(), this.LockStateProvider, new AzureLockState { LockingBlobContainer = this.LockContainer }, this.LogService).LockAsync(lockName).Result;
 		}
 
 
@@ -175,7 +175,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public IGlobalLock CreateLock(string lockName, CancellationToken cancelToken)
 		{
-			return new AzureGlobalLock(cancelToken, this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).LockAsync(lockName, null).Result;
+			return new AzureGlobalLock(cancelToken, this.LockStateProvider, new AzureLockState { LockingBlobContainer = this.LockContainer }, this.LogService).LockAsync(lockName).Result;
 		}
 
 
@@ -213,7 +213,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public Task<IGlobalLock> CreateLockAsync(string lockName)
 		{
-			return new AzureGlobalLock(new CancellationToken(), this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).LockAsync(lockName, null);
+			return new AzureGlobalLock(new CancellationToken(), this.LockStateProvider, new AzureLockState { LockingBlobContainer = this.LockContainer }, this.LogService).LockAsync(lockName);
 		}
 
 
@@ -251,7 +251,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// </returns>
 		public Task<IGlobalLock> CreateLockAsync(string lockName, CancellationToken cancelToken)
 		{
-			return new AzureGlobalLock(cancelToken, this.LockStateProvider, new AzureLockState {LockingBlobContainer = this.LockContainer}, this.LogService).LockAsync(lockName, null);
+			return new AzureGlobalLock(cancelToken, this.LockStateProvider, new AzureLockState { LockingBlobContainer = this.LockContainer }, this.LogService).LockAsync(lockName);
 		}
 
 
