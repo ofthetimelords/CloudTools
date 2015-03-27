@@ -42,7 +42,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		/// <summary>Used as the prefix of an overflown message.</summary>
 		public static readonly string OverflownMessagePrefix = "*Overflown*";
 
-		internal static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings {PreserveReferencesHandling = PreserveReferencesHandling.All};
+//		internal static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings {PreserveReferencesHandling = PreserveReferencesHandling.All};
 		private readonly string _queueName;
 		private object _data;
 		private bool _initialized;
@@ -198,7 +198,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 				{
 					this.LogService.QuickLogDebug(
 						"QueueMessageWrapper",
-						"The message with ID '{0}' on queue '{1}' was an overflown message; procedding to decode download data from the respective BLOB",
+						"The message with ID '{0}' on queue '{1}' was an overflown message; proceeding to download data from the respective BLOB",
 						this.ActualMessage.Id,
 						this._queueName);
 					this.WasOverflown = true;

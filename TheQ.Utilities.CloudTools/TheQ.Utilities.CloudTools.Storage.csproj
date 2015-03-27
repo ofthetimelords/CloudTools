@@ -57,9 +57,8 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.4.0.38\lib\net40\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -72,12 +71,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blob\BlobExtensions.cs" />
+    <Compile Include="ExtendedQueue\Decorators\LoggingDecorator.cs" />
+    <Compile Include="ExtendedQueue\Decorators\JsonSerialiserDecorator.cs" />
+    <Compile Include="ExtendedQueue\Decorators\OverflowToBlobDecorator.cs" />
+    <Compile Include="ExtendedQueue\Decorators\CompressionDecorator.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Add.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.cs" />
+    <Compile Include="ExtendedQueue\ObjectModel\IMaximumMessageSizeProvider.cs" />
+    <Compile Include="ExtendedQueue\ObjectModel\IOverflownMessageHandler.cs" />
+    <Compile Include="ExtendedQueue\ObjectModel\IExtendedQueueFactory.cs" />
     <Compile Include="GlobalLockFramework\GlobalLockBase.cs" />
     <Compile Include="GlobalLockFramework\ILockState.cs" />
     <Compile Include="GlobalLockFramework\ILockStateProvider.cs" />
     <Compile Include="GlobalLockFramework\IGlobalLock.cs" />
     <Compile Include="GlobalLockFramework\IGlobalLockFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Infrastructure\NullLogService.cs" />
     <Compile Include="Infrastructure\ILogService.cs" />
     <Compile Include="Internal\CodeAnnotations.cs" />
     <Compile Include="Internal\Guard.cs" />
@@ -96,15 +105,17 @@
     <Compile Include="Models\ObjectModel\IQueueMesssage.cs" />
     <Compile Include="Models\ObjectModel\IQueue.cs" />
     <Compile Include="Models\ObjectModel\IQueueMessageProvider.cs" />
-    <Compile Include="Queues\QueueExtensions.Exceptions.cs" />
-    <Compile Include="Queues\QueueExtensions.ProcessBatch.cs" />
-    <Compile Include="Queues\QueueExtensions.Process.cs" />
-    <Compile Include="Queues\QueueExtensions.KeepAlive.cs" />
-    <Compile Include="Queues\QueueExtensions.Add.cs" />
-    <Compile Include="Queues\QueueExtensions.Parallel.cs" />
-    <Compile Include="Queues\QueueExtensions.Batch.cs" />
-    <Compile Include="Queues\QueueExtensions.Serial.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueue.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.Exceptions.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.ProcessBatch.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.Process.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.KeepAlive.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.Add.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.Parallel.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.Batch.cs" />
+    <Compile Include="ExtendedQueue\__OLD__\QueueExtensions.Serial.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ExtendedQueue\ObjectModel\IExtendedQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

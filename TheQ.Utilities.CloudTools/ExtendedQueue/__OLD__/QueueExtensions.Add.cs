@@ -77,7 +77,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Queues
 			Guard.NotNull(overflowContainer, "overflowContainer");
 
 			//			var maxSize = (IQueueMessage.MaxMessageSize * 3) / 4;
-			var maxSize = maxMessageSize/4;
+			var maxSize = maxMessageSize*3/4;
 
 			var stringSource = source as string;
 			var serialized = stringSource ?? JsonConvert.SerializeObject(source, QueueMessageWrapper.JsonSettings);
