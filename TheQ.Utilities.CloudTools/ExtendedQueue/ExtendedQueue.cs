@@ -35,7 +35,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			this.OriginalQueue = original;
 			this.MessageProvider = messageProvider;
-			this.MaximumMessageSize = maximumMessageSizeProvider;
+			this.MaximumMessageProvider = maximumMessageSizeProvider;
 		}
 
 		protected internal override string SerializeMessageEntity(object messageEntity)
@@ -60,7 +60,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			return this.AddMessageAsync(this.MessageProvider.Create(messageContents), token);
+			return (this as IQueue).AddMessageAsync(this.MessageProvider.Create(messageContents), token);
 		}
 
 

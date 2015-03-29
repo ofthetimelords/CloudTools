@@ -47,6 +47,9 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Threading.Tasks">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
@@ -57,8 +60,9 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\packages\ServiceStack.Text.4.0.38\lib\net40\ServiceStack.Text.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,6 +79,9 @@
     <Compile Include="ExtendedQueue\Decorators\JsonSerialiserDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\OverflowHandlingDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\CompressionDecorator.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Exceptions.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Process.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Serial.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Add.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.cs" />
     <Compile Include="ExtendedQueue\DefaultExtendedQueueFactory.cs" />

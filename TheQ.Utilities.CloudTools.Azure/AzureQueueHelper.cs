@@ -66,7 +66,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			try
 			{
-				await ((AzureQueue) queue).AddSafeMessage(source, (AzureBlobContainer) overflowContainer, AzureQueueMessageProviderInstance, CloudQueueMessage.MaxMessageSize, logService);
+				//await ((AzureQueue) queue).AddSafeMessage(source, (AzureBlobContainer) overflowContainer, AzureQueueMessageProviderInstance, CloudQueueMessage.MaxMessageSize, logService);
 			}
 			catch (StorageException ex)
 			{

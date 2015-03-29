@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Models;
+using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
@@ -59,9 +60,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		{
 			var id = Guid.NewGuid().ToString("D", CultureInfo.InvariantCulture);
 
-			await this.OverflownMessageHandler.Serialize(messageContents, id).ConfigureAwait(false);
+			await this.OverflownMessageHandler.Serialize(messageContents, id, this.Name, token).ConfigureAwait(false);
 			var messagePointer = this.MessageProvider.Create(string.Concat(QueueMessageWrapper.OverflownMessagePrefix, id));
-			await this.AddMessageAsync(messagePointer, token).ConfigureAwait(false);
+			await (this as IQueue).AddMessageAsync(messagePointer, token).ConfigureAwait(false);
 		}
 	}
 }

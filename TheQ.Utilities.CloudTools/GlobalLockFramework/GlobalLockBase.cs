@@ -294,7 +294,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				if (ex.HttpStatusCode != 404 && ex.HttpStatusCode != 409)
+				if (ex.StatusCode != 404 && ex.StatusCode != 409)
 				{
 					this.LogService.QuickLogError("GlobalLock", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
 					if (throwOnError) throw;
@@ -550,7 +550,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 			catch (CloudToolsStorageException ex)
 			{
 				// 409 a lease is already present
-				if (ex.ErrorCode != "LeaseAlreadyPresent" && ex.HttpStatusCode != (int) HttpStatusCode.Conflict)
+				if (ex.ErrorCode != "LeaseAlreadyPresent" && ex.StatusCode != (int) HttpStatusCode.Conflict)
 				{
 					this.LogService.QuickLogError("GlobalLock", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
 					throw;

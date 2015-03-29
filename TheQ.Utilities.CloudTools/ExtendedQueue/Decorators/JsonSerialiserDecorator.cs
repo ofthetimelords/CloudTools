@@ -7,8 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using ServiceStack;
-using ServiceStack.Text;
+using Newtonsoft.Json;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
@@ -27,7 +26,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override string SerializeMessageEntity(object messageEntity) { return messageEntity.ToJsv(); }
+		protected internal override string SerializeMessageEntity(object messageEntity) { return JsonConvert.SerializeObject(messageEntity, Formatting.None); }
 
 
 		protected internal override Stream GetByteConverter(Stream originalConverter) { return this.DecoratedQueue.GetByteConverter(originalConverter); }

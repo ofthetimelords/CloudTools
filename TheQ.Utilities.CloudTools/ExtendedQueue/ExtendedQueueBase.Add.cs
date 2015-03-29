@@ -15,9 +15,6 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
-	/// <summary>
-	/// A wrapper around an <see cref="IQueue"/> implementation that provides extended functionality (through decoration).
-	/// </summary>
 	public abstract partial class ExtendedQueueBase
 	{
 		public void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity).ConfigureAwait(false).GetAwaiter().GetResult(); }
@@ -32,7 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(entity, "entity");
 
-			var maxSize = this.MaximumMessageSize*3/4;
+			var maxSize = this.MaximumMessageProvider.MaximumMessageSize *3/4;
 
 			var stringSource = entity as string;
 			var serialized = stringSource ?? this.SerializeMessageEntity(entity);

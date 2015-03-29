@@ -128,7 +128,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Queues
 					}
 					catch (CloudToolsStorageException ex)
 					{
-						if (ex.HttpStatusCode != 404 && ex.HttpStatusCode != 409 && ex.HttpStatusCode != 412)
+						if (ex.StatusCode != 404 && ex.StatusCode != 409 && ex.StatusCode != 412)
 						{
 							// Anything other than "not found" or "already exists" conditions will be considered as a runtime error.
 							loggingService.QuickLogDebug(

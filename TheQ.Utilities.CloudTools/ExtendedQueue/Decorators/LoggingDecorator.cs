@@ -7,9 +7,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using ServiceStack;
-using ServiceStack.Text;
-
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
@@ -59,6 +56,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
 			}
+
+			return string.Empty;
 		}
 
 
@@ -76,6 +75,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
 			}
+
+			return Stream.Null;
 		}
 
 
