@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models;
@@ -27,14 +28,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="original">The original queue to be wrapped.</param>
 		/// <exception cref="ArgumentNullException">The parameter was null: + <paramref name="original" /></exception>
-		public ExtendedQueue([NotNull] IQueue original, IQueueMessageProvider messageProvider, int maximumMessageSize)
+		public ExtendedQueue([NotNull] IQueue original, IQueueMessageProvider messageProvider, IMaximumMessageSizeProvider maximumMessageSizeProvider)
 		{
 			Guard.NotNull(original, "original");
 			Guard.NotNull(messageProvider, "messageProvider");
 
 			this.OriginalQueue = original;
 			this.MessageProvider = messageProvider;
-			this.MaximumMessageSize = maximumMessageSize;
+			this.MaximumMessageSize = maximumMessageSizeProvider;
 		}
 
 		protected internal override string SerializeMessageEntity(object messageEntity)
@@ -57,16 +58,23 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal override Task AddNonOverflownMessage(byte[] messageContents)
+		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			return this.AddMessageAsync(this.MessageProvider.Create(messageContents));
+			return this.AddMessageAsync(this.MessageProvider.Create(messageContents), token);
 		}
 
 
 
-		protected internal override async Task AddOverflownMessage(byte[] messageContents)
+		/// <summary>
+		/// Adds the overflown message.
+		/// </summary>
+		/// <param name="messageContents">The message contents.</param>
+		/// <param name="token">The token.</param>
+		/// <returns></returns>
+		/// <exception cref="System.ArgumentException">Message wouldn't fit in the Queue.</exception>
+		protected internal override async Task AddOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			throw new InvalidOperationException("Message wouldn't fit in the Queue!");
+			throw new ArgumentException("Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes", "messageContents");
 		}
 	}
 }

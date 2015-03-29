@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
@@ -14,6 +15,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	{
 		Task AddMessageEntityAsync([NotNull] object entity);
 
+
+		Task AddMessageEntityAsync([NotNull] object entity, CancellationToken token);
 
 
 		void AddMessageEntity([NotNull] object entity);

@@ -1,15 +1,8 @@
-﻿// <copyright file="AzureQueueMessageProvider.cs" company="nett">
-//      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
-//      Please see the License.txt file for more information. All other rights reserved.
-// </copyright>
-// <author>James Kavakopoulos</author>
-// <email>ofthetimelords@gmail.com</email>
-// <date>2015/02/06</date>
-// <summary>
-// 
-// </summary>
-
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using Microsoft.WindowsAzure.Storage.Queue;
 
@@ -18,11 +11,8 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
-namespace TheQ.Utilities.CloudTools.Azure
+namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 {
-	/// <summary>
-	///     An implementation of <see cref="IQueueMessageProvider" /> for Windows Azure.
-	/// </summary>
 	public class AzureQueueMessageProvider : IQueueMessageProvider
 	{
 		/// <summary>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models;
@@ -20,7 +21,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	/// </summary>
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
-		protected int MaximumMessageSize { get; set; }
+		protected IMaximumMessageSizeProvider MaximumMessageSize { get; set; }
 
 
 		protected IQueue OriginalQueue { get; set; }
@@ -63,7 +64,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task AddMessageAsync(IQueueMessage message)
+		Task IQueue.AddMessageAsync(IQueueMessage message)
 		{
 			return this.OriginalQueue.AddMessageAsync(message);
 		}
@@ -85,7 +86,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task AddMessageAsync(IQueueMessage message, CancellationToken cancellationToken)
+		Task IQueue.AddMessageAsync(IQueueMessage message, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.AddMessageAsync(message, cancellationToken);
 		}
@@ -101,7 +102,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount)
+		Task<IEnumerable<IQueueMessage>> IQueue.GetMessagesAsync(int messageCount)
 		{
 			return this.OriginalQueue.GetMessagesAsync(messageCount);
 		}
@@ -121,7 +122,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount, CancellationToken cancellationToken)
+		Task<IEnumerable<IQueueMessage>> IQueue.GetMessagesAsync(int messageCount, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.GetMessagesAsync(messageCount, cancellationToken);
 		}
@@ -144,7 +145,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task<IQueueMessage> GetMessageAsync(TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
+		Task<IQueueMessage> IQueue.GetMessageAsync(TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.GetMessageAsync(visibilityTimeout, cancellationToken);
 		}
@@ -169,7 +170,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount, TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
+		Task<IEnumerable<IQueueMessage>> IQueue.GetMessagesAsync(int messageCount, TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.GetMessagesAsync(messageCount, visibilityTimeout, cancellationToken);
 		}
@@ -183,7 +184,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>An <see cref="IQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
-		public void DeleteMessage(IQueueMessage message)
+		void IQueue.DeleteMessage(IQueueMessage message)
 		{
 			this.OriginalQueue.DeleteMessage(message);
 		}
@@ -195,7 +196,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messageId">A string specifying the message ID.</param>
 		/// <param name="popReceipt">A string specifying the pop receipt value.</param>
-		public void DeleteMessage(string messageId, string popReceipt)
+		void IQueue.DeleteMessage(string messageId, string popReceipt)
 		{
 			this.OriginalQueue.DeleteMessage(messageId, popReceipt);
 		}
@@ -221,7 +222,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields)
+		Task IQueue.UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields)
 		{
 			return this.OriginalQueue.UpdateMessageAsync(message, visibilityTimeout, updateFields);
 		}
@@ -251,7 +252,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields, CancellationToken cancellationToken)
+		Task IQueue.UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.UpdateMessageAsync(message, visibilityTimeout, updateFields, cancellationToken);
 		}

@@ -28,12 +28,12 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="baseException">The base exception.</param>
-		/// <param name="statusCode">The HTTP status code.</param>
+		/// <param name="statusCode">The exception's status code.</param>
 		/// <param name="errorCode">The specific error code.</param>
 		public CloudToolsStorageException(Exception baseException, int? statusCode, string errorCode)
 			: base(baseException.Message, baseException)
 		{
-			this.HttpStatusCode = statusCode;
+			this.StatusCode = statusCode;
 			this.ErrorCode = errorCode;
 		}
 
@@ -81,19 +81,19 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// </param>
 		protected CloudToolsStorageException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
-			this.HttpStatusCode = info.GetValue("HttpStatusCode", typeof (int?)) as int?;
+			this.StatusCode = info.GetValue("StatusCode", typeof (int?)) as int?;
 			this.ErrorCode = info.GetString("ErrorCode");
 		}
 
 
 
 		/// <summary>
-		///     Gets the HTTP status code.
+		///     Gets the status code of the exception if valid.
 		/// </summary>
 		/// <value>
 		///     An integer representing a valid status code.
 		/// </value>
-		public int? HttpStatusCode { get; private set; }
+		public int? StatusCode { get; private set; }
 
 
 		/// <summary>
@@ -129,10 +129,21 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// </PermissionSet>
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("HttpStatusCode", this.HttpStatusCode);
+			info.AddValue("StatusCode", this.StatusCode);
 			info.AddValue("ErrorCode", this.ErrorCode);
 
 			base.GetObjectData(info, context);
 		}
+
+
+
+		/// <summary>
+		/// Creates and returns a string representation of the current exception.
+		/// </summary>
+		/// <returns>
+		/// A string representation of the current exception.
+		/// </returns>
+		/// <PermissionSet><IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" PathDiscovery="*AllFiles*"/></PermissionSet>
+		public override string ToString() { return base.ToString() + Environment.NewLine + "[Status Code: " + (this.StatusCode) + "][Error Code:" + this.ErrorCode + "]"; }
 	}
 }

@@ -159,14 +159,14 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		/// <returns></returns>
 		public T GetMessageContents<T>()
 		{
-			if (!this._initialized)
-			{
-				this.LogService.QuickLogDebug("QueueMessageWrapper", "Attempting to read and initialise the contents of message with ID '{0}' on queue '{1}'", this.ActualMessage.Id, this._queueName);
-				if (typeof (T) == typeof (string)) this._data = this.MessageContentsRaw;
-				else this._data = JsonConvert.DeserializeObject<T>(this.MessageContentsRaw, JsonSettings);
+			//if (!this._initialized)
+			//{
+			//	this.LogService.QuickLogDebug("QueueMessageWrapper", "Attempting to read and initialise the contents of message with ID '{0}' on queue '{1}'", this.ActualMessage.Id, this._queueName);
+			//	if (typeof (T) == typeof (string)) this._data = this.MessageContentsRaw;
+			//	else this._data = JsonConvert.DeserializeObject<T>(this.MessageContentsRaw, JsonSettings);
 
-				this._initialized = true;
-			}
+			//	this._initialized = true;
+			//}
 
 			return (T) this._data;
 		}

@@ -24,7 +24,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		public virtual async Task AddMessageEntityAsync(object entity)
+		public virtual Task AddMessageEntityAsync(object entity) { return this.AddMessageEntityAsync(entity, CancellationToken.None); }
+
+
+
+		public virtual async Task AddMessageEntityAsync(object entity, CancellationToken token)
 		{
 			Guard.NotNull(entity, "entity");
 
@@ -36,25 +40,21 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			var messageAsBytes = await this.MessageContentsToByteArray(serialized).ConfigureAwait(false);
 			messageAsBytes = this.PostProcessMessage(messageAsBytes);
 
-			if (messageAsBytes.Length < maxSize) await this.AddNonOverflownMessage(messageAsBytes).ConfigureAwait(false);
-			else await this.AddOverflownMessage(messageAsBytes).ConfigureAwait(false);
+			if (messageAsBytes.Length < maxSize) await this.AddNonOverflownMessage(messageAsBytes, token).ConfigureAwait(false);
+			else await this.AddOverflownMessage(messageAsBytes, token).ConfigureAwait(false);
 		}
 
 
 
 		protected virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{
-			byte[] bytes;
-
 			using (var converter = new MemoryStream(serializedContents.Length))
 			using (var decoratedConverter = this.GetByteConverter(converter))
 			using (var writer = new StreamWriter(decoratedConverter))
 			{
 				await writer.WriteAsync(serializedContents).ConfigureAwait(false);
-				bytes = converter.ToArray();
+				return converter.ToArray();
 			}
-
-			return bytes;
 		}
 
 
@@ -71,10 +71,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal abstract Task AddNonOverflownMessage(byte[] messageContents);
+		protected internal abstract Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token);
 
 
 
-		protected internal abstract Task AddOverflownMessage(byte[] messageContents);
+		protected internal abstract Task AddOverflownMessage(byte[] messageContents, CancellationToken token);
 	}
 }

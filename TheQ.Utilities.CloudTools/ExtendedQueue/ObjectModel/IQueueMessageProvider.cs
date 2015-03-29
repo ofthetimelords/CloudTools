@@ -11,9 +11,11 @@
 
 using System.Linq;
 
+using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
-namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
+
+namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 {
 	/// <summary>
 	///     Allows the generation of a <see cref="IQueueMessage" /> instance.

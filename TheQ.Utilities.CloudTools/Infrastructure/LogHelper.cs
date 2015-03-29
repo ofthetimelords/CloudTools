@@ -20,10 +20,14 @@ using TheQ.Utilities.CloudTools.Storage.Models;
 
 namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 {
-	public static class LogHelper
+	internal static class LogHelper
 	{
 		[StringFormatMethod("message")]
-		public static void QuickLogDebug([CanBeNull] this HandleMessageOptionsBase options, [NotNull] string category, [NotNull] string message, [NotNull] params object[] formatArguments)
+		public static void QuickLogDebug(
+			[CanBeNull] this HandleMessageOptionsBase options,
+			[NotNull] string category,
+			[NotNull] string message,
+			[NotNull] params object[] formatArguments)
 		{
 			(options != null && options.LogService != null ? options.LogService : null).QuickLogDebug(category, message, formatArguments);
 		}
@@ -33,7 +37,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 		[StringFormatMethod("message")]
 		public static void QuickLogDebug([CanBeNull] this ILogService logService, [NotNull] string category, [NotNull] string message, [NotNull] params object[] formatArguments)
 		{
-			if (logService != null) logService.Debug(string.Format(CultureInfo.InvariantCulture, message, formatArguments), "TheQ/CloudTools/" + category);
+			if (logService != null) logService.Debug(string.Format(CultureInfo.InvariantCulture, message, formatArguments), "TheQ.CloudTools." + category);
 		}
 
 
@@ -59,7 +63,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 			[NotNull] string message,
 			[NotNull] params object[] formatArguments)
 		{
-			if (logService != null) logService.Error(exception, "TheQ/CloudTools/" + category, string.Format(CultureInfo.InvariantCulture, message, formatArguments));
+			if (logService != null && exception != null) 
+				logService.Error(exception, "TheQ.CloudTools." + category, string.Format(CultureInfo.InvariantCulture, message, formatArguments));
 		}
 	}
 }

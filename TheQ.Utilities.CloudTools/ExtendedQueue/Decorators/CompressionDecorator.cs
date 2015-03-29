@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Internal;
@@ -17,6 +18,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 	{
 		private ExtendedQueueBase DecoratedQueue { get; set; }
 
+
 		public CompressionDecorator(ExtendedQueueBase decoratedQueue) { this.DecoratedQueue = decoratedQueue; }
 
 
@@ -29,9 +31,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override byte[] PostProcessMessage(byte[] originalContents) { return this.DecoratedQueue.PostProcessMessage(originalContents); }
 
 
-		protected internal override Task AddNonOverflownMessage(byte[] messageContents) { return this.DecoratedQueue.AddNonOverflownMessage(messageContents); }
+
+		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
+		{
+			return this.DecoratedQueue.AddNonOverflownMessage(messageContents, token);
+		}
 
 
-		protected internal override Task AddOverflownMessage(byte[] messageContents) { return this.DecoratedQueue.AddOverflownMessage(messageContents); }
+
+		protected internal override Task AddOverflownMessage(byte[] messageContents, CancellationToken token) { return this.DecoratedQueue.AddOverflownMessage(messageContents, token); }
 	}
 }
