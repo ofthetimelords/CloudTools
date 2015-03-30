@@ -88,7 +88,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected virtual async Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
+		protected internal virtual async Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
 		{
 			using (var converter = new MemoryStream(messageBytes))
 			using (var decoratedConverter = this.GetByteDecoder(converter))

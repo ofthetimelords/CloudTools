@@ -21,13 +21,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	/// </summary>
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
-		protected IMaximumMessageSizeProvider MaximumMessageProvider { get; set; }
+		protected internal virtual IMaximumMessageSizeProvider MaximumMessageProvider { get; set; }
 
 
-		protected IQueue OriginalQueue { get; set; }
+		protected internal virtual IQueue OriginalQueue { get; set; }
 
 
-		protected IQueueMessageProvider MessageProvider { get; set; }
+		protected internal virtual IQueueMessageProvider MessageProvider { get; set; }
 
 
 		public Task HandleMessagesInBatchAsync(HandleBatchMessageOptions messageOptions) { throw new NotImplementedException(); }
@@ -43,7 +43,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <value>
 		///     A string containing the name of the queue.
 		/// </value>
-		public string Name
+		public virtual string Name
 		{
 			get { return this.OriginalQueue.Name; }
 		}

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
@@ -30,6 +31,39 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 		protected ExtendedQueueBase DecoratedQueue { get; private set; }
+
+
+		protected internal override IQueueMessageProvider MessageProvider
+		{
+			get { return this.DecoratedQueue.MessageProvider; }
+			set { this.DecoratedQueue.MessageProvider = value; }
+		}
+
+
+		/// <summary>
+		///     Gets the name of the queue.
+		/// </summary>
+		/// <value>
+		///     A string containing the name of the queue.
+		/// </value>
+		public override string Name
+		{
+			get { return this.DecoratedQueue.Name; }
+		}
+
+
+		protected internal override IMaximumMessageSizeProvider MaximumMessageProvider
+		{
+			get { return this.DecoratedQueue.MaximumMessageProvider; }
+			set { this.DecoratedQueue.MaximumMessageProvider = value; }
+		}
+
+
+		protected internal override IQueue OriginalQueue
+		{
+			get { return this.DecoratedQueue.OriginalQueue; }
+			set { this.DecoratedQueue.OriginalQueue = value; }
+		}
 
 
 		protected internal override string SerializeMessageEntity(object messageEntity) { return this.DecoratedQueue.SerializeMessageEntity(messageEntity); }

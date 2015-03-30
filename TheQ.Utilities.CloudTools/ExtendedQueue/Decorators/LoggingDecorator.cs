@@ -107,15 +107,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		public override Task AddMessageEntityAsync(object entity)
 		{
 			return this.LogAction(
-				() => base.AddMessageEntityAsync(entity), "Unexpected exception occurred while adding a message to the queue.");
+				() => this.DecoratedQueue.AddMessageEntityAsync(entity), "Unexpected exception occurred while adding a message to the queue.");
 		}
 
 
 
-		protected override Task<byte[]> MessageContentsToByteArray(string serializedContents)
+		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{
 			return this.LogAction(
-				() => base.MessageContentsToByteArray(serializedContents),
+				() => this.DecoratedQueue.MessageContentsToByteArray(serializedContents),
 				"Unexpected exception occurred while adding a message to the queue (converting the message's contents to a byte array)");
 		}
 
@@ -124,15 +124,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		public override Task AddMessageEntityAsync(object entity, CancellationToken token)
 		{
 			return this.LogAction(
-				() => base.AddMessageEntityAsync(entity, token), "Unexpected exception occurred while adding a message to the queue");
+				() => this.DecoratedQueue.AddMessageEntityAsync(entity, token), "Unexpected exception occurred while adding a message to the queue");
 		}
 
 
 
-		protected override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
+		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
 		{
 			return this.LogAction(
-				() => base.ByteArrayToSerializedMessageContents(messageBytes),
+				() => this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes),
 				"Unexpected exception occurred while retrieving a message from the queue (converting the the byte array representation of message's contents to a serialized string)");
 		}
 
@@ -141,7 +141,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token)
 		{
 			return this.LogAction(
-				() => ((ExtendedQueueBase) this).DecodeMessageAsync<T>(wrapper, token),
+				() => this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token),
 				"Unexpected exception occurred while retrieving a message from the queue (decoding the message)");
 		}
 
@@ -150,16 +150,16 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override T DeserializeToObject<T>(string serializedContents)
 		{
 			return this.LogAction(
-				() => base.DeserializeToObject<T>(serializedContents),
+				() => this.DecoratedQueue.DeserializeToObject<T>(serializedContents),
 				"Unexpected exception occurred while retrieving a message from the queue (deserializing the message to an object)");
 		}
 
 
 
-		protected override Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
+		protected internal override Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			return this.LogAction(
-				() => base.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource),
+				() => this.DecoratedQueue.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource),
 				"Unexpected exception occurred while retrieving a message from the queue");
 		}
 
@@ -168,7 +168,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override Task<byte[]> GetNonOverflownMessageContentsAsync(IQueueMessage message, CancellationToken token)
 		{
 			return this.LogAction(
-				() => base.GetNonOverflownMessageContentsAsync(message, token),
+				() => this.DecoratedQueue.GetNonOverflownMessageContentsAsync(message, token),
 				"");
 		}
 
@@ -177,7 +177,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token)
 		{
 			return this.LogAction(
-				() => base.GetOverflownMessageContentsAsync(message, id, token),
+				() => this.DecoratedQueue.GetOverflownMessageContentsAsync(message, id, token),
 				"");
 		}
 
@@ -186,32 +186,32 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override string GetOverflownMessageId(IQueueMessage message)
 		{
 			return this.LogAction(
-				() => base.GetOverflownMessageId(message),
+				() => this.DecoratedQueue.GetOverflownMessageId(message),
 				"");
 		}
 
 
 
-		protected override void HandleGeneralExceptions(HandleMessageOptionsBase messageOptions, Exception ex, bool parallelYetExternal = false)
+		protected internal override void HandleGeneralExceptions(HandleMessageOptionsBase messageOptions, Exception ex, bool parallelYetExternal = false)
 		{
 			this.LogAction(
-				() => base.HandleGeneralExceptions(messageOptions, ex, parallelYetExternal),
+				() => this.DecoratedQueue.HandleGeneralExceptions(messageOptions, ex, parallelYetExternal),
 				"");
 		}
 
-		protected override void HandleStorageExceptions(HandleMessageOptionsBase messageOptions, CloudToolsStorageException ex)
+		protected internal override void HandleStorageExceptions(HandleMessageOptionsBase messageOptions, CloudToolsStorageException ex)
 		{
 			this.LogAction(
-				() => base.HandleStorageExceptions(messageOptions, ex),
+				() => this.DecoratedQueue.HandleStorageExceptions(messageOptions, ex),
 				"");
 		}
 
 
 
-		protected override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		protected internal override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
 		{
 			this.LogAction(
-				() => base.HandleTaskCancelled(messageOptions),
+				() => this.DecoratedQueue.HandleTaskCancelled(messageOptions),
 				"");
 		}
 
@@ -220,19 +220,21 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override Task RemoveOverflownContentsAsync(QueueMessageWrapper message, CancellationToken token)
 		{
 			return this.LogAction(
-				() => base.RemoveOverflownContentsAsync(message, token),
+				() => this.DecoratedQueue.RemoveOverflownContentsAsync(message, token),
 				"");
 		}
 
 
 
-		protected override void SerialFinallyHandler(
+		protected internal override void SerialFinallyHandler(
 			HandleSerialMessageOptions messageOptions,
 			Task keepAliveTask,
 			IQueueMessage message,
 			CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
-			base.SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
+			this.LogAction(
+				() => this.DecoratedQueue.SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource),
+				"");
 		}
 
 

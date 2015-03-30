@@ -17,7 +17,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		protected virtual void HandleStorageExceptions([CanBeNull] HandleMessageOptionsBase messageOptions, [CanBeNull] CloudToolsStorageException ex)
+		protected internal virtual void HandleStorageExceptions([CanBeNull] HandleMessageOptionsBase messageOptions, [CanBeNull] CloudToolsStorageException ex)
 		{
 			if (Guard.IsAnyNull(messageOptions, ex)) return;
 
@@ -43,7 +43,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected virtual void HandleGeneralExceptions(
+		protected internal virtual void HandleGeneralExceptions(
 			[CanBeNull] HandleMessageOptionsBase messageOptions,
 			[CanBeNull] Exception ex,
 			bool parallelYetExternal = false)

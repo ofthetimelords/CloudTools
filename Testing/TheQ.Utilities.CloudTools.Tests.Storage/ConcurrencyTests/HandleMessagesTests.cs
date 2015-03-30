@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TheQ.Utilities.AzureTools.Tests.Storage.Models;
 using TheQ.Utilities.CloudTools.Azure;
+using TheQ.Utilities.CloudTools.Azure.ExtendedQueue;
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators;
 using TheQ.Utilities.CloudTools.Storage.Models;
 
 
@@ -28,59 +30,60 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 	[TestClass]
 	public class HandleMessagesTests
 	{
-		//[TestMethod]
-		//public void TestSerial_NormalProcessing()
-		//{
-		//	// Arrange
-		//	const int runCount = 300;
-		//	var client = new CloudEnvironment();
-		//	var overflow = client.BlobClient.GetContainerReference("overflownqueues-1");
-		//	var queue = client.QueueClient.GetQueueReference("test1");
-		//	var result = string.Empty;
-		//	var expected = string.Empty;
-		//	var sw = new Stopwatch();
-		//	for (var i = 0; i < runCount; i++) expected += i.ToString(CultureInfo.InvariantCulture);
+		[TestMethod]
+		public void TestSerial_NormalProcessing()
+		{
+			// Arrange
+			const int runCount = 300;
+			var client = new CloudEnvironment();
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-1");
+			var queue = client.QueueClient.GetQueueReference("test1");
+			var result = string.Empty;
+			var expected = string.Empty;
+			var sw = new Stopwatch();
+			var factory = new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factory.Create(new AzureQueue(queue));
 
-		//	using (var mre = new ManualResetEvent(false))
-		//	{
-		//		var options = new HandleSerialMessageOptions(
-		//			TimeSpan.FromSeconds(0),
-		//			TimeSpan.FromMinutes(2),
-		//			TimeSpan.FromSeconds(30),
-		//			5,
-		//			new ConsoleLogService(),
-		//			new CancellationToken(),
-		//			(AzureBlobContainer) overflow,
-		//			message =>
-		//			{
-		//				if (message.GetMessageContents<string>() == "END")
-		//				{
-		//					mre.Set();
-		//					return true;
-		//				}
+			for (var i = 0; i < runCount; i++) expected += i.ToString(CultureInfo.InvariantCulture);
 
-		//				result += message.GetMessageContents<string>();
-		//				return true;
-		//			},
-		//			null,
-		//			ex => { throw ex; });
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleSerialMessageOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					5,
+					new CancellationToken(),
+					message =>
+					{
+						if (message.GetMessageContents<string>() == "END")
+						{
+							mre.Set();
+							return true;
+						}
 
-		//		// Act
-		//		sw.Start();
-		//		queue.CreateIfNotExists();
-		//		overflow.CreateIfNotExists();
-		//		queue.Clear();
-		//		for (var i = 0; i < runCount; i++) queue.AddSafeMessage(i.ToString(CultureInfo.InvariantCulture), overflow).Wait();
-		//		queue.AddSafeMessage("END", overflow);
-		//		queue.HandleMessages(options);
+						result += message.GetMessageContents<string>();
+						return true;
+					},
+					null,
+					ex => { throw ex; });
 
-		//		// Assert
-		//		mre.WaitOne();
-		//		sw.Stop();
-		//		Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
-		//		Assert.AreEqual(expected, result);
-		//	}
-		//}
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				for (var i = 0; i < runCount; i++) equeue.AddMessageEntity(i.ToString(CultureInfo.InvariantCulture));
+				equeue.AddMessageEntity("END");
+				equeue.HandleMessagesAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.AreEqual(expected, result);
+			}
+		}
 
 
 

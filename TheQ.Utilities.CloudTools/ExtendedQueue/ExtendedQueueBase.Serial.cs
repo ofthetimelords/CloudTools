@@ -72,21 +72,21 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected virtual void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		protected internal virtual void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
 		{
 			//messageOptions.QuickLogDebug("HandleMessages", "The message checking task was cancelled on queue '{0}'", queue.Name);
 		}
 
 
 
-		protected virtual async Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
+		protected internal virtual async Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			return await (this as IQueue).GetMessageAsync(messageOptions.MessageLeaseTime, messageOptions.CancelToken).ConfigureAwait(false);
 		}
 
 
 
-		protected virtual void SerialFinallyHandler(
+		protected internal virtual void SerialFinallyHandler(
 			[CanBeNull] HandleSerialMessageOptions messageOptions,
 			[CanBeNull] Task keepAliveTask,
 			[CanBeNull] IQueueMessage message,
