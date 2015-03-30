@@ -51,10 +51,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		}
 
 
-		protected internal override IMaximumMessageSizeProvider MaximumMessageProvider
+		protected internal override IMaximumMessageSizeProvider MaximumSizeProvider
 		{
-			get { return this.DecoratedQueue.MaximumMessageProvider; }
-			set { this.DecoratedQueue.MaximumMessageProvider = value; }
+			get { return this.DecoratedQueue.MaximumSizeProvider; }
+			set { this.DecoratedQueue.MaximumSizeProvider = value; }
 		}
 
 

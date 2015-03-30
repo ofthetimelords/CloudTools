@@ -21,7 +21,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	/// </summary>
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
-		protected internal virtual IMaximumMessageSizeProvider MaximumMessageProvider { get; set; }
+		protected internal virtual IMaximumMessageSizeProvider MaximumSizeProvider { get; set; }
+
+		protected internal virtual IMaximumMessagesPerRequestProvider MaximumMessagesProvider { get; set; }
 
 
 		protected internal virtual IQueue OriginalQueue { get; set; }
@@ -31,9 +33,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		public Task HandleMessagesInBatchAsync(HandleBatchMessageOptions messageOptions) { throw new NotImplementedException(); }
-
-
-		public Task HandleMessagesInParallelAsync(HandleParallelMessageOptions messageOptions) { throw new NotImplementedException(); }
 
 
 

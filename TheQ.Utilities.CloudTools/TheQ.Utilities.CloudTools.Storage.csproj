@@ -81,12 +81,15 @@
     <Compile Include="ExtendedQueue\Decorators\OverflowHandlingDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\CompressionDecorator.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Exceptions.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Batch.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Process.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Retrieve.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Parallel.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Serial.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Add.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.cs" />
     <Compile Include="ExtendedQueue\DefaultExtendedQueueFactory.cs" />
+    <Compile Include="ExtendedQueue\ObjectModel\IMaximumMessagesPerRequestProvider.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IMaximumMessageSizeProvider.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IOverflownMessageHandler.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IExtendedQueueFactory.cs" />

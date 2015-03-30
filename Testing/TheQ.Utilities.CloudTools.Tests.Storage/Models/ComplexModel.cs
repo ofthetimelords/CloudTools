@@ -9,6 +9,8 @@
 // 
 // </summary>
 
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,7 @@ using System.Linq;
 
 namespace TheQ.Utilities.AzureTools.Tests.Storage.Models
 {
+	[Serializable]
 	internal class ComplexModel
 	{
 		public ComplexModel()

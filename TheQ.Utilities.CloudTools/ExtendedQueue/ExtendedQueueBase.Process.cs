@@ -10,6 +10,7 @@
 // </summary>
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -166,6 +167,95 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				// Execute the provided action and if successful, delete the message.
 				if (messageOptions.MessageHandler(message)) this.SyncDeleteMessage(syncToken, message, comboCancelToken);
 			}
+		}
+
+
+
+		/// <summary>
+		///     Handles poison <paramref name="messages" /> by either delegating it to a handler or deleting them if no handler is provided.
+		/// </summary>
+		/// <param name="messages">The list of messages to operate on.</param>
+		/// <param name="queue">The queue the message belongs to.</param>
+		/// <param name="messageOptions">Initialisation options for this method.</param>
+		/// <param name="syncToken">A synchronisation token.</param>
+		/// <param name="loggingService">An object used for logging.</param>
+		/// <returns>
+		///     Returns a list of <paramref name="messages" /> that were not poison <paramref name="messages" /> and should be further processed.
+		/// </returns>
+		private IList<QueueMessageWrapper> WerePoisonMessagesAndRemovedBatch(
+			[NotNull] HandleBatchMessageOptions messageOptions,
+			[NotNull] IList<QueueMessageWrapper> messages,
+			[NotNull] object syncToken)
+		{
+			Guard.NotNull(messageOptions, "messageOptions");
+			Guard.NotNull(messages, "messages");
+			Guard.NotNull(syncToken, "syncToken");
+
+			var poisonMessages = messages.Where(p => p.ActualMessage.DequeueCount > messageOptions.PoisonMessageThreshold).ToList();
+
+			if (poisonMessages.Count == 0) return messages;
+
+			//messageOptions.QuickLogDebug("HandleBatchMessages", "Queue's '{0}' {1} messages were identified as poison message(s)", queue.Name, poisonMessages.Count);
+
+			var handledMessages = messageOptions.PoisonHandler != null ? messageOptions.PoisonHandler(poisonMessages) : new List<QueueMessageWrapper>(poisonMessages);
+
+			//messageOptions.QuickLogDebug("HandleMessages", "Deleting queue's '{0}' poison messages", queue.Name);
+
+			foreach (var message in handledMessages) this.SyncDeleteMessage(syncToken, message, null);
+
+			return messages.Except(handledMessages).ToList();
+		}
+
+
+
+		/// <summary>
+		///     Processes <paramref name="queue" /> <paramref name="messages" /> in batch.
+		/// </summary>
+		/// <param name="messages">The messages to be processed.</param>
+		/// <param name="queue">The queue the <paramref name="messages" /> belong to.</param>
+		/// <param name="keepAliveTask">A task that is responsible for keeping a message alive while being processed.</param>
+		/// <param name="batchCancellationToken">A cancellation token that's responsible for all tasks used in keep-alive.</param>
+		/// <param name="messageOptions">Initialisation options for the method that handles the messages.</param>
+		private void ProcessMessageInternalBatch(
+			[NotNull] IList<QueueMessageWrapper> messages,
+			[CanBeNull] ref Task keepAliveTask,
+			[NotNull] CancellationTokenSource batchCancellationToken,
+			[NotNull] HandleBatchMessageOptions messageOptions)
+		{
+			Guard.NotNull(messages, "messages");
+			Guard.NotNull(messageOptions, "messageOptions");
+
+			var syncToken = new object();
+
+			var oldMessages = messageOptions.TimeWindow.TotalSeconds <= 0
+				? new List<QueueMessageWrapper>()
+				: messages.Where(m => !m.ActualMessage.InsertionTime.HasValue || m.ActualMessage.InsertionTime.Value.UtcDateTime.Add(messageOptions.TimeWindow) < DateTime.UtcNow).ToList();
+			var timeValidMessages = messages.Except(oldMessages).ToList();
+
+			// Very old messages; delete them and move to the next one
+			if (oldMessages.Count > 0)
+			{
+//				messageOptions.QuickLogDebug("HandleBatchMessages", "Queue's '{0}' {1} messages exceeded the allowed time window and will be deleted", queue.Name, oldMessages.Count);
+
+				foreach (var message in messages) this.SyncDeleteMessage(syncToken, message, null);
+			}
+
+			// Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
+			var toBeProcessedMessages = this.WerePoisonMessagesAndRemovedBatch(messageOptions, timeValidMessages, syncToken);
+
+			if (toBeProcessedMessages.Count == 0) return;
+
+			var generalCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(batchCancellationToken.Token, messageOptions.CancelToken).Token;
+			keepAliveTask = this.KeepMessageAlive(messages, messageOptions.MessageLeaseTime, generalCancellationToken, syncToken);
+
+			//messageOptions.QuickLogDebug("HandleMessages", "Calling handler ('{1}') for message queue's {0} messages", toBeProcessedMessages.Count, queue.Name);
+			var handledMessages = messageOptions.MessageHandler(messages);
+
+			batchCancellationToken.Cancel();
+
+			// Execute the provided action and if successful, delete the message.
+			foreach (var message in handledMessages) 
+				this.SyncDeleteMessage(syncToken, message, null);
 		}
 	}
 }

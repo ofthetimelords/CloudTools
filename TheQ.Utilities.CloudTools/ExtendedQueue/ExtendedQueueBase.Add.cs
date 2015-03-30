@@ -29,7 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(entity, "entity");
 
-			var maxSize = this.MaximumMessageProvider.MaximumMessageSize *3/4;
+			var maxSize = this.MaximumSizeProvider.MaximumMessageSize *3/4;
 
 			var stringSource = entity as string;
 			var serialized = stringSource ?? this.SerializeMessageEntity(entity);

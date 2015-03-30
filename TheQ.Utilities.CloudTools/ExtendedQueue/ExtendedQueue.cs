@@ -28,14 +28,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="original">The original queue to be wrapped.</param>
 		/// <exception cref="ArgumentNullException">The parameter was null: + <paramref name="original" /></exception>
-		public ExtendedQueue([NotNull] IQueue original, IQueueMessageProvider messageProvider, IMaximumMessageSizeProvider maximumMessageSizeProvider)
+		public ExtendedQueue([NotNull] IQueue original, IQueueMessageProvider messageProvider, IMaximumMessageSizeProvider maximumSizeSizeProvider)
 		{
 			Guard.NotNull(original, "original");
 			Guard.NotNull(messageProvider, "messageProvider");
 
 			this.OriginalQueue = original;
 			this.MessageProvider = messageProvider;
-			this.MaximumMessageProvider = maximumMessageSizeProvider;
+			this.MaximumSizeProvider = maximumSizeSizeProvider;
 		}
 
 
