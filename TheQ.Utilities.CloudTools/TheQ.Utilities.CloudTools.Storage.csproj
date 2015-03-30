@@ -77,10 +77,12 @@
     <Compile Include="Blob\BlobExtensions.cs" />
     <Compile Include="ExtendedQueue\Decorators\LoggingDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\JsonSerialiserDecorator.cs" />
+    <Compile Include="ExtendedQueue\Decorators\DecoratorBase.cs" />
     <Compile Include="ExtendedQueue\Decorators\OverflowHandlingDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\CompressionDecorator.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Exceptions.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Process.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.Retrieve.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Serial.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Add.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="ExtendedQueue\ObjectModel\IMaximumMessageSizeProvider.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IOverflownMessageHandler.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IExtendedQueueFactory.cs" />
+    <Compile Include="ExtendedQueue\ExtendedQueueBase.KeepAlive.cs" />
     <Compile Include="GlobalLockFramework\GlobalLockBase.cs" />
     <Compile Include="GlobalLockFramework\ILockState.cs" />
     <Compile Include="GlobalLockFramework\ILockStateProvider.cs" />
@@ -101,7 +104,7 @@
     <Compile Include="Models\ObjectModel\IAccessCondition.cs" />
     <Compile Include="Models\ObjectModel\IBlobProperties.cs" />
     <Compile Include="Models\ObjectModel\CloudToolsStorageException.cs" />
-    <Compile Include="ExtendedQueue\__OLD__\QueueMessageWrapper.cs" />
+    <Compile Include="ExtendedQueue\QueueMessageWrapper.cs" />
     <Compile Include="Infrastructure\DataCompression.cs" />
     <Compile Include="Infrastructure\LogHelper.cs" />
     <Compile Include="Models\HandleMessageOptionsBase.cs" />

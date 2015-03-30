@@ -38,9 +38,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			this.MaximumMessageProvider = maximumMessageSizeProvider;
 		}
 
+
+
 		protected internal override string SerializeMessageEntity(object messageEntity)
 		{
-			// Not a preferrable method!
+			// Not a preferrable method; this is meant to be overriden by a decorator
 			using (var ms = new MemoryStream())
 			{
 				new BinaryFormatter().Serialize(ms, messageEntity);
@@ -50,7 +52,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal override Stream GetByteConverter(Stream originalConverter) { return originalConverter; }
+		protected internal override Stream GetByteEncoder(Stream originalConverter) { return originalConverter; }
+
+		protected internal override Stream GetByteDecoder(Stream originalConverter) { return originalConverter; }
 
 
 
@@ -74,7 +78,45 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <exception cref="System.ArgumentException">Message wouldn't fit in the Queue.</exception>
 		protected internal override async Task AddOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			throw new ArgumentException("Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes", "messageContents");
+			throw new NotSupportedException("Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes.");
 		}
+
+
+
+		protected internal override string GetOverflownMessageId(IQueueMessage message)
+		{
+			// The default implementation does not support overflown messages, so it will have to assume that this is not an overflown message.
+			return string.Empty;
+		}
+
+
+
+		protected internal override Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token)
+		{
+			throw new NotSupportedException("Retrieving overflown messages is not supported by the default ExtendedQueue implementation.");
+		}
+
+
+
+		protected internal override Task<byte[]> GetNonOverflownMessageContentsAsync(IQueueMessage message, CancellationToken token) { return Task.FromResult(message.AsBytes); }
+
+
+
+		protected internal override T DeserializeToObject<T>(string serializedContents)
+		{
+			// Not a preferrable method; this is meant to be overriden by a decorator
+			using (var ms = new MemoryStream())
+			using (var sw = new StreamWriter(ms))
+			{
+				sw.Write(Convert.FromBase64String(serializedContents));
+				ms.Seek(0, SeekOrigin.Begin);
+
+				return (T) new BinaryFormatter().Deserialize(ms);
+			}
+		}
+
+
+
+		protected internal override Task RemoveOverflownContentsAsync(QueueMessageWrapper message, CancellationToken token) { return Task.FromResult(false); }
 	}
 }

@@ -95,10 +95,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtendedQueue\AzureRedisOverflownMessageHandler.cs" />
     <Compile Include="ExtendedQueue\AzureExtendedQueueFactory.cs" />
     <Compile Include="ExtendedQueue\AzureMaximumMessageSizeProvider.cs" />
-    <Compile Include="ExtendedQueue\AzureOverflownMessageHandler.cs" />
+    <Compile Include="ExtendedQueue\AzureBlobOverflownMessageHandler.cs" />
     <Compile Include="ExtendedQueue\AzureQueueMessageProvider.cs" />
+    <Compile Include="ExtendedQueue\ObjectModel\AzureOverflownMessageHandlerBase.cs" />
     <Compile Include="GlobalLockFramework\AzureGlobalLock.cs" />
     <Compile Include="GlobalLockFramework\AzureGlobalLockFactory.cs" />
     <Compile Include="GlobalLockFramework\AzureLockState.cs" />
@@ -108,7 +110,6 @@
     <Compile Include="AzureBlobProperties.cs" />
     <Compile Include="AzureBlob.cs" />
     <Compile Include="AzureBlobContainer.cs" />
-    <Compile Include="AzureQueueHelper.cs" />
     <Compile Include="AzureQueueMessageProvider.cs" />
     <Compile Include="AzureQueueMessage.cs" />
     <Compile Include="AzureQueue.cs" />

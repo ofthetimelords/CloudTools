@@ -37,14 +37,16 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				try
 				{
 					message = await this.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
-					if (message != null) receivedMessage = true;
+					if (message != null)
+					{
+						receivedMessage = true;
 
-
-					//this.ProcessMessageInternal(
-					//	new QueueMessageWrapper(message, messageOptions.OverflowMessageContainer),
-					//	messageOptions,
-					//	messageSpecificCancellationTokenSource,
-					//	ref keepAliveTask);
+						this.ProcessMessageInternal(
+							new QueueMessageWrapper(this, message),
+							messageOptions,
+							messageSpecificCancellationTokenSource,
+							ref keepAliveTask);
+					}
 				}
 				catch (TaskCanceledException)
 				{
@@ -64,7 +66,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 
 				// Delay the next polling attempt for a new message, since no messages were received last time.
-				if (!receivedMessage) await Task.Delay(messageOptions.PollFrequency);
+				if (!receivedMessage) await Task.Delay(messageOptions.PollFrequency, messageOptions.CancelToken).ConfigureAwait(false);
 			}
 		}
 

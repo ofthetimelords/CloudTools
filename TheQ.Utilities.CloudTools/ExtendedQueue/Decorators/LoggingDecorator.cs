@@ -1,14 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright file="LoggingDecorator.cs" company="nett">
+//      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
+//      Please see the License.txt file for more information. All other rights reserved.
+// </copyright>
+// <author>James Kavakopoulos</author>
+// <email>ofthetimelords@gmail.com</email>
+// <date>2015/03/30</date>
+// <summary>
+// 
+// </summary>
+
+using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
-using TheQ.Utilities.CloudTools.Storage.Internal;
+using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
@@ -16,7 +24,7 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
 	/// <summary>
-	/// Defines the exception handling policy that will be used by the <see cref="LoggingDecorator"/> instance.
+	///     Defines the exception handling policy that will be used by the <see cref="LoggingDecorator" /> instance.
 	/// </summary>
 	public enum ExceptionPolicy
 	{
@@ -25,153 +33,240 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		ThrowOnly = 2
 	}
 
-	public class LoggingDecorator : ExtendedQueueBase
+
+
+	public class LoggingDecorator : DecoratorBase
 	{
-		private ExtendedQueueBase DecoratedQueue { get; set; }
-
-		private ILogService LogService { get; set; }
-
-		public ExceptionPolicy PolicyForExceptions { get; set; }
-
-
-
-		public LoggingDecorator(ExtendedQueueBase decoratedQueue, ExceptionPolicy policy, ILogService logService)
+		public LoggingDecorator(ExtendedQueueBase decoratedQueue, ExceptionPolicy policy, ILogService logService) : base(decoratedQueue)
 		{
-			this.DecoratedQueue = decoratedQueue;
 			this.LogService = logService ?? new NullLogService();
 		}
 
 
 
+		private ILogService LogService { get; set; }
+
+
+		public ExceptionPolicy PolicyForExceptions { get; set; }
+
+
+
 		protected internal override string SerializeMessageEntity(object messageEntity)
 		{
-			try
-			{
-				return this.DecoratedQueue.SerializeMessageEntity(messageEntity);
-			}
-			catch (CloudToolsStorageException ex)
-			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue (during serialisation)");
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
-			}
-
-			return string.Empty;
+			return this.LogAction(
+				() => this.DecoratedQueue.SerializeMessageEntity(messageEntity),
+				"Unexpected exception occurred while adding a message to the queue (during serialisation)");
 		}
 
 
 
-		protected internal override Stream GetByteConverter(Stream originalConverter)
+		protected internal override Stream GetByteEncoder(Stream originalConverter)
 		{
-			try
-			{
-				return this.DecoratedQueue.GetByteConverter(originalConverter);
-			}
-			catch (CloudToolsStorageException ex)
-			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue (during the retrieval of a byte converter)");
+			return this.LogAction(
+				() => this.DecoratedQueue.GetByteEncoder(originalConverter),
+				"Unexpected exception occurred while adding a message to the queue (during the retrieval of a byte encoder)");
+		}
 
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
-			}
 
-			return Stream.Null;
+
+		protected internal override Stream GetByteDecoder(Stream originalConverter)
+		{
+			return this.LogAction(
+				() => this.DecoratedQueue.GetByteDecoder(originalConverter),
+				"Unexpected exception occurred while retrieving a message from the queue (during the retrieval of a byte decoder)");
 		}
 
 
 
 		protected internal override byte[] PostProcessMessage(byte[] originalContents)
 		{
-			try
-			{
-				return this.DecoratedQueue.PostProcessMessage(originalContents);
-			}
-			catch (CloudToolsStorageException ex)
-			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue (during post-processing of the mesasge)");
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
-			}
-
-			return null;
+			return this.LogAction(
+				() => this.DecoratedQueue.PostProcessMessage(originalContents),
+				"Unexpected exception occurred while adding a message to the queue (during post-processing of the mesasge)");
 		}
 
 
 
 		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			try
-			{
-				return this.DecoratedQueue.AddNonOverflownMessage(messageContents, token);
-			}
-			catch (CloudToolsStorageException ex)
-			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue (adding the message; not-overflown)");
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
-			}
-
-			return Task.FromResult(false);
+			return this.LogAction(
+				() => this.DecoratedQueue.AddNonOverflownMessage(messageContents, token),
+				"Unexpected exception occurred while adding a message to the queue (adding the message; not-overflown)");
 		}
 
 
 
 		protected internal override Task AddOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			try
-			{
-				return this.DecoratedQueue.AddOverflownMessage(messageContents, token);
-			}
-			catch (CloudToolsStorageException ex)
-			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue (adding the message; overflown)");
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
-			}
-
-			return Task.FromResult(false);
+			return this.LogAction(
+				() => this.DecoratedQueue.AddOverflownMessage(messageContents, token), "Unexpected exception occurred while adding a message to the queue (adding the message; overflown)");
 		}
 
 
 
 		public override Task AddMessageEntityAsync(object entity)
 		{
-			try
-			{
-				return base.AddMessageEntityAsync(entity);
-			}
-			catch (CloudToolsStorageException ex)
-			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue.");
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
-			}
-
-			return Task.FromResult(false);
+			return this.LogAction(
+				() => base.AddMessageEntityAsync(entity), "Unexpected exception occurred while adding a message to the queue.");
 		}
 
 
 
 		protected override Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{
+			return this.LogAction(
+				() => base.MessageContentsToByteArray(serializedContents),
+				"Unexpected exception occurred while adding a message to the queue (converting the message's contents to a byte array)");
+		}
+
+
+
+		public override Task AddMessageEntityAsync(object entity, CancellationToken token)
+		{
+			return this.LogAction(
+				() => base.AddMessageEntityAsync(entity, token), "Unexpected exception occurred while adding a message to the queue");
+		}
+
+
+
+		protected override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
+		{
+			return this.LogAction(
+				() => base.ByteArrayToSerializedMessageContents(messageBytes),
+				"Unexpected exception occurred while retrieving a message from the queue (converting the the byte array representation of message's contents to a serialized string)");
+		}
+
+
+
+		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token)
+		{
+			return this.LogAction(
+				() => ((ExtendedQueueBase) this).DecodeMessageAsync<T>(wrapper, token),
+				"Unexpected exception occurred while retrieving a message from the queue (decoding the message)");
+		}
+
+
+
+		protected internal override T DeserializeToObject<T>(string serializedContents)
+		{
+			return this.LogAction(
+				() => base.DeserializeToObject<T>(serializedContents),
+				"Unexpected exception occurred while retrieving a message from the queue (deserializing the message to an object)");
+		}
+
+
+
+		protected override Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
+		{
+			return this.LogAction(
+				() => base.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource),
+				"Unexpected exception occurred while retrieving a message from the queue");
+		}
+
+
+
+		protected internal override Task<byte[]> GetNonOverflownMessageContentsAsync(IQueueMessage message, CancellationToken token)
+		{
+			return this.LogAction(
+				() => base.GetNonOverflownMessageContentsAsync(message, token),
+				"");
+		}
+
+
+
+		protected internal override Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token)
+		{
+			return this.LogAction(
+				() => base.GetOverflownMessageContentsAsync(message, id, token),
+				"");
+		}
+
+
+
+		protected internal override string GetOverflownMessageId(IQueueMessage message)
+		{
+			return this.LogAction(
+				() => base.GetOverflownMessageId(message),
+				"");
+		}
+
+
+
+		protected override void HandleGeneralExceptions(HandleMessageOptionsBase messageOptions, Exception ex, bool parallelYetExternal = false)
+		{
+			this.LogAction(
+				() => base.HandleGeneralExceptions(messageOptions, ex, parallelYetExternal),
+				"");
+		}
+
+		protected override void HandleStorageExceptions(HandleMessageOptionsBase messageOptions, CloudToolsStorageException ex)
+		{
+			this.LogAction(
+				() => base.HandleStorageExceptions(messageOptions, ex),
+				"");
+		}
+
+
+
+		protected override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		{
+			this.LogAction(
+				() => base.HandleTaskCancelled(messageOptions),
+				"");
+		}
+
+
+
+		protected internal override Task RemoveOverflownContentsAsync(QueueMessageWrapper message, CancellationToken token)
+		{
+			return this.LogAction(
+				() => base.RemoveOverflownContentsAsync(message, token),
+				"");
+		}
+
+
+
+		protected override void SerialFinallyHandler(
+			HandleSerialMessageOptions messageOptions,
+			Task keepAliveTask,
+			IQueueMessage message,
+			CancellationTokenSource messageSpecificCancellationTokenSource)
+		{
+			base.SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
+		}
+
+
+
+		private T LogAction<T>(Func<T> action, string message)
+		{
 			try
 			{
-				return base.MessageContentsToByteArray(serializedContents);
+				return action();
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly)
-					this.LogService.QuickLogError("Queue", ex, "Unexpected exception occurred while adding a message to the queue (converting the message's contents to a byte array)");
+				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly) this.LogService.QuickLogError("Queue", ex, message);
 
 				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
 			}
 
-			return Task.FromResult<byte[]>(null);
+			return default(T);
+		}
+
+
+
+		private void LogAction(Action action, string message)
+		{
+			try
+			{
+				action();
+			}
+			catch (CloudToolsStorageException ex)
+			{
+				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly) this.LogService.QuickLogError("Queue", ex, message);
+
+				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
+			}
 		}
 	}
 }

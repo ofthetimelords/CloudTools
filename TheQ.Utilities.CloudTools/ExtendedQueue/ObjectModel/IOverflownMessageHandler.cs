@@ -22,5 +22,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public interface IOverflownMessageHandler
 	{
 		Task Serialize([NotNull] byte[] originalMessage, string messageId, string queueName, CancellationToken token);
+
+
+		string CreateMessagePointerFromId(string id);
+
+
+		string GetIdFromMessagePointer(byte[] pointer);
+
+
+		Task RemoveOverflownContentsAsync(string id, string queueName, CancellationToken token);
+
+
+		Task<byte[]> GetOverflownMessageContents(string id, string queueName, CancellationToken token);
 	}
 }

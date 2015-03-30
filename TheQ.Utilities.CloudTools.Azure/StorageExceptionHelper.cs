@@ -23,7 +23,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 	/// <summary>
 	///     Helper methods for Azure's <see cref="StorageException" /> .
 	/// </summary>
-	public static class StorageExceptionHelper
+	internal static class StorageExceptionHelper
 	{
 		/// <summary>
 		///     Wraps a <see cref="StorageException" /> to a <see cref="CloudToolsStorageException" /> .

@@ -1,48 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
+﻿// <copyright file="JsonSerialiserDecorator.cs" company="nett">
+//      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
+//      Please see the License.txt file for more information. All other rights reserved.
+// </copyright>
+// <author>James Kavakopoulos</author>
+// <email>ofthetimelords@gmail.com</email>
+// <date>2015/03/29</date>
+// <summary>
+// 
+// </summary>
+
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Newtonsoft.Json;
-
-using TheQ.Utilities.CloudTools.Storage.Infrastructure;
-using TheQ.Utilities.CloudTools.Storage.Internal;
-using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
-	public class JsonSerialiserDecorator : ExtendedQueueBase
+	public class JsonSerialiserDecorator : DecoratorBase
 	{
-		private ExtendedQueueBase DecoratedQueue { get; set; }
-
-
-		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) { this.DecoratedQueue = decoratedQueue; }
-
+		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) : base(decoratedQueue) { }
 
 
 		protected internal override string SerializeMessageEntity(object messageEntity) { return JsonConvert.SerializeObject(messageEntity, Formatting.None); }
 
 
-		protected internal override Stream GetByteConverter(Stream originalConverter) { return this.DecoratedQueue.GetByteConverter(originalConverter); }
-
-
-		protected internal override byte[] PostProcessMessage(byte[] originalContents) { return this.DecoratedQueue.PostProcessMessage(originalContents); }
-
-
-
-		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
-		{
-			return this.DecoratedQueue.AddNonOverflownMessage(messageContents, token);
-		}
-
-
-
-		protected internal override Task AddOverflownMessage(byte[] messageContents, CancellationToken token) { return this.DecoratedQueue.AddOverflownMessage(messageContents, token); }
+		protected internal override T DeserializeToObject<T>(string serializedContents) { return JsonConvert.DeserializeObject<T>(serializedContents); }
 	}
 }

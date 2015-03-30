@@ -30,5 +30,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		Task HandleMessagesAsync([NotNull] HandleSerialMessageOptions messageOptions);
+
+
+		Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token);
 	}
 }

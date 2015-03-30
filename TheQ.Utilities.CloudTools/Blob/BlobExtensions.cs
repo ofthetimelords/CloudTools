@@ -12,6 +12,7 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Internal;
@@ -36,16 +37,16 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 		///     A <see langword="byte" /> array of the retrieved data.
 		/// </returns>
 		[NotNull]
-		public static async Task<byte[]> DownloadByteArray([NotNull] this IBlobContainer container, [NotNull] string blobName)
+		public static async Task<byte[]> DownloadByteArrayAsync([NotNull] this IBlobContainer container, [NotNull] string blobName, CancellationToken token)
 		{
 			Guard.NotNull(container, "container");
 			Guard.NotNull(blobName, "blobName");
 
 			var blobData = container.GetBlobReference(blobName);
-			await blobData.FetchAttributesAsync();
+			await blobData.FetchAttributesAsync(token).ConfigureAwait(false);
 
 			var blobDataArray = new byte[blobData.Properties.Length];
-			await blobData.DownloadToByteArrayAsync(blobDataArray, 0);
+			await blobData.DownloadToByteArrayAsync(blobDataArray, 0, token).ConfigureAwait(false);
 
 			return blobDataArray;
 		}
@@ -61,14 +62,14 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 		///     A <see langword="byte" /> array of the retrieved data.
 		/// </returns>
 		[NotNull]
-		public static async Task<byte[]> DownloadByteArray([NotNull] this IBlob blob)
+		public static async Task<byte[]> DownloadByteArrayAsync([NotNull] this IBlob blob, CancellationToken token)
 		{
 			Guard.NotNull(blob, "blob");
 
-			await blob.FetchAttributesAsync();
+			await blob.FetchAttributesAsync(token).ConfigureAwait(false);
 
 			var blobDataArray = new byte[blob.Properties.Length];
-			await blob.DownloadToByteArrayAsync(blobDataArray, 0);
+			await blob.DownloadToByteArrayAsync(blobDataArray, 0, token).ConfigureAwait(false);
 
 			return blobDataArray;
 		}
@@ -80,7 +81,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 		/// </summary>
 		/// <param name="blob">The BLOB to upload the object to.</param>
 		/// <param name="instance">The object that will be serialised and then uploaded.</param>
-		public static async void UploadObject([NotNull] this IBlob blob, [NotNull] object instance)
+		public static async void UploadObjectAsync([NotNull] this IBlob blob, [NotNull] object instance, CancellationToken token)
 		{
 			Guard.NotNull(blob, "blob");
 			Guard.NotNull(instance, "instance");
@@ -89,7 +90,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 			{
 				new BinaryFormatter().Serialize(ms, instance);
 				ms.Seek(0, SeekOrigin.Begin);
-				await blob.UploadFromStreamAsync(ms);
+				await blob.UploadFromStreamAsync(ms, token).ConfigureAwait(false);
 			}
 		}
 	}

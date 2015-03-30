@@ -17,7 +17,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		public void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity).ConfigureAwait(false).GetAwaiter().GetResult(); }
+		public void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity).Wait(); }
 
 
 
@@ -46,7 +46,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		protected virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{
 			using (var converter = new MemoryStream(serializedContents.Length))
-			using (var decoratedConverter = this.GetByteConverter(converter))
+			using (var decoratedConverter = this.GetByteEncoder(converter))
 			using (var writer = new StreamWriter(decoratedConverter))
 			{
 				await writer.WriteAsync(serializedContents).ConfigureAwait(false);
@@ -60,7 +60,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal abstract Stream GetByteConverter(Stream originalConverter);
+		protected internal abstract Stream GetByteEncoder(Stream originalConverter);
 
 
 

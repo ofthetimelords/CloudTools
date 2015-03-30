@@ -37,7 +37,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			}
 			catch (Exception innerEx)
 			{
-				if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
+				//if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			}
 			catch (Exception innerEx)
 			{
-				if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
+				//if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
 			}
 		}
 	}

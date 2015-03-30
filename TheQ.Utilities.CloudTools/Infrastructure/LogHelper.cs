@@ -23,34 +23,9 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 	internal static class LogHelper
 	{
 		[StringFormatMethod("message")]
-		public static void QuickLogDebug(
-			[CanBeNull] this HandleMessageOptionsBase options,
-			[NotNull] string category,
-			[NotNull] string message,
-			[NotNull] params object[] formatArguments)
-		{
-			(options != null && options.LogService != null ? options.LogService : null).QuickLogDebug(category, message, formatArguments);
-		}
-
-
-
-		[StringFormatMethod("message")]
 		public static void QuickLogDebug([CanBeNull] this ILogService logService, [NotNull] string category, [NotNull] string message, [NotNull] params object[] formatArguments)
 		{
 			if (logService != null) logService.Debug(string.Format(CultureInfo.InvariantCulture, message, formatArguments), "TheQ.CloudTools." + category);
-		}
-
-
-
-		[StringFormatMethod("message")]
-		public static void QuickLogError(
-			[CanBeNull] this HandleMessageOptionsBase options,
-			[NotNull] string category,
-			[CanBeNull] Exception exception,
-			[NotNull] string message,
-			[NotNull] params object[] formatArguments)
-		{
-			(options != null && options.LogService != null ? options.LogService : null).QuickLogError(category, exception, message, formatArguments);
 		}
 
 
