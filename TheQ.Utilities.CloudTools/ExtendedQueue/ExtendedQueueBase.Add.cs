@@ -17,7 +17,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		public void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity).Wait(); }
+		public virtual void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity).Wait(); }
+
+
+
+		internal virtual void AddMessageEntity(object entity, ExtendedQueueBase invoker) { this.AddMessageEntityAsync(entity, CancellationToken.None, invoker).Wait(); }
 
 
 
@@ -25,32 +29,37 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		public virtual async Task AddMessageEntityAsync(object entity, CancellationToken token)
+		public virtual Task AddMessageEntityAsync(object entity, CancellationToken token) { return this.AddMessageEntityAsync(entity, token, this); }
+
+		internal virtual async Task AddMessageEntityAsync(object entity, CancellationToken token, ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(entity, "entity");
 
 			var maxSize = this.MaximumSizeProvider.MaximumMessageSize *3/4;
 
 			var stringSource = entity as string;
-			var serialized = stringSource ?? this.SerializeMessageEntity(entity);
+			var serialized = stringSource ?? this.Get(invoker).SerializeMessageEntity(entity);
 
-			var messageAsBytes = await this.MessageContentsToByteArray(serialized).ConfigureAwait(false);
-			messageAsBytes = this.PostProcessMessage(messageAsBytes);
+			var messageAsBytes = await this.Get(invoker).MessageContentsToByteArray(serialized, invoker).ConfigureAwait(false);
+			messageAsBytes = this.Get(invoker).PostProcessMessage(messageAsBytes);
 
-			if (messageAsBytes.Length < maxSize) await this.AddNonOverflownMessage(messageAsBytes, token).ConfigureAwait(false);
-			else await this.AddOverflownMessage(messageAsBytes, token).ConfigureAwait(false);
+			if (messageAsBytes.Length < maxSize) await this.Get(invoker).AddNonOverflownMessage(messageAsBytes, token).ConfigureAwait(false);
+			else await this.Get(invoker).AddOverflownMessage(messageAsBytes, token).ConfigureAwait(false);
 		}
 
 
 
-		protected internal virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents)
+		protected internal virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker)
 		{
 			using (var converter = new MemoryStream(serializedContents.Length))
-			using (var decoratedConverter = this.GetByteEncoder(converter))
-			using (var writer = new StreamWriter(decoratedConverter))
 			{
-				await writer.WriteAsync(serializedContents).ConfigureAwait(false);
-				await writer.FlushAsync().ConfigureAwait(false);
+				using (var decoratedConverter = this.Get(invoker).GetByteEncoder(converter))
+				using (var writer = new StreamWriter(decoratedConverter))
+				{
+					await writer.WriteAsync(serializedContents).ConfigureAwait(false);
+					await writer.FlushAsync().ConfigureAwait(false);
+				}
+
 				return converter.ToArray();
 			}
 		}

@@ -20,6 +20,7 @@ using Microsoft.WindowsAzure.Storage;
 using TheQ.Utilities.CloudTools.Storage.GlobalLockFramework;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
+using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
@@ -62,10 +63,16 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		{
 			Guard.NotNull(state, "state");
 
-
-			// TODO: What if does not exist already, Exceptions
-			if (state.LeaseId != null) await this.UnregisterLockAsync(state, cancelToken);
-			else await this.BreakLockInternal(state, cancelToken);
+			try
+			{
+				// TODO: What if does not exist already, Exceptions
+				if (state.LeaseId != null) await this.UnregisterLockAsync(state, cancelToken);
+				else await this.BreakLockInternal(state, cancelToken);
+			}
+			catch (CloudToolsStorageException ex)
+			{
+				if (ex.StatusCode == 409 || ex.StatusCode == 412) this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
+			}
 
 			return state;
 		}

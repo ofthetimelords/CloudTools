@@ -10,6 +10,7 @@
 // </summary>
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -112,10 +113,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents)
+		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker)
 		{
 			return this.LogAction(
-				() => this.DecoratedQueue.MessageContentsToByteArray(serializedContents),
+				() => this.DecoratedQueue.MessageContentsToByteArray(serializedContents, invoker),
 				"Unexpected exception occurred while adding a message to the queue (converting the message's contents to a byte array)");
 		}
 
@@ -129,10 +130,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
+		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes, ExtendedQueueBase invoker)
 		{
 			return this.LogAction(
-				() => this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes),
+				() => this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes, invoker),
 				"Unexpected exception occurred while retrieving a message from the queue (converting the the byte array representation of message's contents to a serialized string)");
 		}
 
@@ -239,6 +240,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
+		[DebuggerStepThrough]
 		private T LogAction<T>(Func<T> action, string message)
 		{
 			try
@@ -257,6 +259,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
+		[DebuggerStepThrough]
 		private void LogAction(Action action, string message)
 		{
 			try

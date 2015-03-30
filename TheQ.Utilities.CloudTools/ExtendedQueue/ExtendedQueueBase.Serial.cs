@@ -17,7 +17,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		public async Task HandleMessagesAsync(HandleSerialMessageOptions messageOptions)
+		public Task HandleMessagesAsync(HandleSerialMessageOptions messageOptions)
+		{
+			return this.HandleMessagesAsync(messageOptions, this);
+		}
+
+		internal async Task HandleMessagesAsync(HandleSerialMessageOptions messageOptions, ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -36,33 +41,33 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 				try
 				{
-					message = await this.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
+					message = await this.Get(invoker).GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					if (message != null)
 					{
 						receivedMessage = true;
 
-						this.ProcessMessageInternal(
-							new QueueMessageWrapper(this, message),
+						this.Get(invoker).ProcessMessageInternal(
+							new QueueMessageWrapper(this.Get(invoker), message),
 							messageOptions,
 							messageSpecificCancellationTokenSource,
-							ref keepAliveTask);
+							ref keepAliveTask, this.Get(invoker));
 					}
 				}
 				catch (TaskCanceledException)
 				{
-					this.HandleTaskCancelled(messageOptions);
+					this.Get(invoker).HandleTaskCancelled(messageOptions);
 				}
 				catch (CloudToolsStorageException ex)
 				{
-					this.HandleStorageExceptions(messageOptions, ex);
+					this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
 				}
 				catch (Exception ex)
 				{
-					this.HandleGeneralExceptions(messageOptions, ex);
+					this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
 				}
 				finally
 				{
-					this.SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
+					this.Get(invoker).SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
 				}
 
 				// Delay the next polling attempt for a new message, since no messages were received last time.
@@ -81,7 +86,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		protected internal virtual async Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
-			return await this.GetMessageAsync(messageOptions.MessageLeaseTime, messageOptions.CancelToken).ConfigureAwait(false);
+			return await this.GetMessageAsync(messageOptions.MessageLeaseTime, messageSpecificCancellationTokenSource.Token).ConfigureAwait(false);
 		}
 
 

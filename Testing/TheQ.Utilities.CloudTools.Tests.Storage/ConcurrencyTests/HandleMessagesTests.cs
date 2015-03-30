@@ -20,8 +20,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TheQ.Utilities.AzureTools.Tests.Storage.Models;
 using TheQ.Utilities.CloudTools.Azure;
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue;
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators;
 using TheQ.Utilities.CloudTools.Storage.Models;
+using TheQ.Utilities.CloudTools.Tests.Storage.Mocks;
 
 
 
@@ -30,11 +32,12 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 	[TestClass]
 	public class HandleMessagesTests
 	{
+		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
 		public void TestSerial_NormalProcessing()
 		{
 			// Arrange
-			const int runCount = 300;
+			const int runCount = 100;	
 			var client = new CloudEnvironment();
 			var overflow = client.BlobClient.GetContainerReference("overflownqueues-1");
 			var queue = client.QueueClient.GetQueueReference("test1");
@@ -87,11 +90,12 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 
 
 
+		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
 		public void TestSerial_ParallelProcessing()
 		{
 			// Arrange
-			const int runCount = 300;
+			const int runCount = 100;
 			var client = new CloudEnvironment();
 			var queue = client.QueueClient.GetQueueReference("test2");
 			var overflow = client.BlobClient.GetContainerReference("overflownqueues-2");
@@ -148,14 +152,15 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 
 
 
+		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
 		public void TestSerial_BatchProcessing()
 		{
 			// Arrange
-			const int runCount = 300;
+			const int runCount = 100;
 			var client = new CloudEnvironment();
-			var queue = client.QueueClient.GetQueueReference("test5");
-			var overflow = client.BlobClient.GetContainerReference("overflownqueues-5");
+			var queue = client.QueueClient.GetQueueReference("test3");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-3");
 			var locking = new object();
 			var result = string.Empty;
 			var expected = string.Empty;
@@ -211,13 +216,14 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 
 
 
+		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
 		public void TestOverflownMessages()
 		{
 			// Arrange
 			var client = new CloudEnvironment();
-			var queue = client.QueueClient.GetQueueReference("test3");
-			var overflow = client.BlobClient.GetContainerReference("overflownqueues-3");
+			var queue = client.QueueClient.GetQueueReference("test4");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-4");
 			var result = string.Empty;
 			var rnd = new Random();
 			var expected = new string(Enumerable.Range(1, 128 * 1024).Select(r => (char)rnd.Next(1024, 4096)).ToArray());
@@ -260,13 +266,14 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 
 
 
+		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
 		public void TestSerializedMessages()
 		{
 			// Arrange
 			var client = new CloudEnvironment();
-			var queue = client.QueueClient.GetQueueReference("test4");
-			var overflow = client.BlobClient.GetContainerReference("overflownqueues-4");
+			var queue = client.QueueClient.GetQueueReference("test5");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-5");
 			ComplexModel result = null;
 			var expected = new ComplexModel { Name = "Test" };
 			var sw = new Stopwatch();
@@ -306,6 +313,264 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				Assert.AreEqual(expected.ADictionary.First().Key, result.ADictionary.First().Key);
 				Assert.AreEqual(expected.ADictionary.First().Value, result.ADictionary.First().Value);
 				Assert.AreEqual(expected.AList.First(), result.AList.First());
+			}
+		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestErrorDuringRetrieval_GetIdFromMessagePointer()
+		{
+			// Arrange
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test6");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-6");
+			var rnd = new Random();
+			ComplexModel result = null;
+			var expected = new ComplexModel { Name = new string(Enumerable.Range(1, 128 * 1024).Select(r => (char)rnd.Next(1024, 4096)).ToArray()) };
+			var sw = new Stopwatch();
+			var succeeded = false;
+			var factoryOne = new DefaultExtendedQueueFactory(
+				ExceptionPolicy.LogAndThrow,
+				new AzureQueueMessageProvider(),
+				new AzureMaximumMessageSizeProvider(),
+				new AzureMaximumMessagesPerRequestProvider(),
+				new ChaosMonkeyOverflownMessageHandler(new AzureBlobContainer(overflow), ChaosMonkeyOverflownMessageHandler.FailureMode.GetIdFromMessagePointer),
+				new ConsoleLogService()
+				);
+
+			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factoryOne.Create(new AzureQueue(queue));
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleSerialMessageOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					1,
+					new CancellationToken(),
+					message =>
+					{
+						result = message.GetMessageContents<ComplexModel>();
+						mre.Set();
+						return true;
+					},
+					null,
+					ex =>
+					{
+						succeeded = true;
+						mre.Set();
+					});
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				equeue.AddMessageEntity(expected);
+				equeue.HandleMessagesAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(succeeded);
+			}
+		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestErrorDuringRetrieval_GetOverflownContents()
+		{
+			// Arrange
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test7");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-7");
+			var rnd = new Random();
+			ComplexModel result = null;
+			var expected = new ComplexModel { Name = new string(Enumerable.Range(1, 128 * 1024).Select(r => (char)rnd.Next(1024, 4096)).ToArray()) };
+			var sw = new Stopwatch();
+			var succeeded = false;
+			var factoryOne = new DefaultExtendedQueueFactory(
+				ExceptionPolicy.LogAndThrow,
+				new AzureQueueMessageProvider(),
+				new AzureMaximumMessageSizeProvider(),
+				new AzureMaximumMessagesPerRequestProvider(),
+				new ChaosMonkeyOverflownMessageHandler(new AzureBlobContainer(overflow), ChaosMonkeyOverflownMessageHandler.FailureMode.GetOverflownContents),
+				new ConsoleLogService()
+				);
+
+			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factoryOne.Create(new AzureQueue(queue));
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleSerialMessageOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					1,
+					new CancellationToken(),
+					message =>
+					{
+						result = message.GetMessageContents<ComplexModel>();
+						mre.Set();
+						return true;
+					},
+					null,
+					ex =>
+					{
+						succeeded = true;
+						mre.Set();
+					});
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				equeue.AddMessageEntity(expected);
+				equeue.HandleMessagesAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(succeeded);
+			}
+		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestErrorDuringRetrieval_RemoveOverflownContents()
+		{
+			// Arrange
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test8");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-8");
+			var rnd = new Random();
+			ComplexModel result = null;
+			var expected = new ComplexModel { Name = new string(Enumerable.Range(1, 128 * 1024).Select(r => (char)rnd.Next(1024, 4096)).ToArray()) };
+			var sw = new Stopwatch();
+			var succeeded = false;
+			var factoryOne = new DefaultExtendedQueueFactory(
+				ExceptionPolicy.LogAndThrow,
+				new AzureQueueMessageProvider(),
+				new AzureMaximumMessageSizeProvider(),
+				new AzureMaximumMessagesPerRequestProvider(),
+				new ChaosMonkeyOverflownMessageHandler(new AzureBlobContainer(overflow), ChaosMonkeyOverflownMessageHandler.FailureMode.RemoveOverflownContents),
+				new ConsoleLogService()
+				);
+
+			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factoryOne.Create(new AzureQueue(queue));
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleSerialMessageOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					5,
+					new CancellationToken(),
+					message =>
+					{
+						result = message.GetMessageContents<ComplexModel>();
+						return true;
+					},
+					null,
+					ex =>
+					{
+						succeeded = true;
+						mre.Set();
+					});
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				equeue.AddMessageEntity(expected);
+				equeue.HandleMessagesAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(succeeded);
+			}
+		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestErrorDuringRetrieval_Serialize()
+		{
+			// Arrange
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test9");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-9");
+			var rnd = new Random();
+			ComplexModel result = null;
+			var expected = new ComplexModel { Name = new string(Enumerable.Range(1, 128 * 1024).Select(r => (char)rnd.Next(1024, 4096)).ToArray()) };
+			var sw = new Stopwatch();
+			var succeeded = false;
+			var factoryOne = new DefaultExtendedQueueFactory(
+				ExceptionPolicy.LogAndThrow,
+				new AzureQueueMessageProvider(),
+				new AzureMaximumMessageSizeProvider(),
+				new AzureMaximumMessagesPerRequestProvider(),
+				new ChaosMonkeyOverflownMessageHandler(new AzureBlobContainer(overflow), ChaosMonkeyOverflownMessageHandler.FailureMode.Serialize),
+				new ConsoleLogService()
+				);
+
+			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factoryOne.Create(new AzureQueue(queue));
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleSerialMessageOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					5,
+					new CancellationToken(),
+					message =>
+					{
+						result = message.GetMessageContents<ComplexModel>();
+						mre.Set();
+						return true;
+					},
+					null,
+					null);
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				try
+				{
+					equeue.AddMessageEntity(expected);
+				}
+				catch (Exception ex)
+				{
+					succeeded = true;
+				}
+
+				equeue.HandleMessagesAsync(options);
+
+				// Assert
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(succeeded);
 			}
 		}
 	}

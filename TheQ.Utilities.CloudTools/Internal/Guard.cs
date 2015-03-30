@@ -10,6 +10,7 @@
 // </summary>
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 
@@ -28,6 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Internal
 		/// <param name="argument">The parameter to check for null.</param>
 		/// <param name="name">The name of the parameter (used to display on the xception).</param>
 		/// <exception cref="ArgumentNullException">The parameter was null: + <paramref name="name" /></exception>
+		[DebuggerStepThrough]
 		public static void NotNull([CanBeNull] object argument, [NotNull] [InvokerParameterName] string name)
 		{
 			if (argument == null) throw new ArgumentNullException(name, "A parameter was null: " + name);
@@ -42,6 +44,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Internal
 		/// <param name="argument">The parameter to check for <see langword="null" /> & whitespace-only.</param>
 		/// <param name="name">The name of the parameter (used to display on the xception).</param>
 		/// <exception cref="ArgumentNullException">The parameter was null: + <paramref name="name" /></exception>
+		[DebuggerStepThrough]
 		public static void NotNull([CanBeNull] string argument, [NotNull] [InvokerParameterName] string name)
 		{
 			if (string.IsNullOrWhiteSpace(argument)) throw new ArgumentNullException(name, "A parameter was null or an empty string: " + name);
@@ -56,6 +59,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Internal
 		/// <returns>
 		///     True if no object is null, <see langword="false" /> if at least one is.
 		/// </returns>
+		[DebuggerStepThrough]
 		public static bool IsAnyNull([CanBeNull] params object[] instances)
 		{
 			return instances == null || instances.Any(o => o == null);
@@ -70,6 +74,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Internal
 		/// <param name="argument">The parameter to check for null.</param>
 		/// <param name="name">The name of the parameter (used to display on the xception).</param>
 		/// <exception cref="ArgumentNullException">The parameter was null: + <paramref name="name" /></exception>
+		[DebuggerStepThrough]
 		public static void NotNullOnly([CanBeNull] string argument, [NotNull] [InvokerParameterName] string name)
 		{
 			if (argument == null) throw new ArgumentNullException(name, "A parameter was null: " + name);

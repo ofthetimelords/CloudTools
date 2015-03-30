@@ -32,10 +32,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		protected internal virtual IQueueMessageProvider MessageProvider { get; set; }
 
 
-		public Task HandleMessagesInBatchAsync(HandleBatchMessageOptions messageOptions) { throw new NotImplementedException(); }
-
-
-
 		/// <summary>
 		///     Gets the name of the queue.
 		/// </summary>

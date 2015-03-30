@@ -58,6 +58,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		}
 
 
+		protected internal override IMaximumMessagesPerRequestProvider MaximumMessagesProvider
+		{
+			get { return this.DecoratedQueue.MaximumMessagesProvider; }
+			set { this.DecoratedQueue.MaximumMessagesProvider = value; }
+		}
+
+
 		protected internal override IQueue OriginalQueue
 		{
 			get { return this.DecoratedQueue.OriginalQueue; }
@@ -106,10 +113,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		public override Task AddMessageEntityAsync(object entity) { return this.DecoratedQueue.AddMessageEntityAsync(entity); }
+		public override void AddMessageEntity(object entity) { this.DecoratedQueue.AddMessageEntity(entity, this); }
 
 
-		public override Task AddMessageEntityAsync(object entity, CancellationToken token) { return this.DecoratedQueue.AddMessageEntityAsync(entity, token); }
+		internal override Task AddMessageEntityAsync(object entity, CancellationToken token, ExtendedQueueBase invoker) { return this.DecoratedQueue.AddMessageEntityAsync(entity, token, invoker); }
+
+
+		internal override void AddMessageEntity(object entity, ExtendedQueueBase invoker) { this.DecoratedQueue.AddMessageEntity(entity, invoker); }
+
+
+		public override Task AddMessageEntityAsync(object entity) { return this.DecoratedQueue.AddMessageEntityAsync(entity, CancellationToken.None, this); }
+
+
+		public override Task AddMessageEntityAsync(object entity, CancellationToken token) { return this.DecoratedQueue.AddMessageEntityAsync(entity, token, this); }
 
 
 
@@ -221,7 +237,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions) { this.DecoratedQueue.HandleTaskCancelled(messageOptions); }
 
 
-		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents) { return this.DecoratedQueue.MessageContentsToByteArray(serializedContents); }
+		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker) { return this.DecoratedQueue.MessageContentsToByteArray(serializedContents, invoker); }
 
 
 
@@ -306,14 +322,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
+		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes, ExtendedQueueBase invoker)
 		{
-			return this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes);
+			return this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes, invoker);
 		}
 
 
 
-		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token) { return this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token); }
+		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token) { return this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token, this); }
 
 
 

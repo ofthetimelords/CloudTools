@@ -25,6 +25,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		private IMaximumMessageSizeProvider MaximumMessageSizeProvider { get; set; }
 
 
+		private IMaximumMessagesPerRequestProvider MaximumMessagesProvider { get; set; }
+
+
 		private IOverflownMessageHandler OverflownMessageHandler { get; set; }
 
 
@@ -46,6 +49,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			ExceptionPolicy policy,
 			IQueueMessageProvider messageProvider,
 			IMaximumMessageSizeProvider maximumMessageSizeProvider,
+			IMaximumMessagesPerRequestProvider maximumMessagePerRequestProvider,
 			IOverflownMessageHandler overflownMessageHandler,
 			ILogService logService)
 		{
@@ -57,6 +61,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			this.MessageProvider = messageProvider;
 			this.MaximumMessageSizeProvider = maximumMessageSizeProvider;
+			this.MaximumMessagesProvider = maximumMessagePerRequestProvider;
 			this.OverflownMessageHandler = overflownMessageHandler;
 			this.LogService = logService;
 			this.Policy = policy;
@@ -66,7 +71,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		public IExtendedQueue Create(IQueue original)
 		{
-			var baseQueue = new ExtendedQueue(original, this.MessageProvider, this.MaximumMessageSizeProvider);
+			var baseQueue = new ExtendedQueue(original, this.MessageProvider, this.MaximumMessageSizeProvider, this.MaximumMessagesProvider);
 
 			var compressibleQueue = new CompressionDecorator(baseQueue);
 			var jsonQueue = new JsonSerialiserDecorator(compressibleQueue);

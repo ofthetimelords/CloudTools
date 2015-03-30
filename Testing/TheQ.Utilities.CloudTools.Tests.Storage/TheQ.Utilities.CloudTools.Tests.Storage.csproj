@@ -109,6 +109,7 @@
     <Compile Include="CloudEnvironment.cs" />
     <Compile Include="ConcurrencyTests\GlobalLockTests.cs" />
     <Compile Include="ConcurrencyTests\HandleMessagesTests.cs" />
+    <Compile Include="Mocks\ChaosMonkeyOverflownMessageHandler.cs" />
     <Compile Include="Models\ComplexModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

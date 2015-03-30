@@ -25,7 +25,14 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 		public AzureExtendedQueueFactory(
 			ExceptionPolicy policy,
 			IBlobContainer overflowContainer,
-			ILogService logService) : base(policy, new AzureQueueMessageProvider(), new AzureMaximumMessageSizeProvider(), new AzureBlobOverflownMessageHandler(overflowContainer), logService)
+			ILogService logService)
+			: base(
+				policy,
+				new AzureQueueMessageProvider(),
+				new AzureMaximumMessageSizeProvider(),
+				new AzureMaximumMessagesPerRequestProvider(),
+				new AzureBlobOverflownMessageHandler(overflowContainer),
+				logService)
 		{
 		}
 	}

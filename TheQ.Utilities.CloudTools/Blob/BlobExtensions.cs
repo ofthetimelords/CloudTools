@@ -73,25 +73,5 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 
 			return blobDataArray;
 		}
-
-
-
-		/// <summary>
-		///     Serialises and uploads an object to a BLOB reference.
-		/// </summary>
-		/// <param name="blob">The BLOB to upload the object to.</param>
-		/// <param name="instance">The object that will be serialised and then uploaded.</param>
-		public static async void UploadObjectAsync([NotNull] this IBlob blob, [NotNull] object instance, CancellationToken token)
-		{
-			Guard.NotNull(blob, "blob");
-			Guard.NotNull(instance, "instance");
-
-			using (var ms = new MemoryStream())
-			{
-				new BinaryFormatter().Serialize(ms, instance);
-				ms.Seek(0, SeekOrigin.Begin);
-				await blob.UploadFromStreamAsync(ms, token).ConfigureAwait(false);
-			}
-		}
 	}
 }
