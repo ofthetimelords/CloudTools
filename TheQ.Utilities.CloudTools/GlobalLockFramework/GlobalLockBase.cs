@@ -37,12 +37,12 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <summary>
 		///     The default time between locking attempts, set to 3 seconds.
 		/// </summary>
-		private static TimeSpan _defaultTimeBetweenLockAttemptsValue = TimeSpan.FromSeconds(3);
+		private static TimeSpan DefaultTimeBetweenLockAttemptsValue = TimeSpan.FromSeconds(3);
 
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
@@ -55,7 +55,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
@@ -69,7 +69,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
@@ -83,7 +83,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
@@ -110,8 +110,8 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </value>
 		public static TimeSpan DefaultTimeBetweenLockAttempts
 		{
-			get { return _defaultTimeBetweenLockAttemptsValue; }
-			set { if (_defaultTimeBetweenLockAttemptsValue.TotalSeconds >= 1) _defaultTimeBetweenLockAttemptsValue = value; }
+			get { return GlobalLockBase<TLockState>.DefaultTimeBetweenLockAttemptsValue; }
+			set { if (GlobalLockBase<TLockState>.DefaultTimeBetweenLockAttemptsValue.TotalSeconds >= 1) GlobalLockBase<TLockState>.DefaultTimeBetweenLockAttemptsValue = value; }
 		}
 
 
@@ -637,7 +637,8 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 				try
 				{
-					if (disposing) this.LockStateProvider.Dispose();
+					if (disposing) 
+						this.LockStateProvider.Dispose();
 				}
 				catch (Exception ex)
 				{

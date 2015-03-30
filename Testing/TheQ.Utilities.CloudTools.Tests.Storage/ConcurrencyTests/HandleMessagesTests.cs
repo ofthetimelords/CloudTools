@@ -560,7 +560,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				{
 					equeue.AddMessageEntity(expected);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					succeeded = true;
 				}

@@ -100,7 +100,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 
 
 
-		public async Task RemoveOverflownContentsAsync(string id, string queueName, CancellationToken token)
+		public Task RemoveOverflownContentsAsync(string id, string queueName, CancellationToken token)
 		{
 			if (this._failureMode == FailureMode.RemoveOverflownContents)
 				throw new ArgumentNullException();
@@ -115,6 +115,8 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 				if (ex.StatusCode != 404 && ex.StatusCode != 409 && ex.StatusCode != 412)
 					throw;
 			}
+
+			return Task.FromResult(false);
 		}
 
 

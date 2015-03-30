@@ -41,7 +41,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// <summary>
 		///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose() { if (!this.IsDisposed) this.IsDisposed = true; }
+		/// <remarks>This instance is not disposable.</remarks>
+		public void Dispose()
+		{
+			if (!this.IsDisposed)
+			{
+				this.IsDisposed = true;
+				GC.SuppressFinalize(this);
+			}
+		}
 
 
 
@@ -66,8 +74,8 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 			try
 			{
 				// TODO: What if does not exist already, Exceptions
-				if (state.LeaseId != null) await this.UnregisterLockAsync(state, cancelToken);
-				else await this.BreakLockInternal(state, cancelToken);
+				if (state.LeaseId != null) await this.UnregisterLockAsync(state, cancelToken).ConfigureAwait(false);
+				else await this.BreakLockInternal(state, cancelToken).ConfigureAwait(false);
 			}
 			catch (CloudToolsStorageException ex)
 			{
@@ -85,7 +93,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 			if (state.LockingBlob != null)
 			{
-				await state.LockingBlob.ReleaseLeaseAsync(new AzureAccessCondition(AccessCondition.GenerateLeaseCondition(state.LeaseId)), cancelToken);
+				await state.LockingBlob.ReleaseLeaseAsync(new AzureAccessCondition(AccessCondition.GenerateLeaseCondition(state.LeaseId)), cancelToken).ConfigureAwait(false);
 				state.LockingBlob = null;
 				state.LeaseId = null;
 			}
@@ -99,13 +107,18 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		{
 			Guard.NotNull(state, "state");
 
-			await state.LockingBlobContainer.CreateIfNotExistsAsync(cancelToken);
+			await state.LockingBlobContainer.CreateIfNotExistsAsync(cancelToken).ConfigureAwait(false);
 
 			state.LockingBlob = state.LockingBlobContainer.GetBlobReference(newLockName);
 
-			if (!await state.LockingBlob.ExistsAsync(cancelToken)) await state.LockingBlob.UploadFromByteArrayAsync(new byte[0], 0, 0, cancelToken);
+			if (!await state.LockingBlob.ExistsAsync(cancelToken).ConfigureAwait(false)) await state.LockingBlob.UploadFromByteArrayAsync(new byte[0], 0, 0, cancelToken).ConfigureAwait(false);
 
-			state.LeaseId = await state.LockingBlob.AcquireLeaseAsync(isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime, null, cancelToken);
+			state.LeaseId =
+				await
+					state.LockingBlob.AcquireLeaseAsync(
+						isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
+						null,
+						cancelToken).ConfigureAwait(false);
 			state.LockName = newLockName;
 
 			return state;
@@ -113,14 +126,22 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 
+		/// <summary>
+		/// Renews the lock lease asynchronously.
+		/// </summary>
+		/// <param name="state">The lock state object.</param>
+		/// <param name="cancelToken">The cancellation token.</param>
+		/// <returns>The updated <see cref="AzureLockState"/> instance.</returns>
 		public async Task<AzureLockState> RenewLockAsync(AzureLockState state, CancellationToken cancelToken)
 		{
 			Guard.NotNull(state, "state");
 
-			if (state.LockingBlob != null) await state.LockingBlob.RenewLeaseAsync(new AzureAccessCondition(AccessCondition.GenerateLeaseCondition(state.LeaseId)), cancelToken);
+			if (state.LockingBlob != null) await state.LockingBlob.RenewLeaseAsync(new AzureAccessCondition(AccessCondition.GenerateLeaseCondition(state.LeaseId)), cancelToken).ConfigureAwait(false);
 
 			return state;
 		}
+
+
 
 		/// <summary>
 		///     Ensures that a lease time is between 15 and 60 seconds (inclusive).
@@ -135,11 +156,12 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		}
 
 
+
 		private async Task<AzureLockState> BreakLockInternal(AzureLockState state, CancellationToken cancelToken)
 		{
 			if (state.LockingBlob != null)
 			{
-				await state.LockingBlob.BreakLeaseAsync(null, cancelToken);
+				await state.LockingBlob.BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
 				state.LockingBlob = null;
 				state.LeaseId = null;
 			}

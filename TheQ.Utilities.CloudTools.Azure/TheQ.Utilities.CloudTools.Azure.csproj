@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <DocumentationFile>..\Output\vLatest\TheQ.Utilities.CloudTools.Azure.xml</DocumentationFile>
-    <CodeAnalysisRuleSet>..\Code Analysis Rules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -106,6 +106,7 @@
     <Compile Include="GlobalLockFramework\AzureGlobalLockFactory.cs" />
     <Compile Include="GlobalLockFramework\AzureLockState.cs" />
     <Compile Include="GlobalLockFramework\AzureLockStateProvider.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="StorageExceptionHelper.cs" />
     <Compile Include="AzureAccessCondition.cs" />
     <Compile Include="AzureBlobProperties.cs" />

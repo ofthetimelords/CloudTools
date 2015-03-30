@@ -11,6 +11,7 @@
 
 using System;
 using System.Linq;
+using System.Security.Policy;
 
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -267,7 +268,12 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     The underlying <see cref="CloudQueueMessage" /> .
 		/// </returns>
-		public static implicit operator CloudQueueMessage(AzureQueueMessage message) { return message._queueMessageReference; }
+		public static implicit operator CloudQueueMessage(AzureQueueMessage message)
+		{
+			Guard.NotNull(message, "message");
+
+			return message._queueMessageReference;
+		}
 
 
 
@@ -279,5 +285,19 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     A <see cref="AzureQueueMessage" /> wrapper.
 		/// </returns>
 		public static implicit operator AzureQueueMessage(CloudQueueMessage message) { return new AzureQueueMessage(message); }
+
+
+
+		/// <summary>
+		///     Creates an <see cref="AzureQueueMessage"/> from a <see cref="CloudQueueMessage" /> instance.
+		/// </summary>
+		/// <param name="message">The <see cref="CloudQueueMessage" /> instance.</param>
+		/// <returns>
+		///     A <see cref="AzureQueueMessage" /> wrapper.
+		/// </returns>
+		public static AzureQueueMessage FromCloudQueueMessage(CloudQueueMessage message)
+		{
+			return new AzureQueueMessage(message);
+		}
 	}
 }

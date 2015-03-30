@@ -355,5 +355,30 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     A <see cref="AzureQueue" /> wrapper.
 		/// </returns>
 		public static implicit operator AzureQueue(CloudQueue queue) { return new AzureQueue(queue); }
+
+
+
+		/// <summary>
+		///     Creates an <see cref="AzureQueue"/> from a <see cref="CloudQueue" /> instance.
+		/// </summary>
+		/// <param name="queue">The <see cref="CloudQueue" /> instance.</param>
+		/// <returns>
+		///     A <see cref="AzureQueue" /> wrapper.
+		/// </returns>
+		public static AzureQueue FromCloudQueue(CloudQueue queue)
+		{
+			return new AzureQueue(queue);
+		}
+
+
+
+		/// <summary>
+		///     Retrieves the underlying <see cref="CloudQueue" /> instance from this <see cref="AzureQueue"/> instance.
+		/// </summary>
+		/// <param name="queue">The underlying <see cref="CloudQueue" /> instance.</param>
+		/// <returns>
+		///     An <see cref="AzureQueue" /> wrapper.
+		/// </returns>
+		public static CloudQueue ToCloudQueueMessage(AzureQueue queue) { return queue._queueReference; }
 	}
 }

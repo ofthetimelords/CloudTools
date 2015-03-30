@@ -4,14 +4,12 @@
 // </copyright>
 // <author>James Kavakopoulos</author>
 // <email>ofthetimelords@gmail.com</email>
-// <date>2015/02/06</date>
+// <date>2015/03/31</date>
 // <summary>
 // 
 // </summary>
 
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 

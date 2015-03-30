@@ -50,7 +50,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <param name="success">The value is set when the operation completes, indicating if the lock was successfully acquired or not.</param>
 		/// <returns>
-		///     <para>A <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>A <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		public IGlobalLock TryCreateLock(string lockName, out bool success)
@@ -61,7 +61,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
 		/// <remarks>
@@ -86,7 +86,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
@@ -104,7 +104,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
 		/// <remarks>
@@ -127,7 +127,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
@@ -143,7 +143,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <remarks>
@@ -164,7 +164,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
@@ -181,7 +181,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <remarks>
@@ -203,7 +203,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
@@ -219,7 +219,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <remarks>
@@ -240,7 +240,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
@@ -257,7 +257,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="TheQ.Utilities.CloudTools.Storage.Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
 		/// <remarks>

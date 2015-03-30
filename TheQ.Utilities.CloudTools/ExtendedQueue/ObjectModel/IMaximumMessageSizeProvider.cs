@@ -1,17 +1,20 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
-
-using TheQ.Utilities.CloudTools.Storage.Infrastructure;
-using TheQ.Utilities.CloudTools.Storage.Internal;
-using TheQ.Utilities.CloudTools.Storage.Models;
-using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
-namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
+namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 {
+	/// <summary>
+	/// Provides the maximum amount of a queue's message in bytes. Used to allow for easier IoC scenarios.
+	/// </summary>
 	public interface IMaximumMessageSizeProvider
 	{
+		/// <summary>
+		/// Gets the maximum size of a message a queue supports.
+		/// </summary>
+		/// <value>
+		/// An integer representing the maximum size of the message.
+		/// </value>
 		int MaximumMessageSize { get; }
 	}
 }

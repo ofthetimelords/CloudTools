@@ -30,7 +30,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <DocumentationFile>..\Output\vLatest\TheQ.Utilities.CloudTools.Storage.xml</DocumentationFile>
-    <CodeAnalysisRuleSet>..\Code Analysis Rules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
