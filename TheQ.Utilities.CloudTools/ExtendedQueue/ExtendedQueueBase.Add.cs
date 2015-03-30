@@ -50,6 +50,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			using (var writer = new StreamWriter(decoratedConverter))
 			{
 				await writer.WriteAsync(serializedContents).ConfigureAwait(false);
+				await writer.FlushAsync().ConfigureAwait(false);
 				return converter.ToArray();
 			}
 		}

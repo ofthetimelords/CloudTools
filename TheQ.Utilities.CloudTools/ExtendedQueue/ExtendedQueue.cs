@@ -64,7 +64,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
 		{
-			return (this as IQueue).AddMessageAsync(this.MessageProvider.Create(messageContents), token);
+			return this.AddMessageAsync(this.MessageProvider.Create(messageContents), token);
 		}
 
 

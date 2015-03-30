@@ -175,7 +175,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			if (cancelToken.IsCancellationRequested) return;
 
-			await (this as IQueue).UpdateMessageAsync(message, messageLeaseTime, QueueMessageUpdateFields.Visibility, cancelToken).ConfigureAwait(false);
+			await this.UpdateMessageAsync(message, messageLeaseTime, QueueMessageUpdateFields.Visibility, cancelToken).ConfigureAwait(false);
 		}
 	}
 }

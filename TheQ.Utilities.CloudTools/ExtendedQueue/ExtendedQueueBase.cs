@@ -61,7 +61,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		Task IQueue.AddMessageAsync(IQueueMessage message)
+		public virtual Task AddMessageAsync(IQueueMessage message)
 		{
 			return this.OriginalQueue.AddMessageAsync(message);
 		}
@@ -83,7 +83,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		Task IQueue.AddMessageAsync(IQueueMessage message, CancellationToken cancellationToken)
+		public virtual Task AddMessageAsync(IQueueMessage message, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.AddMessageAsync(message, cancellationToken);
 		}
@@ -99,7 +99,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		Task<IEnumerable<IQueueMessage>> IQueue.GetMessagesAsync(int messageCount)
+		public virtual Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount)
 		{
 			return this.OriginalQueue.GetMessagesAsync(messageCount);
 		}
@@ -119,7 +119,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		Task<IEnumerable<IQueueMessage>> IQueue.GetMessagesAsync(int messageCount, CancellationToken cancellationToken)
+		public virtual Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.GetMessagesAsync(messageCount, cancellationToken);
 		}
@@ -142,7 +142,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		Task<IQueueMessage> IQueue.GetMessageAsync(TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
+		public virtual Task<IQueueMessage> GetMessageAsync(TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.GetMessageAsync(visibilityTimeout, cancellationToken);
 		}
@@ -167,7 +167,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		Task<IEnumerable<IQueueMessage>> IQueue.GetMessagesAsync(int messageCount, TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
+		public virtual Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount, TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.GetMessagesAsync(messageCount, visibilityTimeout, cancellationToken);
 		}
@@ -181,7 +181,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>An <see cref="IQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
-		void IQueue.DeleteMessage(IQueueMessage message)
+		public virtual void DeleteMessage(IQueueMessage message)
 		{
 			this.OriginalQueue.DeleteMessage(message);
 		}
@@ -193,7 +193,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messageId">A string specifying the message ID.</param>
 		/// <param name="popReceipt">A string specifying the pop receipt value.</param>
-		void IQueue.DeleteMessage(string messageId, string popReceipt)
+		public virtual void DeleteMessage(string messageId, string popReceipt)
 		{
 			this.OriginalQueue.DeleteMessage(messageId, popReceipt);
 		}
@@ -219,7 +219,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		Task IQueue.UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields)
+		public virtual Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields)
 		{
 			return this.OriginalQueue.UpdateMessageAsync(message, visibilityTimeout, updateFields);
 		}
@@ -249,7 +249,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		Task IQueue.UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields, CancellationToken cancellationToken)
+		public virtual Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields, CancellationToken cancellationToken)
 		{
 			return this.OriginalQueue.UpdateMessageAsync(message, visibilityTimeout, updateFields, cancellationToken);
 		}

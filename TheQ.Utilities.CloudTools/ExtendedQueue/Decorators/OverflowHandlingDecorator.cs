@@ -40,7 +40,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 			await this.OverflownMessageHandler.Serialize(messageContents, id, this.Name, token).ConfigureAwait(false);
 			var messagePointer = this.MessageProvider.Create(this.OverflownMessageHandler.CreateMessagePointerFromId(id));
-			await (this as IQueue).AddMessageAsync(messagePointer, token).ConfigureAwait(false);
+			await this.AddMessageAsync(messagePointer, token).ConfigureAwait(false);
 		}
 
 

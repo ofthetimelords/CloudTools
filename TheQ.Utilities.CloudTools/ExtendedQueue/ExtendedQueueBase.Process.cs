@@ -90,7 +90,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				//				loggingService.QuickLogDebug("HandleMessages", "Queue's '{0}' message '{1}' scheduled for deletion, cancelling other related tasks prior to deletion", queue.Name, message.ActualMessage.Id);
 
 				if (messageSpecificCancellationTokenSource != null) messageSpecificCancellationTokenSource.Cancel();
-				(this as IQueue).DeleteMessage(message.ActualMessage);
+				this.DeleteMessage(message.ActualMessage);
 
 				if (message.WasOverflown)
 				{

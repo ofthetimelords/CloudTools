@@ -81,7 +81,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		protected internal virtual async Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
-			return await (this as IQueue).GetMessageAsync(messageOptions.MessageLeaseTime, messageOptions.CancelToken).ConfigureAwait(false);
+			return await this.GetMessageAsync(messageOptions.MessageLeaseTime, messageOptions.CancelToken).ConfigureAwait(false);
 		}
 
 

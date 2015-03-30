@@ -18,19 +18,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		public async virtual Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token)
+		public async virtual Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token) 
 		{
 			var msgBytes = wrapper.ActualMessage.AsBytes;
 			var overflownId = (wrapper.OverflowId = this.GetOverflownMessageId(wrapper.ActualMessage));
 			var wasOverflown = (wrapper.WasOverflown = !string.IsNullOrWhiteSpace(overflownId));
 
-			msgBytes = await (!string.IsNullOrWhiteSpace(overflownId)
+			msgBytes = await (wasOverflown
 				? this.GetOverflownMessageContentsAsync(wrapper.ActualMessage, overflownId, token)
 				: this.GetNonOverflownMessageContentsAsync(wrapper.ActualMessage, token)).ConfigureAwait(false);
 
 			var serialized = await this.ByteArrayToSerializedMessageContents(msgBytes).ConfigureAwait(false);
 
-			return this.DeserializeToObject<T>(serialized);
+			return typeof(T) == typeof(string) ? (T) (object)serialized : this.DeserializeToObject<T>(serialized);
 
 
 
