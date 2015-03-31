@@ -18,7 +18,7 @@ using System.Runtime.Serialization;
 namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 {
 	/// <summary>
-	///     Wraps a storage exception to one that is compatible with CloudTools.
+	///     Wraps underlying subsystem exceptions to one that is compatible with CloudTools frameworks.
 	/// </summary>
 	[Serializable]
 	public class CloudToolsStorageException : Exception

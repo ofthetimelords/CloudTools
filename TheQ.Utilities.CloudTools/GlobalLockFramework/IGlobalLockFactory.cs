@@ -21,20 +21,18 @@ using TheQ.Utilities.CloudTools.Storage.Internal;
 namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 {
 	/// <summary>
-	///     Represents a Global Lock Factory which can be inherited from to provide implementations for other cloud platforms.
+	///     Represents a Global Lock Factory which can be inherited from to provide implementations for different platforms.
 	/// </summary>
 	public interface IGlobalLockFactory
 	{
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLockFactory" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <param name="success">The value is set when the operation completes, indicating if the lock was successfully acquired or not.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock TryCreateLock(
@@ -44,20 +42,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
-		/// <remarks>
-		///     <para>Warning! Unless you are aware of the implications an infinite lock has, you should probably avoid providing a <see langword="null" /> value in <paramref name="leaseTime" /></para>
-		///     <para>.</para>
-		/// </remarks>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
 		/// <param name="success">The value is set when the operation completes, indicating if the lock was successfully acquired or not.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock TryCreateLock(
@@ -68,16 +60,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <param name="cancelToken">A cancellation token.</param>
 		/// <param name="success">The value is set when the operation completes, indicating if the lock was successfully acquired or not.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock TryCreateLock(
@@ -88,21 +78,15 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates a <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it with the specified name and will return instantly.</para>
 		/// </summary>
-		/// <remarks>
-		///     <para>Warning! Unless you are aware of the implications an infinite lock has, you should probably avoid providing a <see langword="null" /> value in <paramref name="leaseTime" /></para>
-		///     <para>.</para>
-		/// </remarks>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
 		/// <param name="cancelToken">The cancel token.</param>
 		/// <param name="success">The value is set when the operation completes, indicating if the lock was successfully acquired or not.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock TryCreateLock(
@@ -114,14 +98,12 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock CreateLock([NotNull] string lockName);
@@ -129,19 +111,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <remarks>
-		///     <para>Warning! Unless you are aware of the implications an infinite lock has, you should probably avoid providing a <see langword="null" /> value in <paramref name="leaseTime" /></para>
-		///     <para>.</para>
-		/// </remarks>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
-		/// <param name="loggingService">An optional logging service.</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock CreateLock([NotNull] string lockName, TimeSpan? leaseTime);
@@ -149,15 +125,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <param name="cancelToken">The cancel token.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock CreateLock([NotNull] string lockName, CancellationToken cancelToken);
@@ -165,20 +139,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <remarks>
-		///     <para>Warning! Unless you are aware of the implications an infinite lock has, you should probably avoid providing a <see langword="null" /> value in <paramref name="leaseTime" /></para>
-		///     <para>.</para>
-		/// </remarks>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
 		/// <param name="cancelToken">The cancel token.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		IGlobalLock CreateLock([NotNull] string lockName, TimeSpan? leaseTime, CancellationToken cancelToken);
@@ -186,14 +154,12 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		Task<IGlobalLock> CreateLockAsync([NotNull] string lockName);
@@ -201,19 +167,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <remarks>
-		///     <para>Warning! Unless you are aware of the implications an infinite lock has, you should probably avoid providing a <see langword="null" /> value in <paramref name="leaseTime" /></para>
-		///     <para>.</para>
-		/// </remarks>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
-		/// <param name="loggingService">An optional logging service.</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		Task<IGlobalLock> CreateLockAsync([NotNull] string lockName, TimeSpan? leaseTime);
@@ -221,15 +181,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <param name="cancelToken">The cancel token.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		Task<IGlobalLock> CreateLockAsync([NotNull] string lockName, CancellationToken cancelToken);
@@ -237,20 +195,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Creates a <see cref="Blob.GlobalLock" /></para>
+		///     <para>Creates an <see cref="IGlobalLock" /></para>
 		///     <para>instance and attempts to create a lock on it. The method will not return before a lock can be retrieved.</para>
 		/// </summary>
-		/// <remarks>
-		///     <para>Warning! Unless you are aware of the implications an infinite lock has, you should probably avoid providing a <see langword="null" /> value in <paramref name="leaseTime" /></para>
-		///     <para>.</para>
-		/// </remarks>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
 		/// <param name="cancelToken">The cancel token.</param>
-		/// <param name="loggingService">An optional logging service.</param>
 		/// <returns>
-		///     <para>A <see cref="Blob.GlobalLock" /></para>
+		///     <para>An <see cref="IGlobalLock" /></para>
 		///     <para>instance with an activated lock (if successful).</para>
 		/// </returns>
 		Task<IGlobalLock> CreateLockAsync([NotNull] string lockName, TimeSpan? leaseTime, CancellationToken cancelToken);

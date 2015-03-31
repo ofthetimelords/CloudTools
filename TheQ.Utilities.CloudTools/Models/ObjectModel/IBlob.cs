@@ -205,37 +205,37 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to renew a lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		Task RenewLeaseAsync(IAccessCondition accessCondition);
+		///// <summary>
+		/////     Initiates an asynchronous operation to renew a lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//Task RenewLeaseAsync(IAccessCondition accessCondition);
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to renew a lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
+		///// <summary>
+		/////     Initiates an asynchronous operation to renew a lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <param name="cancellationToken">
+		/////     <para>A <see cref="CancellationToken" /></para>
+		/////     <para>to observe while waiting for a task to complete.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
 
 
 
@@ -271,37 +271,37 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to release the lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		Task ReleaseLeaseAsync(IAccessCondition accessCondition);
+		///// <summary>
+		/////     Initiates an asynchronous operation to release the lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//Task ReleaseLeaseAsync(IAccessCondition accessCondition);
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to release the lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		Task ReleaseLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
+		///// <summary>
+		/////     Initiates an asynchronous operation to release the lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <param name="cancellationToken">
+		/////     <para>A <see cref="CancellationToken" /></para>
+		/////     <para>to observe while waiting for a task to complete.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//Task ReleaseLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
 
 
 

@@ -16,11 +16,26 @@ using System.Linq;
 
 namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 {
+	/// <summary>
+	/// Represents the state of a lock for the Global Locking Framework.
+	/// </summary>
 	public interface ILockState
 	{
+		/// <summary>
+		/// Gets or sets the name of the lock.
+		/// </summary>
+		/// <value>
+		/// A string value representing the name of the lock.
+		/// </value>
 		string LockName { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the lease identifier used to validate ownership of a lock.
+		/// </summary>
+		/// <value>
+		/// A string value representing the lease identifier.
+		/// </value>
 		string LeaseId { get; set; }
 	}
 }

@@ -376,57 +376,57 @@ namespace TheQ.Utilities.CloudTools.Azure
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to renew a lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task RenewLeaseAsync(IAccessCondition accessCondition)
-		{
-			try
-			{
-				await this._blobReference.RenewLeaseAsync((AzureAccessCondition) accessCondition);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
+		///// <summary>
+		/////     Initiates an asynchronous operation to renew a lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//public async Task RenewLeaseAsync(IAccessCondition accessCondition)
+		//{
+		//	try
+		//	{
+		//		await this._blobReference.RenewLeaseAsync((AzureAccessCondition) accessCondition);
+		//	}
+		//	catch (StorageException ex)
+		//	{
+		//		throw ex.Wrap();
+		//	}
+		//}
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to renew a lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
-		{
-			try
-			{
-				await this._blobReference.RenewLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
+		///// <summary>
+		/////     Initiates an asynchronous operation to renew a lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <param name="cancellationToken">
+		/////     <para>A <see cref="CancellationToken" /></para>
+		/////     <para>to observe while waiting for a task to complete.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//public async Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
+		//{
+		//	try
+		//	{
+		//		await this._blobReference.RenewLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
+		//	}
+		//	catch (StorageException ex)
+		//	{
+		//		throw ex.Wrap();
+		//	}
+		//}
 
 
 
@@ -482,57 +482,57 @@ namespace TheQ.Utilities.CloudTools.Azure
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to release the lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task ReleaseLeaseAsync(IAccessCondition accessCondition)
-		{
-			try
-			{
-				await this._blobReference.ReleaseLeaseAsync((AzureAccessCondition) accessCondition);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
+		///// <summary>
+		/////     Initiates an asynchronous operation to release the lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//public async Task ReleaseLeaseAsync(IAccessCondition accessCondition)
+		//{
+		//	try
+		//	{
+		//		await this._blobReference.ReleaseLeaseAsync((AzureAccessCondition) accessCondition);
+		//	}
+		//	catch (StorageException ex)
+		//	{
+		//		throw ex.Wrap();
+		//	}
+		//}
 
 
 
-		/// <summary>
-		///     Initiates an asynchronous operation to release the lease on this blob.
-		/// </summary>
-		/// <param name="accessCondition">
-		///     <para>An <see cref="AccessCondition" /></para>
-		///     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task ReleaseLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
-		{
-			try
-			{
-				await this._blobReference.ReleaseLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
+		///// <summary>
+		/////     Initiates an asynchronous operation to release the lease on this blob.
+		///// </summary>
+		///// <param name="accessCondition">
+		/////     <para>An <see cref="AccessCondition" /></para>
+		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
+		///// </param>
+		///// <param name="cancellationToken">
+		/////     <para>A <see cref="CancellationToken" /></para>
+		/////     <para>to observe while waiting for a task to complete.</para>
+		///// </param>
+		///// <returns>
+		/////     <para>A <see cref="Task" /></para>
+		/////     <para>object that represents the asynchronous operation.</para>
+		///// </returns>
+		//public async Task ReleaseLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
+		//{
+		//	try
+		//	{
+		//		await this._blobReference.ReleaseLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
+		//	}
+		//	catch (StorageException ex)
+		//	{
+		//		throw ex.Wrap();
+		//	}
+		//}
 
 
 

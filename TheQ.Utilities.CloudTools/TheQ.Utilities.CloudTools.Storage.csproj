@@ -109,7 +109,6 @@
     <Compile Include="Models\ObjectModel\IBlobProperties.cs" />
     <Compile Include="Models\ObjectModel\CloudToolsStorageException.cs" />
     <Compile Include="ExtendedQueue\QueueMessageWrapper.cs" />
-    <Compile Include="Infrastructure\DataCompression.cs" />
     <Compile Include="Infrastructure\LogHelper.cs" />
     <Compile Include="Models\HandleMessageOptionsBase.cs" />
     <Compile Include="Models\HandleParallelMessageOptions.cs" />

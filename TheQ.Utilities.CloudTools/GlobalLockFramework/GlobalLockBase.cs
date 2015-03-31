@@ -1,29 +1,23 @@
 ﻿// <copyright file="GlobalLockBase.cs" company="nett">
-
-
-
-#region Using directives
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
 // <author>James Kavakopoulos</author>
 // <email>ofthetimelords@gmail.com</email>
-// <date>2015/02/06</date>
+// <date>2015/03/31</date>
 // <summary>
 // 
 // </summary>
 
-
 using System;
+using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
-#endregion
 
 
 
@@ -45,9 +39,9 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
-		public GlobalLockBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState)
+		/// <param name="lockStateProvider">The lock state provider to use.</param>
+		/// <param name="initialState">The initial state of the lock.</param>
+		protected GlobalLockBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState)
 			: this(new CancellationToken(), lockStateProvider, initialState, null)
 		{
 		}
@@ -58,24 +52,10 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
-		/// <param name="cancelToken">The cancellation token.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
-		public GlobalLockBase(CancellationToken cancelToken, ILockStateProvider<TLockState> lockStateProvider, TLockState initialState)
-			: this(cancelToken, lockStateProvider, initialState, null)
-		{
-		}
-
-
-
-		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
-		///     <para>class.</para>
-		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
+		/// <param name="lockStateProvider">The lock state provider.</param>
+		/// <param name="initialState">The initial state.</param>
 		/// <param name="logService">The logging service to use.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
-		public GlobalLockBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService)
+		protected GlobalLockBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService)
 			: this(new CancellationToken(), lockStateProvider, initialState, logService)
 		{
 		}
@@ -86,11 +66,11 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="cancelToken">The cancellation token.</param>
+		/// <param name="lockStateProvider">The lock state provider.</param>
+		/// <param name="initialState">The initial state.</param>
 		/// <param name="logService">The logging service to use.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
-		public GlobalLockBase(CancellationToken cancelToken, ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService)
+		protected GlobalLockBase(CancellationToken cancelToken, ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService = null)
 		{
 			Guard.NotNull(lockStateProvider, "lockStateProvider");
 
@@ -110,8 +90,8 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </value>
 		public static TimeSpan DefaultTimeBetweenLockAttempts
 		{
-			get { return GlobalLockBase<TLockState>.DefaultTimeBetweenLockAttemptsValue; }
-			set { if (GlobalLockBase<TLockState>.DefaultTimeBetweenLockAttemptsValue.TotalSeconds >= 1) GlobalLockBase<TLockState>.DefaultTimeBetweenLockAttemptsValue = value; }
+			get { return DefaultTimeBetweenLockAttemptsValue; }
+			set { if (DefaultTimeBetweenLockAttemptsValue.TotalSeconds >= 1) DefaultTimeBetweenLockAttemptsValue = value; }
 		}
 
 
@@ -147,7 +127,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <summary>
 		///     Used for gracefully aborting the renewal thread.
 		/// </summary>
-		[NotNull]
+		[CanBeNull]
 		private CancellationTokenSource RenewalThreadCancelToken { get; set; }
 
 
@@ -167,12 +147,26 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		}
 
 
+		/// <summary>
+		///     Gets the name of the current lock.
+		/// </summary>
+		/// <value>
+		///     A string value with the name of the current lock.
+		/// </value>
+		[CanBeNull]
 		public string CurrentLockName
 		{
 			get { return this.LockState.LockName; }
 		}
 
 
+		/// <summary>
+		///     Gets the current lease identifier.
+		/// </summary>
+		/// <value>
+		///     A string value with current lease identifier.
+		/// </value>
+		[CanBeNull]
 		public string CurrentLeaseId
 		{
 			get { return this.LockState.LeaseId; }
@@ -209,7 +203,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </summary>
 		public async Task UnlockAsync()
 		{
-			await this.UnlockAsync(true);
+			await this.UnlockAsync(true).ConfigureAwait(false);
 		}
 
 
@@ -233,7 +227,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		[NotNull]
 		public async Task<IGlobalLock> ForceUnlockAsync()
 		{
-			return await this.ForceUnlockAsync(false);
+			return await this.ForceUnlockAsync(false).ConfigureAwait(false);
 		}
 
 
@@ -280,15 +274,17 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
+		/// <exception cref="CloudToolsStorageException">A conflict has occurred while attempting to retrieve the lock and <paramref name="throwOnError" /> was set to <c>true</c>.</exception>
+		/// <exception cref="Exception">Any uncaught exception.</exception>
 		[NotNull]
 		public async Task<IGlobalLock> ForceUnlockAsync(bool throwOnError)
 		{
 			try
 			{
-				if (this.LockState.LeaseId != null) await this.UnlockAsync();
+				if (this.LockState.LeaseId != null) await this.UnlockAsync().ConfigureAwait(false);
 				else
 				{
-					this.LockState = await this.LockStateProvider.BreakLockAsync(this.LockState, this.CancelToken);
+					this.LockState = await this.LockStateProvider.BreakLockAsync(this.LockState, this.CancelToken).ConfigureAwait(false);
 					this.LogService.QuickLogDebug("GlobalLock", "Global lock with name '{0}' was force-released", this.LockName);
 				}
 			}
@@ -346,6 +342,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
+		/// <exception cref="ArgumentNullException">The <paramref name="function" /> parameter was null.</exception>
 		public IGlobalLock TryLock(string lockName, TimeSpan? leaseTime, out bool success)
 		{
 			success = Task.Run(() => this.TryLockInternal(lockName, leaseTime, false), this.CancelToken).Result;
@@ -359,7 +356,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <exception cref="ArgumentException">Parameter <paramref name="lockName" /> is <see langword="null" /> or empty;lockName</exception>
-		/// <exception cref="OperationCanceledException">A wait for a global lock retrieval was cancelled</exception>
+		/// <exception cref="ArgumentNullException">The parameter was null: <paramref name="lockName" /></exception>
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
@@ -370,7 +367,6 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 			return this.LockInternal(lockName, null, true, DefaultTimeBetweenLockAttempts);
 		}
-
 
 
 
@@ -387,7 +383,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
-		[NotNull]
+		/// <exception cref="ArgumentNullException">The parameter was null: <paramref name="lockName" /></exception>
 		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
@@ -403,7 +399,6 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <param name="lockName">The name of the lock to acquire.</param>
 		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
 		/// <param name="timeBetweenAttempts">The time between lock retrieval attempts.</param>
-		/// <exception cref="OperationCanceledException">A wait for a global lock retrieval was cancelled</exception>
 		/// <exception cref="ArgumentException">
 		///     Parameter <paramref name="lockName" /> is <see langword="null" /> or empty;lockName or Parameter <paramref name="leaseTime" /> must be either <see langword="null" /> or between 15 and 60
 		///     seconds;leaseTime
@@ -411,6 +406,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
+		/// <exception cref="ArgumentNullException">The parameter was null: <paramref name="lockName" /></exception>
 		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts)
 		{
 			Guard.NotNull(lockName, "lockName");
@@ -424,14 +420,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		{
 			Guard.NotNull(lockName, "lockName");
 
-			var success = await this.TryLockInternal(lockName, leaseTime, isDefaultLeaseTime);
+			var success = await this.TryLockInternal(lockName, leaseTime, isDefaultLeaseTime).ConfigureAwait(false);
 
 			while (!success)
 			{
 				if (this.CancelToken.IsCancellationRequested) return this;
 
-				await Task.Delay((int) timeBetweenAttempts.TotalSeconds, this.CancelToken);
-				success = await this.TryLockInternal(lockName, leaseTime, isDefaultLeaseTime);
+				await Task.Delay((int) timeBetweenAttempts.TotalSeconds, this.CancelToken).ConfigureAwait(false);
+				success = await this.TryLockInternal(lockName, leaseTime, isDefaultLeaseTime).ConfigureAwait(false);
 			}
 
 			return this;
@@ -443,28 +439,27 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     Handles an attempt to create a lock on a blob.
 		/// </summary>
 		/// <param name="lockName">The name of the lock to acquire.</param>
-		/// <param name="leaseTime">A custom lease time for the lock. The value must be between 15 and 60 seconds, or <see langword="null" /> (in which case an infinite lock is created).</param>
+		/// <param name="leaseTime">A custom lease time for the lock.</param>
+		/// <param name="isDefaultLeaseTime">if set to <c>true</c> [is default lease time].</param>
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
+		/// <exception cref="ArgumentException">Invalid lease time specified!</exception>
 		private async Task<bool> TryLockInternal([NotNull] string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
-			GuardLeaseTime(leaseTime);
-			Guard.NotNull(lockName, "lockName");
-			GuardLeaseTime(leaseTime);
+			this.GuardLeaseTime(leaseTime);
 
 			try
 			{
 				if (this.LockState.LeaseId != null && this.LockName != null && lockName == this.LockName) return true;
 
-				if (this.CancelToken.IsCancellationRequested)
-					return false;
+				if (this.CancelToken.IsCancellationRequested) return false;
 
-				await this.UnlockAsync();
+				await this.UnlockAsync().ConfigureAwait(false);
 
 				// Allow exceptions to propagate from here.
-				await this.TryAcquireLeaseAsync(lockName, leaseTime, isDefaultLeaseTime);
+				await this.TryAcquireLeaseAsync(lockName, leaseTime, isDefaultLeaseTime).ConfigureAwait(false);
 
 				if (this.LockState.LeaseId != null) this.CreateRenewalThreadIfApplicable(lockName, leaseTime);
 				else return false;
@@ -484,6 +479,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// </summary>
 		/// <param name="lockName">The name of the lock.</param>
 		/// <param name="leaseTime">The lease time.</param>
+		/// <exception cref="ArgumentNullException">The parameter was null: <paramref name="lockName" /></exception>
 		private void CreateRenewalThreadIfApplicable([NotNull] string lockName, TimeSpan? leaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
@@ -514,19 +510,24 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 			{
 				if (cancelToken.IsCancellationRequested) return;
 
-				await Task.Delay(TimeSpan.FromSeconds((leaseTime.TotalSeconds*3)/4), cancelToken);
+				await Task.Delay(TimeSpan.FromSeconds((leaseTime.TotalSeconds*3)/4), cancelToken).ConfigureAwait(false);
 
 				try
 				{
-					if (this.LockName != null) this.LockState = await this.LockStateProvider.RenewLockAsync(this.LockState, cancelToken);
+					if (this.LockName != null) this.LockState = await this.LockStateProvider.RenewLockAsync(this.LockState, cancelToken).ConfigureAwait(false);
+				}
+				catch (OperationCanceledException)
+				{
 				}
 				catch (Exception ex)
 				{
-					if (!(ex is OperationCanceledException))
-					{
-						this.LogService.QuickLogError("GlobalLock", ex, "Unexpected exception while attempting to renew a global lock (using BLOB leases) with name '{0}' and ID '{1}'", lockName, this.LockState.LeaseId);
-						throw;
-					}
+					this.LogService.QuickLogError(
+						"GlobalLock",
+						ex,
+						"Unexpected exception while attempting to renew a global lock (using BLOB leases) with name '{0}' and ID '{1}'",
+						lockName,
+						this.LockState.LeaseId);
+					throw;
 				}
 			}
 		}
@@ -541,11 +542,11 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		private async Task TryAcquireLeaseAsync([NotNull] string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
-			GuardLeaseTime(leaseTime);
+			this.GuardLeaseTime(leaseTime);
 
 			try
 			{
-				this.LockState = await this.LockStateProvider.RegisterLockAsync(this.LockState, lockName, leaseTime, isDefaultLeaseTime, this.CancelToken);
+				this.LockState = await this.LockStateProvider.RegisterLockAsync(this.LockState, lockName, leaseTime, isDefaultLeaseTime, this.CancelToken).ConfigureAwait(false);
 			}
 			catch (CloudToolsStorageException ex)
 			{
@@ -558,13 +559,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 				this.LogService.QuickLogDebug("GlobalLock", "Attempting to create a global lock with name '{0}' failed; a lock has been placed already", lockName);
 			}
+			catch (OperationCanceledException)
+			{
+			}
 			catch (Exception ex)
 			{
-				if (!(ex is OperationCanceledException))
-				{
-					this.LogService.QuickLogError("GlobalLock", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
-					throw;
-				}
+				this.LogService.QuickLogError("GlobalLock", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
+				throw;
 			}
 		}
 
@@ -587,7 +588,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 			if (this.LockState.LeaseId != null && this.LockState.LockName != null)
 			{
-				await this.LockStateProvider.UnregisterLockAsync(this.LockState, this.CancelToken);
+				await this.LockStateProvider.UnregisterLockAsync(this.LockState, this.CancelToken).ConfigureAwait(false);
 
 				if (attemptLog) this.LogService.QuickLogDebug("GlobalLock", "Global lock with name '{0}' was released", this.LockName);
 			}
@@ -620,38 +621,44 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 				{
 					if (disposing) this.ForceUnlockAsync().Wait(TimeSpan.FromMinutes(1));
 				}
+				catch (OperationCanceledException)
+				{
+				}
 				catch (Exception ex)
 				{
-					if (!(ex is OperationCanceledException))
+					try
 					{
-						try
-						{
-							if (attemptLog) this.LogService.QuickLogError("GlobalLock", ex, "An error occurred while attempting to dispose a global lock during unlocking, with name '{0}'", this.LockName);
-						}
-						catch
-						{
-							// Attempt to ignore exceptions at this level
-						}
+						if (attemptLog) this.LogService.QuickLogError("GlobalLock", ex, "An error occurred while attempting to dispose a global lock during unlocking, with name '{0}'", this.LockName);
+					}
+					catch
+					{
+						// Attempt to ignore exceptions at this level
 					}
 				}
 
 				try
 				{
-					if (disposing) 
-						this.LockStateProvider.Dispose();
+					if (disposing) this.LockStateProvider.Dispose();
+				}
+				catch (OperationCanceledException)
+				{
 				}
 				catch (Exception ex)
 				{
-					if (!(ex is OperationCanceledException))
+					try
 					{
-						try
+						if (attemptLog)
 						{
-							if (attemptLog) this.LogService.QuickLogError("GlobalLock", ex, "An error occurred while attempting to dispose the underlying lock provider during unlocking, with name '{0}'", this.LockName);
+							this.LogService.QuickLogError(
+								"GlobalLock",
+								ex,
+								"An error occurred while attempting to dispose the underlying lock provider during unlocking, with name '{0}'",
+								this.LockName);
 						}
-						catch
-						{
-							// Attempt to ignore exceptions at this level
-						}
+					}
+					catch
+					{
+						// Attempt to ignore exceptions at this level
 					}
 				}
 
@@ -662,7 +669,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Finalizes an instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
+		///     <para>Finalizes an instance of the <see cref="GlobalLockBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		~GlobalLockBase()
@@ -679,10 +686,10 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     True if the specified lease time is between 15 and 60 seconds (inclusive)
 		/// </returns>
+		/// <exception cref="ArgumentException">Invalid lease time specified!</exception>
 		private void GuardLeaseTime(TimeSpan? leaseTime)
 		{
-			if (!this.LockStateProvider.IsValidLeaseTime(leaseTime))
-				throw new ArgumentException("Invalid lease time specified!", "leaseTime");
+			if (!this.LockStateProvider.IsValidLeaseTime(leaseTime)) throw new ArgumentException("Invalid lease time specified!", "leaseTime");
 		}
 	}
 }

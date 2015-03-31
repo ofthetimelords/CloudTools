@@ -100,46 +100,46 @@ namespace TheQ.Utilities.CloudTools.Azure
 
 
 
-		/// <summary>
-		///     Returns a task that renews a lease on this container.
-		/// </summary>
-		/// <param name="accessCondition">An <see cref="AccessCondition" /> object that represents the access conditions for the container, including a required lease ID.</param>
-		/// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for a task to complete.</param>
-		/// <returns>
-		///     A <see cref="Task" /> object that represents the current operation.
-		/// </returns>
-		public async Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
-		{
-			try
-			{
-				await this._blobContainerReference.RenewLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
+		///// <summary>
+		/////     Returns a task that renews a lease on this container.
+		///// </summary>
+		///// <param name="accessCondition">An <see cref="AccessCondition" /> object that represents the access conditions for the container, including a required lease ID.</param>
+		///// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for a task to complete.</param>
+		///// <returns>
+		/////     A <see cref="Task" /> object that represents the current operation.
+		///// </returns>
+		//public async Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
+		//{
+		//	try
+		//	{
+		//		await this._blobContainerReference.RenewLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
+		//	}
+		//	catch (StorageException ex)
+		//	{
+		//		throw ex.Wrap();
+		//	}
+		//}
 
 
 
-		/// <summary>
-		///     Returns a task that renews a lease on this container.
-		/// </summary>
-		/// <param name="accessCondition">An <see cref="AccessCondition" /> object that represents the access conditions for the container, including a required lease ID.</param>
-		/// <returns>
-		///     A <see cref="Task" /> object that represents the current operation.
-		/// </returns>
-		public async Task RenewLeaseAsync(IAccessCondition accessCondition)
-		{
-			try
-			{
-				await this._blobContainerReference.RenewLeaseAsync((AzureAccessCondition) accessCondition);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
+		///// <summary>
+		/////     Returns a task that renews a lease on this container.
+		///// </summary>
+		///// <param name="accessCondition">An <see cref="AccessCondition" /> object that represents the access conditions for the container, including a required lease ID.</param>
+		///// <returns>
+		/////     A <see cref="Task" /> object that represents the current operation.
+		///// </returns>
+		//public async Task RenewLeaseAsync(IAccessCondition accessCondition)
+		//{
+		//	try
+		//	{
+		//		await this._blobContainerReference.RenewLeaseAsync((AzureAccessCondition) accessCondition);
+		//	}
+		//	catch (StorageException ex)
+		//	{
+		//		throw ex.Wrap();
+		//	}
+		//}
 
 
 

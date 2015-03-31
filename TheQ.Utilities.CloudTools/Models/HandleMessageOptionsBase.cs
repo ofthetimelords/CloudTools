@@ -22,8 +22,7 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 namespace TheQ.Utilities.CloudTools.Storage.Models
 {
 	/// <summary>
-	///     <para>Input arguments for the <see cref="QueueExtensions.HandleMessages" /></para>
-	///     <para>extension method.</para>
+	///     <para>Input arguments for the ExtendedQueue framework.</para>
 	/// </summary>
 	public abstract class HandleMessageOptionsBase
 	{
@@ -38,11 +37,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		/// <param name="messageLeaseTime">The amount of time between periodic refreshes on the lease of a message.</param>
 		/// <param name="pollFrequency">The frequency with which the queue is being polled for new messages.</param>
 		/// <param name="poisonMessageThreshold">The amount of times a message can be enqueued.</param>
-		/// <param name="logService">The logging service to use.</param>
 		/// <param name="cancelToken">A cancellation token to allow cancellation of this process.</param>
-		/// <param name="overflowContainer">A BLOB container that contains messages that don't fit in the queue.</param>
 		/// <param name="exceptionHandler">An action that specifies how an exception should be handled.</param>
-		/// <exception cref="ArgumentNullException">messageHandler;The Message Handler <see langword="delegate" /> is required</exception>
 		/// <exception cref="ArgumentException">
 		///     Message Lease Time cannot be lower than 30 seconds! or Poll Frequency cannot be lower than 1 second! or Poison Message Threshold cannot be lower than 1
 		/// </exception>
@@ -108,13 +104,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		///     A cancellation token to allow cancellation of this process.
 		/// </summary>
 		public CancellationToken CancelToken { get; private set; }
-
-
-		/// <summary>
-		///     Gets the BLOB container which contains queue messages that don't fit in the Queue.
-		/// </summary>
-		[NotNull]
-		public IBlobContainer OverflowMessageContainer { get; private set; }
 
 
 		/// <summary>

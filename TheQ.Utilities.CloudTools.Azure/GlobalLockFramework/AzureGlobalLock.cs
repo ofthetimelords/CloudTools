@@ -4,12 +4,11 @@
 // </copyright>
 // <author>James Kavakopoulos</author>
 // <email>ofthetimelords@gmail.com</email>
-// <date>2015/02/06</date>
+// <date>2015/03/31</date>
 // <summary>
 // 
 // </summary>
 
-using System;
 using System.Linq;
 using System.Threading;
 
@@ -21,50 +20,49 @@ using TheQ.Utilities.CloudTools.Storage.Internal;
 
 namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 {
+	/// <summary>
+	///     An implementation of <see cref="GlobalLockBase{TLockState}" /> for Windows Azure using BLOBs for the underlying lock operations.
+	/// </summary>
 	public class AzureGlobalLock : GlobalLockBase<AzureLockState>
 	{
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
-		///     <para>class.</para>
+		///     Initializes a new instance of the <see cref="AzureGlobalLock" /> class.
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
+		/// <param name="lockStateProvider">The lock state provider using BLOBs for locking.</param>
+		/// <param name="initialState">The initial state of the lock.</param>
 		public AzureGlobalLock(AzureLockStateProvider lockStateProvider, AzureLockState initialState) : base(lockStateProvider, initialState) { }
 
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
-		///     <para>class.</para>
+		///     Initializes a new instance of the <see cref="AzureGlobalLock" /> class.
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="cancelToken">The cancellation token.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
+		/// <param name="lockStateProvider">The lock state provider using BLOBs for locking.</param>
+		/// <param name="initialState">The initial state of the lock.</param>
 		public AzureGlobalLock(CancellationToken cancelToken, AzureLockStateProvider lockStateProvider, AzureLockState initialState)
 			: base(cancelToken, lockStateProvider, initialState) { }
 
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
-		///     <para>class.</para>
+		///     Initializes a new instance of the <see cref="AzureGlobalLock" /> class.
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
+		/// <param name="lockStateProvider">The lock state provider using BLOBs for locking.</param>
+		/// <param name="initialState">The initial state of the lock.</param>
 		/// <param name="logService">The logging service to use.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
 		public AzureGlobalLock(AzureLockStateProvider lockStateProvider, AzureLockState initialState, [CanBeNull] ILogService logService)
 			: base(lockStateProvider, initialState, logService) { }
 
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="TheQ.Utilities.CloudTools.Storage.GlobalLockFramework.GlobalLockBase`1" /></para>
-		///     <para>class.</para>
+		///     Initializes a new instance of the <see cref="AzureGlobalLock" /> class.
 		/// </summary>
-		/// <param name="container">The container on which to select a blob to apply a lock on.</param>
 		/// <param name="cancelToken">The cancellation token.</param>
+		/// <param name="lockStateProvider">The lock state provider using BLOBs for locking.</param>
+		/// <param name="initialState">The initial state of the lock.</param>
 		/// <param name="logService">The logging service to use.</param>
-		/// <exception cref="ArgumentNullException">container;Parameter <paramref name="container" /> was <see langword="null" /></exception>
 		public AzureGlobalLock(CancellationToken cancelToken, AzureLockStateProvider lockStateProvider, AzureLockState initialState, [CanBeNull] ILogService logService)
 			: base(cancelToken, lockStateProvider, initialState, logService) { }
 	}

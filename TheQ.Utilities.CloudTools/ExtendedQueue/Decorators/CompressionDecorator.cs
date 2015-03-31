@@ -23,7 +23,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CompressionDecorator"/> class.
 		/// </summary>
-		/// <param name="decoratedQueue">The decorated queue.</param>
+		/// <param name="decoratedQueue">The queue to decorate.</param>
 		public CompressionDecorator(ExtendedQueueBase decoratedQueue) :base(decoratedQueue) { }
 
 		protected internal override Stream GetByteEncoder(Stream originalConverter) { return new DeflateStream(originalConverter, CompressionMode.Compress, true); }

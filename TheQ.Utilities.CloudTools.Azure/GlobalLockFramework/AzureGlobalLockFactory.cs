@@ -24,7 +24,13 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 {
 	public class AzureGlobalLockFactory : IGlobalLockFactory
 	{
-		public AzureGlobalLockFactory(IBlobContainer lockContainer, AzureLockStateProvider lockStateProvider, ILogService logService)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AzureGlobalLockFactory"/> class.
+		/// </summary>
+		/// <param name="lockContainer">The BLOB that will contain the lease.</param>
+		/// <param name="lockStateProvider">The lock state provider.</param>
+		/// <param name="logService">The logging service to use.</param>
+		public AzureGlobalLockFactory(AzureBlobContainer lockContainer, AzureLockStateProvider lockStateProvider, ILogService logService)
 		{
 			this.LockStateProvider = lockStateProvider ?? new AzureLockStateProvider(logService);
 			this.LogService = logService;
@@ -33,13 +39,31 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 
 
 
+		/// <summary>
+		/// Gets or sets the lock state provider instance.
+		/// </summary>
+		/// <value>
+		/// The Azure lock state provider.
+		/// </value>
 		private AzureLockStateProvider LockStateProvider { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the logging service of this factory instance.
+		/// </summary>
+		/// <value>
+		/// The log service.
+		/// </value>
 		private ILogService LogService { get; set; }
 
 
-		private IBlobContainer LockContainer { get; set; }
+		/// <summary>
+		/// Gets or sets the BLOB that will contain the lock lease.
+		/// </summary>
+		/// <value>
+		/// An <see cref="AzureBlobContainer"/> instance.
+		/// </value>
+		private AzureBlobContainer LockContainer { get; set; }
 
 
 

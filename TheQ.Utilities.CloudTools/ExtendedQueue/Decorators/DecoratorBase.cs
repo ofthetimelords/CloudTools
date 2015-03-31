@@ -24,11 +24,24 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
+	/// <summary>
+	/// Represents the base class for <see cref="ExtendedQueueBase"/> decorators.
+	/// </summary>
 	public abstract class DecoratorBase : ExtendedQueueBase
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DecoratorBase"/> class.
+		/// </summary>
+		/// <param name="decoratedQueue">The queue to decorate.</param>
 		protected DecoratorBase(ExtendedQueueBase decoratedQueue) { this.DecoratedQueue = decoratedQueue; }
 
 
+		/// <summary>
+		/// Gets the decorated queue.
+		/// </summary>
+		/// <value>
+		/// The decorated queue.
+		/// </value>
 		protected ExtendedQueueBase DecoratedQueue { get; private set; }
 
 

@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.Internal;
-using TheQ.Utilities.CloudTools.Storage.Models;
-using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
-namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
+namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel
 {
 	public abstract class AzureOverflownMessageHandlerBase : IOverflownMessageHandler
 	{

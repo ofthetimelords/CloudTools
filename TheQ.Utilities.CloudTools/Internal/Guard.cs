@@ -4,7 +4,7 @@
 // </copyright>
 // <author>James Kavakopoulos</author>
 // <email>ofthetimelords@gmail.com</email>
-// <date>2015/02/06</date>
+// <date>2015/03/31</date>
 // <summary>
 // 
 // </summary>
@@ -18,7 +18,7 @@ using System.Linq;
 namespace TheQ.Utilities.CloudTools.Storage.Internal
 {
 	/// <summary>
-	///     Helper methods for common data checks.
+	///     Helper methods for common parameter checks.
 	/// </summary>
 	public static class Guard
 	{

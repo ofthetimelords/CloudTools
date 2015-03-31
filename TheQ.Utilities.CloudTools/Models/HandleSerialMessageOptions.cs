@@ -23,8 +23,7 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 namespace TheQ.Utilities.CloudTools.Storage.Models
 {
 	/// <summary>
-	///     <para>Input arguments for the <see cref="QueueExtensions.HandleMessages" /></para>
-	///     <para>extension method.</para>
+	///     <para>Input arguments for the ExtendedQueue framework.</para>
 	/// </summary>
 	public class HandleSerialMessageOptions : HandleMessageOptionsBase
 	{
@@ -39,9 +38,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		/// <param name="messageLeaseTime">The amount of time between periodic refreshes on the lease of a message.</param>
 		/// <param name="pollFrequency">The frequency with which the queue is being polled for new messages.</param>
 		/// <param name="poisonMessageThreshold">The amount of times a message can be enqueued.</param>
-		/// <param name="logService">The logging service to use.</param>
 		/// <param name="cancelToken">A cancellation token to allow cancellation of this process.</param>
-		/// <param name="overflowContainer">A BLOB container that contains messages that don't fit in the queue.</param>
 		/// <param name="messageHandler">An action that specifies how a message should be handled. Returns a value indicating whether the message has been handled successfully and should be removed.</param>
 		/// <param name="poisonHandler">
 		///     <para>An action that specifies how a poison message should be handled, which fires before <see cref="TheQ.Utilities.CloudTools.Storage.Models.HandleSerialMessageOptions.MessageHandler" /></para>

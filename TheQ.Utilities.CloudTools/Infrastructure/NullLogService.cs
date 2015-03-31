@@ -1,10 +1,10 @@
-﻿// <copyright file="ILogService.cs" company="nett">
+﻿// <copyright file="NullLogService.cs" company="nett">
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
 // <author>James Kavakopoulos</author>
 // <email>ofthetimelords@gmail.com</email>
-// <date>2015/02/06</date>
+// <date>2015/03/31</date>
 // <summary>
 // 
 // </summary>
@@ -12,13 +12,14 @@
 using System;
 using System.Linq;
 
-using TheQ.Utilities.CloudTools.Storage.Internal;
-
 
 
 namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 {
-	public class NullLogService : ILogService
+	/// <summary>
+	///     An <see cref="ILogService" /> for implementing the null object pattern.
+	/// </summary>
+	internal class NullLogService : ILogService
 	{
 		/// <summary>
 		///     Logs a critical error.
@@ -26,7 +27,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 		/// <param name="exception">The exception to retrieve the error from.</param>
 		/// <param name="details">The error's additional details.</param>
 		/// <param name="category">The error's category.</param>
-		public void Critical(Exception exception, string category = null, string details = null) {  }
+		public void Critical(Exception exception, string category = null, string details = null) { }
 
 
 
@@ -36,7 +37,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 		/// <param name="message">The error's message.</param>
 		/// <param name="details">The error's additional details.</param>
 		/// <param name="category">The error's category.</param>
-		public void Error(string message, string category = null, string details = null) {  }
+		public void Error(string message, string category = null, string details = null) { }
 
 
 

@@ -19,6 +19,9 @@ using TheQ.Utilities.CloudTools.Storage.Internal;
 
 namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 {
+	/// <summary>
+	/// Represents a Global Lock, a MutEx that can be used to synchronise operations between different machines and/or processes.
+	/// </summary>
 	public interface IGlobalLock : IDisposable
 	{
 		/// <summary>
@@ -34,15 +37,27 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		bool IsDisposed { get; }
 
 
+		/// <summary>
+		/// Gets the name of the current lock.
+		/// </summary>
+		/// <value>
+		/// A string value with the name of the current lock.
+		/// </value>
 		string CurrentLockName { get; }
 
 
+		/// <summary>
+		/// Gets the current lease identifier.
+		/// </summary>
+		/// <value>
+		/// A string value with the current lease identifier.
+		/// </value>
 		string CurrentLeaseId { get; }
 
 
 
 		/// <summary>
-		///     Attempts to release a global lock.
+		///     Attempts to release a global lock asynchronously
 		/// </summary>
 		Task UnlockAsync();
 
@@ -56,7 +71,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     Force-unlock a lock even if it was acquired by another thread.
+		///     Force-unlocks a lock even if it was acquired by another instance, asynchronously.
 		/// </summary>
 		/// <returns>
 		///     The current instance (to allow fluent usage).
@@ -66,7 +81,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     Force-unlock a lock even if it was acquired by another thread.
+		///     Force-unlocks a lock even if it was acquired by another instance.
 		/// </summary>
 		/// <remarks>
 		///     Note: Implementations SHOULD NOT <see langword="throw" /> on error when using this overload.
@@ -80,7 +95,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     Force-unlock a lock even if it was acquired by another thread.
+		///     Force-unlocks a lock even if it was acquired by another instance.
 		/// </summary>
 		/// <param name="throwOnError">
 		///     <para>if set to <c>true</c></para>
@@ -95,7 +110,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     Force-unlock a lock even if it was acquired by another thread.
+		///     Force-unlocks a lock even if it was acquired by another instance, asynchronously.
 		/// </summary>
 		/// <param name="throwOnError">
 		///     <para>if set to <c>true</c></para>
