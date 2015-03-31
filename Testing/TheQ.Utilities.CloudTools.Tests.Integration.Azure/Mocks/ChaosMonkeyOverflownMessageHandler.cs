@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,12 +9,11 @@ using Microsoft.WindowsAzure.Storage;
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.Blob;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
-
-
-namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
+namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.Mocks
 {
 	public class ChaosMonkeyOverflownMessageHandler : IOverflownMessageHandler
 	{
@@ -54,7 +51,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 		{
 			Guard.NotNull(id, "id");
 
-			return string.Concat(OverflownMessagePrefix, id);
+			return string.Concat(ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix, id);
 		}
 
 
@@ -67,8 +64,8 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 			Guard.NotNull(pointer, "pointer");
 			var isOverflown = true;
 
-			for (var i = 0; i < OverflownMessagePrefix.Length; i++)
-				if (pointer[i] != OverflownMessagePrefix[i])
+			for (var i = 0; i < ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix.Length; i++)
+				if (pointer[i] != ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix[i])
 				{
 					isOverflown = false;
 					break;
@@ -77,7 +74,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 			if (!isOverflown) return string.Empty;
 
 			var asString = Encoding.UTF8.GetString(pointer);
-			return asString.Replace(OverflownMessagePrefix, string.Empty);
+			return asString.Replace(ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix, string.Empty);
 		}
 
 
@@ -92,7 +89,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 			Guard.NotNull(queueName, "queueName");
 
 
-			var blob = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, messageId));
+			var blob = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, ChaosMonkeyOverflownMessageHandler.OverflownBlobNameFormat, queueName, messageId));
 
 			return blob.UploadFromByteArrayAsync(originalMessage, 0, originalMessage.Length, token);
 		}
@@ -107,7 +104,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 
 			try
 			{
-				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, id));
+				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, ChaosMonkeyOverflownMessageHandler.OverflownBlobNameFormat, queueName, id));
 				or.DeleteIfExists();
 			}
 			catch (CloudToolsStorageException ex)
@@ -127,7 +124,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.Mocks
 				throw new CloudToolsStorageException(new StorageException(), 404, "Blah");
 
 
-			var blobName = string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, id);
+			var blobName = string.Format(CultureInfo.InvariantCulture, ChaosMonkeyOverflownMessageHandler.OverflownBlobNameFormat, queueName, id);
 
 			return this.OverflowContainer.DownloadByteArrayAsync(blobName, token);
 		}

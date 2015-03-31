@@ -33,8 +33,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		private ILogService LogService { get; set; }
 
-		private ExceptionPolicy Policy { get; set; }
-
 
 
 		/// <summary>
@@ -46,7 +44,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="overflownMessageHandler">An object that handles messages that are overflown and should be recorded in a temporary storage.</param>
 		/// <param name="logService">The logging service to use.</param>
 		public DefaultExtendedQueueFactory(
-			ExceptionPolicy policy,
 			IQueueMessageProvider messageProvider,
 			IMaximumMessageSizeProvider maximumMessageSizeProvider,
 			IMaximumMessagesPerRequestProvider maximumMessagePerRequestProvider,
@@ -64,7 +61,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			this.MaximumMessagesProvider = maximumMessagePerRequestProvider;
 			this.OverflownMessageHandler = overflownMessageHandler;
 			this.LogService = logService;
-			this.Policy = policy;
 		}
 
 
@@ -76,7 +72,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			var compressibleQueue = new CompressionDecorator(baseQueue);
 			var jsonQueue = new JsonSerialiserDecorator(compressibleQueue);
 			var overflowQueue = new OverflowHandlingDecorator(jsonQueue, this.OverflownMessageHandler);
-			var loggedQueue = new LoggingDecorator(overflowQueue, this.Policy, this.LogService);
+			var loggedQueue = new LoggingDecorator(overflowQueue, this.LogService);
 
 			return loggedQueue;
 		}

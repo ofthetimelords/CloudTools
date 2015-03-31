@@ -1,4 +1,8 @@
 ﻿// <copyright file="DecoratorBase.cs" company="nett">
+
+
+
+#region Using directives
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
@@ -9,38 +13,43 @@
 // 
 // </summary>
 
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
+#endregion
 
 
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
 	/// <summary>
-	/// Represents the base class for <see cref="ExtendedQueueBase"/> decorators.
+	///     Represents the base class for <see cref="ExtendedQueueBase" /> decorators.
 	/// </summary>
 	public abstract class DecoratorBase : ExtendedQueueBase
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DecoratorBase"/> class.
+		///     Initializes a new instance of the <see cref="DecoratorBase" /> class.
 		/// </summary>
 		/// <param name="decoratedQueue">The queue to decorate.</param>
-		protected DecoratorBase(ExtendedQueueBase decoratedQueue) { this.DecoratedQueue = decoratedQueue; }
+		protected DecoratorBase(ExtendedQueueBase decoratedQueue)
+		{
+			this.DecoratedQueue = decoratedQueue;
+		}
+
 
 
 		/// <summary>
-		/// Gets the decorated queue.
+		///     Gets the decorated queue.
 		/// </summary>
 		/// <value>
-		/// The decorated queue.
+		///     The decorated queue.
 		/// </value>
 		protected ExtendedQueueBase DecoratedQueue { get; private set; }
 
@@ -126,19 +135,38 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		public override void AddMessageEntity(object entity) { this.DecoratedQueue.AddMessageEntity(entity, this); }
+		public override void AddMessageEntity(object entity)
+		{
+			this.DecoratedQueue.AddMessageEntity(entity, this);
+		}
 
 
-		internal override Task AddMessageEntityAsync(object entity, CancellationToken token, ExtendedQueueBase invoker) { return this.DecoratedQueue.AddMessageEntityAsync(entity, token, invoker); }
+
+		internal override Task AddMessageEntityAsync(object entity, CancellationToken token, ExtendedQueueBase invoker)
+		{
+			return this.DecoratedQueue.AddMessageEntityAsync(entity, token, invoker);
+		}
 
 
-		internal override void AddMessageEntity(object entity, ExtendedQueueBase invoker) { this.DecoratedQueue.AddMessageEntity(entity, invoker); }
+
+		internal override void AddMessageEntity(object entity, ExtendedQueueBase invoker)
+		{
+			this.DecoratedQueue.AddMessageEntity(entity, invoker);
+		}
 
 
-		public override Task AddMessageEntityAsync(object entity) { return this.DecoratedQueue.AddMessageEntityAsync(entity, CancellationToken.None, this); }
+
+		public override Task AddMessageEntityAsync(object entity)
+		{
+			return this.DecoratedQueue.AddMessageEntityAsync(entity, CancellationToken.None, this);
+		}
 
 
-		public override Task AddMessageEntityAsync(object entity, CancellationToken token) { return this.DecoratedQueue.AddMessageEntityAsync(entity, token, this); }
+
+		public override Task AddMessageEntityAsync(object entity, CancellationToken token)
+		{
+			return this.DecoratedQueue.AddMessageEntityAsync(entity, token, this);
+		}
 
 
 
@@ -247,10 +275,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions) { this.DecoratedQueue.HandleTaskCancelled(messageOptions); }
+		protected internal override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		{
+			this.DecoratedQueue.HandleTaskCancelled(messageOptions);
+		}
 
 
-		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker) { return this.DecoratedQueue.MessageContentsToByteArray(serializedContents, invoker); }
+
+		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker)
+		{
+			return this.DecoratedQueue.MessageContentsToByteArray(serializedContents, invoker);
+		}
 
 
 
@@ -342,7 +377,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token) { return this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token, this); }
+		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token)
+		{
+			return this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token, this);
+		}
 
 
 
@@ -358,16 +396,31 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override string SerializeMessageEntity(object messageEntity) { return this.DecoratedQueue.SerializeMessageEntity(messageEntity); }
+		protected internal override string SerializeMessageEntity(object messageEntity)
+		{
+			return this.DecoratedQueue.SerializeMessageEntity(messageEntity);
+		}
 
 
-		protected internal override Stream GetByteEncoder(Stream originalConverter) { return this.DecoratedQueue.GetByteEncoder(originalConverter); }
+
+		protected internal override Stream GetByteEncoder(Stream originalConverter)
+		{
+			return this.DecoratedQueue.GetByteEncoder(originalConverter);
+		}
 
 
-		protected internal override Stream GetByteDecoder(Stream originalConverter) { return this.DecoratedQueue.GetByteDecoder(originalConverter); }
+
+		protected internal override Stream GetByteDecoder(Stream originalConverter)
+		{
+			return this.DecoratedQueue.GetByteDecoder(originalConverter);
+		}
 
 
-		protected internal override string GetOverflownMessageId(IQueueMessage message) { return this.DecoratedQueue.GetOverflownMessageId(message); }
+
+		protected internal override string GetOverflownMessageId(IQueueMessage message)
+		{
+			return this.DecoratedQueue.GetOverflownMessageId(message);
+		}
 
 
 
@@ -385,7 +438,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override T DeserializeToObject<T>(string serializedContents) { return this.DecoratedQueue.DeserializeToObject<T>(serializedContents); }
+		protected internal override T DeserializeToObject<T>(string serializedContents)
+		{
+			return this.DecoratedQueue.DeserializeToObject<T>(serializedContents);
+		}
 
 
 
@@ -396,17 +452,23 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override byte[] PostProcessMessage(byte[] originalContents) { return this.DecoratedQueue.PostProcessMessage(originalContents); }
-
-
-
-		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
+		protected internal override byte[] PostProcessMessage(byte[] originalContents)
 		{
-			return this.DecoratedQueue.AddNonOverflownMessage(messageContents, token);
+			return this.DecoratedQueue.PostProcessMessage(originalContents);
 		}
 
 
 
-		protected internal override Task AddOverflownMessage(byte[] messageContents, CancellationToken token) { return this.DecoratedQueue.AddOverflownMessage(messageContents, token); }
+		protected internal override Task AddNonOverflownMessageAsync(byte[] messageContents, CancellationToken token)
+		{
+			return this.DecoratedQueue.AddNonOverflownMessageAsync(messageContents, token);
+		}
+
+
+
+		protected internal override Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
+		{
+			return this.DecoratedQueue.AddOverflownMessageAsync(messageContents, token);
+		}
 	}
 }

@@ -13,11 +13,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
-
-
-namespace TheQ.Utilities.AzureTools.Tests.Storage.Models
+namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.Models
 {
 	[Serializable]
 	internal class ComplexModel

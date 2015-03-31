@@ -9,8 +9,8 @@
 // 
 // </summary>
 
+
 using System;
-using System.Linq;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,9 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TheQ.Utilities.CloudTools.Azure;
 using TheQ.Utilities.CloudTools.Azure.GlobalLockFramework;
 
-
-
-namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
+namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 {
 	[TestClass]
 	public class GlobalLockTests

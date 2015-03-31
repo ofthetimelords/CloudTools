@@ -1,17 +1,16 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using TheQ.Utilities.CloudTools.Storage.Infrastructure;
-using TheQ.Utilities.CloudTools.Storage.Internal;
-using TheQ.Utilities.CloudTools.Storage.Models;
-using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
-
-
-
-namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
+﻿namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 {
+	/// <summary>
+	/// Provides the maximum amount of messages that can be retrieved at once. Used to allow for easier IoC scenarios.
+	/// </summary>
 	public interface IMaximumMessagesPerRequestProvider
 	{
+		/// <summary>
+		/// Gets the maximum amount of messages that can be retrieved per request.
+		/// </summary>
+		/// <value>
+		/// An integer specifying the maximum messages that can be retrieved per request.
+		/// </value>
 		int MaximumMessagesPerRequest { get; }
 	}
 }

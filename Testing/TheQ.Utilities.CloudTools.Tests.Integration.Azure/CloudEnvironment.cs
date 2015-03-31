@@ -9,17 +9,15 @@
 // 
 // </summary>
 
+
 using System.Configuration;
-using System.Linq;
 
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 
-
-
-namespace TheQ.Utilities.CloudTools.Tests.Storage
+namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 {
 	internal class CloudEnvironment
 	{

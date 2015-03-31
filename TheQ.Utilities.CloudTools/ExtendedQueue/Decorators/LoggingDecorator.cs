@@ -24,21 +24,9 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
-	/// <summary>
-	///     Defines the exception handling policy that will be used by the <see cref="LoggingDecorator" /> instance.
-	/// </summary>
-	public enum ExceptionPolicy
-	{
-		LogAndThrow = 0,
-		LogOnly = 1,
-		ThrowOnly = 2
-	}
-
-
-
 	public class LoggingDecorator : DecoratorBase
 	{
-		public LoggingDecorator(ExtendedQueueBase decoratedQueue, ExceptionPolicy policy, ILogService logService) : base(decoratedQueue)
+		public LoggingDecorator(ExtendedQueueBase decoratedQueue, ILogService logService) : base(decoratedQueue)
 		{
 			this.LogService = logService ?? new NullLogService();
 		}
@@ -46,10 +34,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 		private ILogService LogService { get; set; }
-
-
-		public ExceptionPolicy PolicyForExceptions { get; set; }
-
 
 
 		protected internal override string SerializeMessageEntity(object messageEntity)
@@ -88,19 +72,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
+		protected internal override Task AddNonOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			return this.LogAction(
-				() => this.DecoratedQueue.AddNonOverflownMessage(messageContents, token),
+				() => this.DecoratedQueue.AddNonOverflownMessageAsync(messageContents, token),
 				"Unexpected exception occurred while adding a message to the queue (adding the message; not-overflown)");
 		}
 
 
 
-		protected internal override Task AddOverflownMessage(byte[] messageContents, CancellationToken token)
+		protected internal override Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			return this.LogAction(
-				() => this.DecoratedQueue.AddOverflownMessage(messageContents, token), "Unexpected exception occurred while adding a message to the queue (adding the message; overflown)");
+				() => this.DecoratedQueue.AddOverflownMessageAsync(messageContents, token), "Unexpected exception occurred while adding a message to the queue (adding the message; overflown)");
 		}
 
 
@@ -249,12 +233,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly) this.LogService.QuickLogError("Queue", ex, message);
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
+				this.LogService.QuickLogError("Queue", ex, message);
+				throw;
 			}
-
-			return default(T);
 		}
 
 
@@ -268,9 +249,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				if (this.PolicyForExceptions != ExceptionPolicy.ThrowOnly) this.LogService.QuickLogError("Queue", ex, message);
-
-				if (this.PolicyForExceptions != ExceptionPolicy.LogOnly) throw;
+				this.LogService.QuickLogError("Queue", ex, message);
+				throw;
 			}
 		}
 	}

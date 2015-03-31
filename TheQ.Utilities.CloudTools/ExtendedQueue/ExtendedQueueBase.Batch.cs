@@ -18,6 +18,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
+		/// <summary>
+		///     Begins a task that receives messages in a batch and automatically manages their lifetime.
+		/// </summary>
+		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
+		/// <returns>A cancellable task representing the message processing procedure.</returns>
 		public Task HandleMessagesInBatchAsync([NotNull] HandleBatchMessageOptions messageOptions) { return this.HandleMessagesInBatchAsync(messageOptions, this); }
 
 
@@ -115,6 +120,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
+		/// <summary>
+		/// The finally handler in the try/catch/finally statement of HandleMessagesInBatchAsync.
+		/// </summary>
+		/// <param name="messageOptions">The message options object.</param>
+		/// <param name="keepAliveTask">The <see cref="Task"/> that keeps the message "alive".</param>
+		/// <param name="batchCancelToken">The cancellation token for the batch.</param>
 		private void BatchFinallyHandler(
 			[CanBeNull] HandleBatchMessageOptions messageOptions,
 			[CanBeNull] Task keepAliveTask,

@@ -21,14 +21,38 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	/// </summary>
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
+		/// <summary>
+		/// Gets or sets the maximum message size provider.
+		/// </summary>
+		/// <value>
+		/// An <see cref="IMaximumMessageSizeProvider"/> instance.
+		/// </value>
 		protected internal virtual IMaximumMessageSizeProvider MaximumSizeProvider { get; set; }
 
+		/// <summary>
+		/// Gets or sets the maximum messages per-request provider.
+		/// </summary>
+		/// <value>
+		/// An <see cref="IMaximumMessagesPerRequestProvider"/> instance.
+		/// </value>
 		protected internal virtual IMaximumMessagesPerRequestProvider MaximumMessagesProvider { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the <see cref="IQueue"/> instance to be wrapped.
+		/// </summary>
+		/// <value>
+		/// An <see cref="IQueue"/> instance.
+		/// </value>
 		protected internal virtual IQueue OriginalQueue { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the queue message provider.
+		/// </summary>
+		/// <value>
+		/// An <see cref="IQueueMessageProvider"/> instance.
+		/// </value>
 		protected internal virtual IQueueMessageProvider MessageProvider { get; set; }
 
 

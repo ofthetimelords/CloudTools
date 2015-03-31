@@ -6,8 +6,8 @@
     <ProjectGuid>{179E8E5A-B8A5-41FE-9E6D-3F963F6F8E77}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TheQ.Utilities.CloudTools.Tests.Storage</RootNamespace>
-    <AssemblyName>TheQ.Utilities.CloudTools.Tests.Storage</AssemblyName>
+    <RootNamespace>TheQ.Utilities.CloudTools.Tests.Integration.Azure</RootNamespace>
+    <AssemblyName>TheQ.Utilities.CloudTools.Tests.Integration.Azure</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -108,7 +108,7 @@
     <Compile Include="ConsoleLogService.cs" />
     <Compile Include="CloudEnvironment.cs" />
     <Compile Include="ConcurrencyTests\GlobalLockTests.cs" />
-    <Compile Include="ConcurrencyTests\HandleMessagesTests.cs" />
+    <Compile Include="ConcurrencyTests\ExtendedQueueTests.cs" />
     <Compile Include="Mocks\ChaosMonkeyOverflownMessageHandler.cs" />
     <Compile Include="Models\ComplexModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

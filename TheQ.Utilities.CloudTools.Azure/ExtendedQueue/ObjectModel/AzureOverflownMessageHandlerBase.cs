@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 
 

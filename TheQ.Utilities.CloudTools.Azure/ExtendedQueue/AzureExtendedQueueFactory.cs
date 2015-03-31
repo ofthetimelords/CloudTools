@@ -23,11 +23,9 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 		/// <param name="overflowContainer">The overflow container.</param>
 		/// <param name="logService">The logging service to use.</param>
 		public AzureExtendedQueueFactory(
-			ExceptionPolicy policy,
 			IBlobContainer overflowContainer,
 			ILogService logService)
 			: base(
-				policy,
 				new AzureQueueMessageProvider(),
 				new AzureMaximumMessageSizeProvider(),
 				new AzureMaximumMessagesPerRequestProvider(),

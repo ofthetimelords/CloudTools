@@ -9,6 +9,7 @@
 // 
 // </summary>
 
+
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -17,20 +18,18 @@ using System.Threading;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using TheQ.Utilities.AzureTools.Tests.Storage.Models;
 using TheQ.Utilities.CloudTools.Azure;
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators;
 using TheQ.Utilities.CloudTools.Storage.Models;
-using TheQ.Utilities.CloudTools.Tests.Storage.Mocks;
+using TheQ.Utilities.CloudTools.Tests.Integration.Azure.Mocks;
+using TheQ.Utilities.CloudTools.Tests.Integration.Azure.Models;
 
-
-
-namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
+namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 {
 	[TestClass]
-	public class HandleMessagesTests
+	public class ExtendedQueueTests
 	{
 		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
@@ -44,7 +43,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var result = string.Empty;
 			var expected = string.Empty;
 			var sw = new Stopwatch();
-			var factory = new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
 
 			for (var i = 0; i < runCount; i++) expected += i.ToString(CultureInfo.InvariantCulture);
@@ -104,7 +103,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var expected = string.Empty;
 			var sw = new Stopwatch();
 			long actuallyRun = 0;
-			var factory = new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
 
 
@@ -166,7 +165,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var expected = string.Empty;
 			var sw = new Stopwatch();
 			long actuallyRun = 0;
-			var factory = new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
 
 			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
@@ -228,7 +227,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var rnd = new Random();
 			var expected = new string(Enumerable.Range(1, 128 * 1024).Select(r => (char)rnd.Next(1024, 4096)).ToArray());
 			var sw = new Stopwatch();
-			var factory = new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
 
 			using (var mre = new ManualResetEvent(false))
@@ -277,7 +276,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			ComplexModel result = null;
 			var expected = new ComplexModel { Name = "Test" };
 			var sw = new Stopwatch();
-			var factory = new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
 
 			using (var mre = new ManualResetEvent(false))
@@ -332,7 +331,6 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var sw = new Stopwatch();
 			var succeeded = false;
 			var factoryOne = new DefaultExtendedQueueFactory(
-				ExceptionPolicy.LogAndThrow,
 				new AzureQueueMessageProvider(),
 				new AzureMaximumMessageSizeProvider(),
 				new AzureMaximumMessagesPerRequestProvider(),
@@ -340,7 +338,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				new ConsoleLogService()
 				);
 
-			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factoryOne.Create(new AzureQueue(queue));
 
 			using (var mre = new ManualResetEvent(false))
@@ -396,7 +394,6 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var sw = new Stopwatch();
 			var succeeded = false;
 			var factoryOne = new DefaultExtendedQueueFactory(
-				ExceptionPolicy.LogAndThrow,
 				new AzureQueueMessageProvider(),
 				new AzureMaximumMessageSizeProvider(),
 				new AzureMaximumMessagesPerRequestProvider(),
@@ -404,7 +401,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				new ConsoleLogService()
 				);
 
-			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factoryOne.Create(new AzureQueue(queue));
 
 			using (var mre = new ManualResetEvent(false))
@@ -460,7 +457,6 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var sw = new Stopwatch();
 			var succeeded = false;
 			var factoryOne = new DefaultExtendedQueueFactory(
-				ExceptionPolicy.LogAndThrow,
 				new AzureQueueMessageProvider(),
 				new AzureMaximumMessageSizeProvider(),
 				new AzureMaximumMessagesPerRequestProvider(),
@@ -468,7 +464,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				new ConsoleLogService()
 				);
 
-			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factoryOne.Create(new AzureQueue(queue));
 
 			using (var mre = new ManualResetEvent(false))
@@ -523,7 +519,6 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var sw = new Stopwatch();
 			var succeeded = false;
 			var factoryOne = new DefaultExtendedQueueFactory(
-				ExceptionPolicy.LogAndThrow,
 				new AzureQueueMessageProvider(),
 				new AzureMaximumMessageSizeProvider(),
 				new AzureMaximumMessagesPerRequestProvider(),
@@ -531,7 +526,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				new ConsoleLogService()
 				);
 
-			new AzureExtendedQueueFactory(ExceptionPolicy.LogAndThrow, new AzureBlobContainer(overflow), new ConsoleLogService());
+			new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factoryOne.Create(new AzureQueue(queue));
 
 			using (var mre = new ManualResetEvent(false))

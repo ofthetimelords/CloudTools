@@ -9,15 +9,13 @@
 // 
 // </summary>
 
+
 using System;
 using System.Diagnostics;
-using System.Linq;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 
-
-
-namespace TheQ.Utilities.CloudTools.Tests.Storage
+namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 {
 	internal class ConsoleLogService : ILogService
 	{

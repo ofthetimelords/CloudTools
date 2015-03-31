@@ -9,16 +9,17 @@
 // 
 // </summary>
 
-using System.Linq;
+
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Internal;
 
-
-
-namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
+namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 {
+	/// <summary>
+	/// Implementations of this class will handle messages that need to be written on an overflown store.
+	/// </summary>
 	public interface IOverflownMessageHandler
 	{
 		Task Serialize([NotNull] byte[] originalMessage, string messageId, string queueName, CancellationToken token);

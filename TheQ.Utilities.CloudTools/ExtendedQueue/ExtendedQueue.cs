@@ -63,7 +63,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal override Task AddNonOverflownMessage(byte[] messageContents, CancellationToken token)
+		protected internal override Task AddNonOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			return this.AddMessageAsync(this.MessageProvider.Create(messageContents), token);
 		}
@@ -77,7 +77,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="token">The token.</param>
 		/// <returns></returns>
 		/// <exception cref="System.ArgumentException">Message wouldn't fit in the Queue.</exception>
-		protected internal override async Task AddOverflownMessage(byte[] messageContents, CancellationToken token)
+		protected internal override async Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			throw new NotSupportedException("Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes.");
 		}

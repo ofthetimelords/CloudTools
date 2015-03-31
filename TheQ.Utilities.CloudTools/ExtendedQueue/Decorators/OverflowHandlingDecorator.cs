@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
@@ -34,7 +35,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override async Task AddOverflownMessage(byte[] messageContents, CancellationToken token)
+		protected internal override async Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			var id = Guid.NewGuid().ToString("D", CultureInfo.InvariantCulture);
 

@@ -17,8 +17,15 @@ using Newtonsoft.Json;
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
+	/// <summary>
+	/// An <see cref="ExtendedQueueBase"/> decorator that adds JSON serialisation capabilities.
+	/// </summary>
 	public class JsonSerialiserDecorator : DecoratorBase
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="JsonSerialiserDecorator"/> class.
+		/// </summary>
+		/// <param name="decoratedQueue">The queue to decorate.</param>
 		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) : base(decoratedQueue) { }
 
 

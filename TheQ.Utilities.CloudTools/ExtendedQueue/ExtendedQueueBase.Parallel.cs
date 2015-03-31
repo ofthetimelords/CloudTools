@@ -17,6 +17,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
+		/// <summary>
+		///     Begins a task that receives messages in parallel and automatically manages their lifetime.
+		/// </summary>
+		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
+		/// <returns>A cancellable task representing the message processing procedure.</returns>
+		/// <exception cref="ArgumentNullException">queue;Parameter 'queue' was null. or messageOptions;Parameter 'messageOptions' was not provided.</exception>
 		public Task HandleMessagesInParallelAsync([NotNull] HandleParallelMessageOptions messageOptions)
 		{
 			return this.HandleMessagesInParallelAsync(messageOptions, this);
