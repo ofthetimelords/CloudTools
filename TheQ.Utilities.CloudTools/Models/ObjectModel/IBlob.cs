@@ -387,5 +387,12 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Deletes the current BLOB if it already exists.
 		/// </summary>
 		bool DeleteIfExists();
+
+
+
+		/// <summary>
+		///     Deletes the current BLOB if it already exists.
+		/// </summary>
+		Task<bool> DeleteIfExistsAsync();
 	}
 }

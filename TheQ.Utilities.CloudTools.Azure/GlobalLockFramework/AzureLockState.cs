@@ -32,12 +32,30 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 		public AzureBlobContainer LockingBlobContainer { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the BLOB that will hold the lock.
+		/// </summary>
+		/// <value>
+		/// An <see cref="IBlob"/> instance.
+		/// </value>
 		public IBlob LockingBlob { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the name of the lock.
+		/// </summary>
+		/// <value>
+		/// A string value representing the name of the lock.
+		/// </value>
 		public string LockName { get; set; }
 
 
+		/// <summary>
+		/// Gets or sets the lease identifier used to validate ownership of a lock.
+		/// </summary>
+		/// <value>
+		/// A string value representing the lease identifier.
+		/// </value>
 		public string LeaseId { get; set; }
 	}
 }

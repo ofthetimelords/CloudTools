@@ -665,7 +665,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 
 
 		/// <summary>
-		///     Deletes the blob if it already exists.
+		///     Initiates an asynchronous operation to delete the current blob if it already exists.
 		/// </summary>
 		/// <returns>
 		///     <para>
@@ -679,6 +679,30 @@ namespace TheQ.Utilities.CloudTools.Azure
 			try
 			{
 				return this._blobReference.DeleteIfExists();
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
+		}
+
+
+
+		/// <summary>
+		///     Deletes the blob if it already exists, asynchronously
+		/// </summary>
+		/// <returns>
+		///     <para>
+		///         <c>true</c>
+		///     </para>
+		///     <para>if the blob did already exist and was deleted; otherwise <c>false</c></para>
+		///     <para>.</para>
+		/// </returns>
+		public Task<bool> DeleteIfExistsAsync()
+		{
+			try
+			{
+				return this._blobReference.DeleteIfExistsAsync();
 			}
 			catch (StorageException ex)
 			{

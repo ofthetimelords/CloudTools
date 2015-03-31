@@ -56,16 +56,16 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.Mocks
 
 
 
-		public string GetIdFromMessagePointer(byte[] pointer)
+		public string GetIdFromMessagePointer(byte[] pointerRaw)
 		{
 			if (this._failureMode == FailureMode.GetIdFromMessagePointer)
 				throw new ArgumentNullException();
 
-			Guard.NotNull(pointer, "pointer");
+			Guard.NotNull(pointerRaw, "pointer");
 			var isOverflown = true;
 
 			for (var i = 0; i < ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix.Length; i++)
-				if (pointer[i] != ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix[i])
+				if (pointerRaw[i] != ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix[i])
 				{
 					isOverflown = false;
 					break;
@@ -73,23 +73,23 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.Mocks
 
 			if (!isOverflown) return string.Empty;
 
-			var asString = Encoding.UTF8.GetString(pointer);
+			var asString = Encoding.UTF8.GetString(pointerRaw);
 			return asString.Replace(ChaosMonkeyOverflownMessageHandler.OverflownMessagePrefix, string.Empty);
 		}
 
 
 
-		public Task Serialize(byte[] originalMessage, string messageId, string queueName, CancellationToken token)
+		public Task StoreOverflownMessageAsync(byte[] originalMessage, string messagePointer, string queueName, CancellationToken token)
 		{
 			if (this._failureMode == FailureMode.Serialize)
 				throw new CloudToolsStorageException(new StorageException(), 404, "Blah");
 
 			Guard.NotNull(originalMessage, "originalMessage");
-			Guard.NotNull(messageId, "messageId");
+			Guard.NotNull(messagePointer, "messageId");
 			Guard.NotNull(queueName, "queueName");
 
 
-			var blob = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, ChaosMonkeyOverflownMessageHandler.OverflownBlobNameFormat, queueName, messageId));
+			var blob = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, ChaosMonkeyOverflownMessageHandler.OverflownBlobNameFormat, queueName, messagePointer));
 
 			return blob.UploadFromByteArrayAsync(originalMessage, 0, originalMessage.Length, token);
 		}
@@ -118,7 +118,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.Mocks
 
 
 
-		public Task<byte[]> GetOverflownMessageContents(string id, string queueName, CancellationToken token)
+		public Task<byte[]> RetrieveOverflownMessageAsync(string id, string queueName, CancellationToken token)
 		{
 			if (this._failureMode == FailureMode.GetOverflownContents)
 				throw new CloudToolsStorageException(new StorageException(), 404, "Blah");

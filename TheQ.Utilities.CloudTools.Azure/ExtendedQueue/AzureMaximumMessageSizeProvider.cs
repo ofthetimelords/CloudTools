@@ -12,7 +12,7 @@ using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 {
 	/// <summary>
-	/// Provides the maximum amount of an Azure queue's message in bytes. Used to allow for easier IoC scenarios.
+	/// Provides the maximum amount of an Azure queue's message in bytes. Used in order to allow for easier IoC scenarios.
 	/// </summary>
 	public class AzureMaximumMessageSizeProvider : IMaximumMessageSizeProvider
 	{

@@ -13,6 +13,9 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 {
+	/// <summary>
+	///     Allows the generation of an <see cref="AzureQueueMessage" /> instance.
+	/// </summary>
 	public class AzureQueueMessageProvider : IQueueMessageProvider
 	{
 		/// <summary>

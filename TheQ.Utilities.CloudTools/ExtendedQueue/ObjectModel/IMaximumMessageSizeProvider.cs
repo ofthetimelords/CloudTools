@@ -5,7 +5,7 @@
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 {
 	/// <summary>
-	/// Provides the maximum amount of a queue's message in bytes. Used to allow for easier IoC scenarios.
+	/// Provides the maximum amount of a queue's message in bytes. Used in order to allow for easier IoC scenarios.
 	/// </summary>
 	public interface IMaximumMessageSizeProvider
 	{

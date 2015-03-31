@@ -1,44 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Blob;
-using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
+using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Internal;
-using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
-
-
 
 namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 {
+	/// <summary>
+	///     Implements <see cref="IOverflownMessageHandler" /> for use with Azure BLOBs.
+	/// </summary>
 	public class AzureBlobOverflownMessageHandler : AzureOverflownMessageHandlerBase
 	{
-		private IBlobContainer OverflowContainer { get; set; }
+		/// <summary>
+		/// The name format for BLOBs storing overflown messages.
+		/// </summary>
+		protected const string OverflownBlobNameFormat = "Overflown-{0}-{1}";
+
+	
+		
+		/// <summary>
+		///     Initializes a new instance of the <see cref="AzureBlobOverflownMessageHandler" /> class.
+		/// </summary>
+		/// <param name="container">The BLOB container that will hold the overflown messages.</param>
+		public AzureBlobOverflownMessageHandler(IBlobContainer container)
+		{
+			this.OverflowContainer = container;
+		}
 
 
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AzureBlobOverflownMessageHandler"/> class.
+		/// Gets or sets the overflow container.
 		/// </summary>
-		/// <param name="container">The BLOB container that will hold the overflown messages.</param>
-		public AzureBlobOverflownMessageHandler(IBlobContainer container) { this.OverflowContainer = container; }
+		/// <value>
+		/// An <see cref="IBlobContainer"/> instance.
+		/// </value>
+		private IBlobContainer OverflowContainer { get; set; }
 
 
 
-		public override Task Serialize(byte[] originalMessage, string messageId, string queueName, CancellationToken token)
+		public override Task StoreOverflownMessageAsync(byte[] originalMessage, string messagePointer, string queueName, CancellationToken token)
 		{
 			Guard.NotNull(originalMessage, "originalMessage");
-			Guard.NotNull(messageId, "messageId");
+			Guard.NotNull(messagePointer, "messageId");
 			Guard.NotNull(queueName, "queueName");
 
 
-			var blob = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, AzureOverflownMessageHandlerBase.OverflownBlobNameFormat, queueName, messageId));
+			var blob = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, AzureBlobOverflownMessageHandler.OverflownBlobNameFormat, queueName, messagePointer));
 
 			return blob.UploadFromByteArrayAsync(originalMessage, 0, originalMessage.Length, token);
 		}
@@ -49,8 +61,8 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 		{
 			try
 			{
-				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, AzureOverflownMessageHandlerBase.OverflownBlobNameFormat, queueName, id));
-				or.DeleteIfExists();
+				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, id));
+				await or.DeleteIfExistsAsync().ConfigureAwait(false);
 			}
 			catch (CloudToolsStorageException ex)
 			{
@@ -61,9 +73,9 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 
 
 
-		public override Task<byte[]> GetOverflownMessageContents(string id, string queueName, CancellationToken token)
+		public override Task<byte[]> RetrieveOverflownMessageAsync(string id, string queueName, CancellationToken token)
 		{
-			var blobName = string.Format(CultureInfo.InvariantCulture, AzureOverflownMessageHandlerBase.OverflownBlobNameFormat, queueName, id);
+			var blobName = string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, id);
 
 			return this.OverflowContainer.DownloadByteArrayAsync(blobName, token);
 		}

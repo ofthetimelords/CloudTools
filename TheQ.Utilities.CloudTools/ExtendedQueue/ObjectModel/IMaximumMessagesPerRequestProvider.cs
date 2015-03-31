@@ -1,7 +1,7 @@
 ﻿namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 {
 	/// <summary>
-	/// Provides the maximum amount of messages that can be retrieved at once. Used to allow for easier IoC scenarios.
+	/// Provides the maximum amount of messages that can be retrieved at once. Used in order to allow for easier IoC scenarios.
 	/// </summary>
 	public interface IMaximumMessagesPerRequestProvider
 	{

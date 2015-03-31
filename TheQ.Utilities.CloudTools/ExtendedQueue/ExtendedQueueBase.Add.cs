@@ -126,7 +126,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		/// <summary>
-		/// Adds a non-overflown message to the queue, asynchronously
+		/// Adds a non-overflown message to the queue, asynchronously.
 		/// </summary>
 		/// <param name="messageContents">The message contents to add.</param>
 		/// <param name="token">A cancellation token.</param>
@@ -136,7 +136,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		/// <summary>
-		/// Adds an overflown message to the queue, asynchronously
+		/// Adds an overflown message to the queue, asynchronously.
 		/// </summary>
 		/// <param name="messageContents">The message contents to add.</param>
 		/// <param name="token">A cancellation token.</param>

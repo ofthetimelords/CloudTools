@@ -22,6 +22,9 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
 {
+	/// <summary>
+	///     Represents a Global Lock Factory providing a default implementation for locking with Windows Azure BLOBs..
+	/// </summary>
 	public class AzureGlobalLockFactory : IGlobalLockFactory
 	{
 		/// <summary>
