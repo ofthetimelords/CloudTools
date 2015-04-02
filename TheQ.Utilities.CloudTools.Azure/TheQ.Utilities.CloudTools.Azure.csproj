@@ -102,10 +102,10 @@
     <Compile Include="ExtendedQueue\AzureBlobOverflownMessageHandler.cs" />
     <Compile Include="ExtendedQueue\AzureQueueMessageProvider.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\AzureOverflownMessageHandlerBase.cs" />
-    <Compile Include="GlobalLockFramework\AzureGlobalLock.cs" />
-    <Compile Include="GlobalLockFramework\AzureGlobalLockFactory.cs" />
-    <Compile Include="GlobalLockFramework\AzureLockState.cs" />
-    <Compile Include="GlobalLockFramework\AzureLockStateProvider.cs" />
+    <Compile Include="GlobalMutexFramework\AzureGlobalMutex.cs" />
+    <Compile Include="GlobalMutexFramework\AzureGlobalMutexFactory.cs" />
+    <Compile Include="GlobalMutexFramework\AzureLockState.cs" />
+    <Compile Include="GlobalMutexFramework\AzureLockStateProvider.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="StorageExceptionHelper.cs" />
     <Compile Include="AzureAccessCondition.cs" />

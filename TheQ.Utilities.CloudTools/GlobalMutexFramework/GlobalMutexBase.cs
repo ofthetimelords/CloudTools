@@ -1,4 +1,4 @@
-﻿// <copyright file="GlobalLockBase.cs" company="nett">
+﻿// <copyright file="GlobalMutexBase.cs" company="nett">
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
@@ -21,12 +21,12 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
-namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
+namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 {
 	/// <summary>
 	///     Defines a base implementation of a MutEx framework that can span between different processes or even host machines.
 	/// </summary>
-	public abstract class GlobalLockBase<TLockState> : IGlobalLock where TLockState : class, ILockState
+	public abstract class GlobalMutexBase<TLockState> : IGlobalMutex where TLockState : class, ILockState
 	{
 		/// <summary>
 		///     The default time between locking attempts, set to 3 seconds.
@@ -36,12 +36,12 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalMutexBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="lockStateProvider">The lock state provider to use.</param>
 		/// <param name="initialState">The initial state of the lock.</param>
-		protected GlobalLockBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState)
+		protected GlobalMutexBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState)
 			: this(new CancellationToken(), lockStateProvider, initialState, null)
 		{
 		}
@@ -49,13 +49,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalMutexBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="lockStateProvider">The lock state provider.</param>
 		/// <param name="initialState">The initial state.</param>
 		/// <param name="logService">The logging service to use.</param>
-		protected GlobalLockBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService)
+		protected GlobalMutexBase(ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService)
 			: this(new CancellationToken(), lockStateProvider, initialState, logService)
 		{
 		}
@@ -63,14 +63,14 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="GlobalLockBase{TLockState}" /></para>
+		///     <para>Initializes a new instance of the <see cref="GlobalMutexBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="cancelToken">The cancellation token.</param>
 		/// <param name="lockStateProvider">The lock state provider.</param>
 		/// <param name="initialState">The initial state.</param>
 		/// <param name="logService">The logging service to use.</param>
-		protected GlobalLockBase(CancellationToken cancelToken, ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService = null)
+		protected GlobalMutexBase(CancellationToken cancelToken, ILockStateProvider<TLockState> lockStateProvider, TLockState initialState, [CanBeNull] ILogService logService = null)
 		{
 			Guard.NotNull(lockStateProvider, "lockStateProvider");
 
@@ -225,7 +225,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		public async Task<IGlobalLock> ForceUnlockAsync()
+		public async Task<IGlobalMutex> ForceUnlockAsync()
 		{
 			return await this.ForceUnlockAsync(false).ConfigureAwait(false);
 		}
@@ -239,7 +239,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		public IGlobalLock ForceUnlock()
+		public IGlobalMutex ForceUnlock()
 		{
 			return this.ForceUnlock(false);
 		}
@@ -257,7 +257,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		public IGlobalLock ForceUnlock(bool throwOnError)
+		public IGlobalMutex ForceUnlock(bool throwOnError)
 		{
 			return this.ForceUnlockAsync(throwOnError).Result;
 		}
@@ -277,7 +277,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <exception cref="CloudToolsStorageException">A conflict has occurred while attempting to retrieve the lock and <paramref name="throwOnError" /> was set to <c>true</c>.</exception>
 		/// <exception cref="Exception">Any uncaught exception.</exception>
 		[NotNull]
-		public async Task<IGlobalLock> ForceUnlockAsync(bool throwOnError)
+		public async Task<IGlobalMutex> ForceUnlockAsync(bool throwOnError)
 		{
 			try
 			{
@@ -285,21 +285,21 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 				else
 				{
 					this.LockState = await this.LockStateProvider.BreakLockAsync(this.LockState, this.CancelToken).ConfigureAwait(false);
-					this.LogService.QuickLogDebug("GlobalLock", "Global lock with name '{0}' was force-released", this.LockName);
+					this.LogService.QuickLogDebug("GlobalMutex", "Global lock with name '{0}' was force-released", this.LockName);
 				}
 			}
 			catch (CloudToolsStorageException ex)
 			{
 				if (ex.StatusCode != 404 && ex.StatusCode != 409)
 				{
-					this.LogService.QuickLogError("GlobalLock", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
+					this.LogService.QuickLogError("GlobalMutex", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
 					if (throwOnError) throw;
 				}
-				else this.LogService.QuickLogDebug("GlobalLock", "Attempting to force a global lock with name '{0}' failed; the lock must have been released already", this.LockName);
+				else this.LogService.QuickLogDebug("GlobalMutex", "Attempting to force a global lock with name '{0}' failed; the lock must have been released already", this.LockName);
 			}
 			catch (Exception ex)
 			{
-				this.LogService.QuickLogError("GlobalLock", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
+				this.LogService.QuickLogError("GlobalMutex", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
 				if (throwOnError) throw;
 			}
 
@@ -317,7 +317,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
-		public IGlobalLock TryLock(string lockName, out bool success)
+		public IGlobalMutex TryLock(string lockName, out bool success)
 		{
 			success = Task.Run(() => this.TryLockInternal(lockName, null, true), this.CancelToken).Result;
 			return this;
@@ -343,7 +343,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		/// <exception cref="ArgumentNullException">The <paramref name="function" /> parameter was null.</exception>
-		public IGlobalLock TryLock(string lockName, TimeSpan? leaseTime, out bool success)
+		public IGlobalMutex TryLock(string lockName, TimeSpan? leaseTime, out bool success)
 		{
 			success = Task.Run(() => this.TryLockInternal(lockName, leaseTime, false), this.CancelToken).Result;
 			return this;
@@ -361,7 +361,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		public Task<IGlobalLock> LockAsync(string lockName)
+		public Task<IGlobalMutex> LockAsync(string lockName)
 		{
 			Guard.NotNull(lockName, "lockName");
 
@@ -384,7 +384,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		/// <exception cref="ArgumentNullException">The parameter was null: <paramref name="lockName" /></exception>
-		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime)
+		public Task<IGlobalMutex> LockAsync(string lockName, TimeSpan? leaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");
 
@@ -407,7 +407,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		/// <exception cref="ArgumentNullException">The parameter was null: <paramref name="lockName" /></exception>
-		public Task<IGlobalLock> LockAsync(string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts)
+		public Task<IGlobalMutex> LockAsync(string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts)
 		{
 			Guard.NotNull(lockName, "lockName");
 
@@ -416,7 +416,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 
-		private async Task<IGlobalLock> LockInternal(string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime, TimeSpan timeBetweenAttempts)
+		private async Task<IGlobalMutex> LockInternal(string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime, TimeSpan timeBetweenAttempts)
 		{
 			Guard.NotNull(lockName, "lockName");
 
@@ -522,7 +522,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 				catch (Exception ex)
 				{
 					this.LogService.QuickLogError(
-						"GlobalLock",
+						"GlobalMutex",
 						ex,
 						"Unexpected exception while attempting to renew a global lock (using BLOB leases) with name '{0}' and ID '{1}'",
 						lockName,
@@ -553,18 +553,18 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 				// 409 a lease is already present
 				if (ex.ErrorCode != "LeaseAlreadyPresent" && ex.StatusCode != (int) HttpStatusCode.Conflict)
 				{
-					this.LogService.QuickLogError("GlobalLock", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
+					this.LogService.QuickLogError("GlobalMutex", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
 					throw;
 				}
 
-				this.LogService.QuickLogDebug("GlobalLock", "Attempting to create a global lock with name '{0}' failed; a lock has been placed already", lockName);
+				this.LogService.QuickLogDebug("GlobalMutex", "Attempting to create a global lock with name '{0}' failed; a lock has been placed already", lockName);
 			}
 			catch (OperationCanceledException)
 			{
 			}
 			catch (Exception ex)
 			{
-				this.LogService.QuickLogError("GlobalLock", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
+				this.LogService.QuickLogError("GlobalMutex", ex, "Unexpected exception while attempting to create a global lock (using BLOB leases) with name '{0}'", lockName);
 				throw;
 			}
 		}
@@ -590,7 +590,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 			{
 				await this.LockStateProvider.UnregisterLockAsync(this.LockState, this.CancelToken).ConfigureAwait(false);
 
-				if (attemptLog) this.LogService.QuickLogDebug("GlobalLock", "Global lock with name '{0}' was released", this.LockName);
+				if (attemptLog) this.LogService.QuickLogDebug("GlobalMutex", "Global lock with name '{0}' was released", this.LockName);
 			}
 
 			this.LockState.LeaseId = null;
@@ -628,7 +628,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 				{
 					try
 					{
-						if (attemptLog) this.LogService.QuickLogError("GlobalLock", ex, "An error occurred while attempting to dispose a global lock during unlocking, with name '{0}'", this.LockName);
+						if (attemptLog) this.LogService.QuickLogError("GlobalMutex", ex, "An error occurred while attempting to dispose a global lock during unlocking, with name '{0}'", this.LockName);
 					}
 					catch
 					{
@@ -650,7 +650,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 						if (attemptLog)
 						{
 							this.LogService.QuickLogError(
-								"GlobalLock",
+								"GlobalMutex",
 								ex,
 								"An error occurred while attempting to dispose the underlying lock provider during unlocking, with name '{0}'",
 								this.LockName);
@@ -669,10 +669,10 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 
 
 		/// <summary>
-		///     <para>Finalizes an instance of the <see cref="GlobalLockBase{TLockState}" /></para>
+		///     <para>Finalizes an instance of the <see cref="GlobalMutexBase{TLockState}" /></para>
 		///     <para>class.</para>
 		/// </summary>
-		~GlobalLockBase()
+		~GlobalMutexBase()
 		{
 			this.Dispose(false, false);
 		}

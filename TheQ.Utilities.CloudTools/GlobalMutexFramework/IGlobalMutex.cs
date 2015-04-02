@@ -1,4 +1,4 @@
-﻿// <copyright file="IGlobalLock.cs" company="nett">
+﻿// <copyright file="IGlobalMutex.cs" company="nett">
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
@@ -17,12 +17,12 @@ using TheQ.Utilities.CloudTools.Storage.Internal;
 
 
 
-namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
+namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 {
 	/// <summary>
 	/// Represents a Global Lock, a MutEx that can be used to synchronise operations between different machines and/or processes.
 	/// </summary>
-	public interface IGlobalLock : IDisposable
+	public interface IGlobalMutex : IDisposable
 	{
 		/// <summary>
 		///     Gets a value indicating whether this instance is disposed.
@@ -76,7 +76,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
-		Task<IGlobalLock> ForceUnlockAsync();
+		Task<IGlobalMutex> ForceUnlockAsync();
 
 
 
@@ -90,7 +90,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		IGlobalLock ForceUnlock();
+		IGlobalMutex ForceUnlock();
 
 
 
@@ -105,7 +105,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		IGlobalLock ForceUnlock(bool throwOnError);
+		IGlobalMutex ForceUnlock(bool throwOnError);
 
 
 
@@ -120,7 +120,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		Task<IGlobalLock> ForceUnlockAsync(bool throwOnError);
+		Task<IGlobalMutex> ForceUnlockAsync(bool throwOnError);
 
 
 
@@ -133,7 +133,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		IGlobalLock TryLock([NotNull] string lockName, out bool success);
+		IGlobalMutex TryLock([NotNull] string lockName, out bool success);
 
 
 
@@ -155,7 +155,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		IGlobalLock TryLock([NotNull] string lockName, TimeSpan? leaseTime, out bool success);
+		IGlobalMutex TryLock([NotNull] string lockName, TimeSpan? leaseTime, out bool success);
 
 
 
@@ -169,7 +169,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		Task<IGlobalLock> LockAsync([NotNull] string lockName);
+		Task<IGlobalMutex> LockAsync([NotNull] string lockName);
 
 
 
@@ -188,7 +188,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		Task<IGlobalLock> LockAsync([NotNull] string lockName, TimeSpan? leaseTime);
+		Task<IGlobalMutex> LockAsync([NotNull] string lockName, TimeSpan? leaseTime);
 
 
 
@@ -207,6 +207,6 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
 		///     The current instance (to allow fluent usage).
 		/// </returns>
 		[NotNull]
-		Task<IGlobalLock> LockAsync([NotNull] string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts);
+		Task<IGlobalMutex> LockAsync([NotNull] string lockName, TimeSpan? leaseTime, TimeSpan timeBetweenAttempts);
 	}
 }

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 
 
-namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
+namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 {
 	/// <summary>
 	/// This class is responsible for performing the actual locking operations on a supported backing store for the Global Locking framework.

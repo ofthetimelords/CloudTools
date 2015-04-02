@@ -18,14 +18,14 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-using TheQ.Utilities.CloudTools.Storage.GlobalLockFramework;
+using TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
-namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
+namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 {
 	/// <summary>
 	/// An implementation of <see cref="ILockStateProvider{T}"/> for Windows Azure, using BLOB storage as the back-end.

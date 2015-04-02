@@ -1,4 +1,4 @@
-﻿// <copyright file="GlobalLockTests.cs" company="nett">
+﻿// <copyright file="GlobalMutexTests.cs" company="nett">
 //      Copyright (c) 2015 All Right Reserved, http://q.nett.gr
 //      Please see the License.txt file for more information. All other rights reserved.
 // </copyright>
@@ -16,14 +16,14 @@ using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TheQ.Utilities.CloudTools.Azure;
-using TheQ.Utilities.CloudTools.Azure.GlobalLockFramework;
+using TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework;
 
 
 
 namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 {
 	[TestClass]
-	public class GlobalLockTests
+	public class GlobalMutexTests
 	{
 		[TestMethod]
 		public void TestLock_Lock_Concurrency()
@@ -33,12 +33,12 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var result = string.Empty;
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests1"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests1"), lockProvider, consoleLog);
 
 			var thread1 = new Thread(
 				() =>
 				{
-					using (var globalLock = factory.CreateLock("test_lock"))
+					using (var globalMutex = factory.CreateLock("test_lock"))
 					{
 						result += "1";
 
@@ -49,11 +49,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				() =>
 				{
 					Thread.Sleep(3000); // Ensure it will enter later than the previous method
-					using (var globalLock = factory.CreateLock("test_lock")) result += "2";
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
 				});
 
 			// Act
-			client.BreakAnyLeases("globallocktests1", "test_lock");
+			client.BreakAnyLeases("globalmutextests1", "test_lock");
 			thread2.Start();
 			thread1.Start();
 			thread1.Join();
@@ -72,13 +72,13 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var client = new CloudEnvironment();
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests2"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests2"), lockProvider, consoleLog);
 			var result = string.Empty;
 			var thread1 = new Thread(
 				() =>
 				{
 					bool isLocked;
-					using (var globalLock = factory.TryCreateLock("test_lock", out isLocked))
+					using (var globalMutex = factory.TryCreateLock("test_lock", out isLocked))
 					{
 						if (isLocked) result += "1";
 						Thread.Sleep(2000);
@@ -89,11 +89,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				{
 					Thread.Sleep(1000); // Ensure it will enter later than the previous method
 					bool isLocked;
-					using (var globalLock = factory.TryCreateLock("test_lock", out isLocked)) if (isLocked) result += "2";
+					using (var globalMutex = factory.TryCreateLock("test_lock", out isLocked)) if (isLocked) result += "2";
 				});
 
 			// Act
-			client.BreakAnyLeases("globallocktests2", "test_lock");
+			client.BreakAnyLeases("globalmutextests2", "test_lock");
 			thread2.Start();
 			thread1.Start();
 			thread1.Join();
@@ -113,14 +113,14 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var result = string.Empty;
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests3"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests3"), lockProvider, consoleLog);
 
 
 			// Act
-			client.BreakAnyLeases("globallocktests3", "test_lock");
-			using (var globalLock = factory.CreateLock("test_lock")) result += "1";
+			client.BreakAnyLeases("globalmutextests3", "test_lock");
+			using (var globalMutex = factory.CreateLock("test_lock")) result += "1";
 
-			using (var globalLock = factory.CreateLock("test_lock")) result += "2";
+			using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
 
 			// Assert
 			Assert.AreEqual("12", result);
@@ -138,16 +138,16 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			bool isLockedInner;
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests4"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests4"), lockProvider, consoleLog);
 
 			// Act
-			client.BreakAnyLeases("globallocktests4", "test_lock");
-			using (var globalLock = factory.TryCreateLock("test_lock", TimeSpan.FromSeconds(15), out isLocked))
+			client.BreakAnyLeases("globalmutextests4", "test_lock");
+			using (var globalMutex = factory.TryCreateLock("test_lock", TimeSpan.FromSeconds(15), out isLocked))
 			{
 				if (isLocked) result += "1";
 
 				Thread.Sleep(TimeSpan.FromSeconds(40));
-				using (var globalLockInner = factory.TryCreateLock("test_lock", out isLockedInner)) if (isLockedInner) result += "2";
+				using (var globalMutexInner = factory.TryCreateLock("test_lock", out isLockedInner)) if (isLockedInner) result += "2";
 			}
 
 			// Assert
@@ -166,15 +166,15 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			bool isLockedInner;
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests5"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests5"), lockProvider, consoleLog);
 
 			// Act
-			client.BreakAnyLeases("globallocktests5", "test_lock");
-			using (var globalLock = factory.TryCreateLock("test_lock", out isLocked))
+			client.BreakAnyLeases("globalmutextests5", "test_lock");
+			using (var globalMutex = factory.TryCreateLock("test_lock", out isLocked))
 			{
 				if (isLocked) result += "1";
 
-				using (var globalLockInner = factory.TryCreateLock("test_lock", out isLockedInner)) if (isLockedInner) result += "2";
+				using (var globalMutexInner = factory.TryCreateLock("test_lock", out isLockedInner)) if (isLockedInner) result += "2";
 			}
 
 			// Assert
@@ -192,16 +192,16 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			bool isLocked;
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests6"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests6"), lockProvider, consoleLog);
 
 			// Act
-			client.BreakAnyLeases("globallocktests6", "test_lock");
-			var globalLock = factory.CreateLock("test_lock");
+			client.BreakAnyLeases("globalmutextests6", "test_lock");
+			var globalMutex = factory.CreateLock("test_lock");
 			result += "1";
 
-			using (var globalLockInner = factory.TryCreateLock("test_lock", out isLocked)) if (isLocked) result += "2";
+			using (var globalMutexInner = factory.TryCreateLock("test_lock", out isLocked)) if (isLocked) result += "2";
 
-			globalLock.Unlock();
+			globalMutex.Unlock();
 
 			// Assert
 			Assert.AreEqual("1", result);
@@ -216,19 +216,19 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var client = new CloudEnvironment();
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests7"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests7"), lockProvider, consoleLog);
 
 			// Act
-			using (var globalLock = factory.CreateLock("test_lock7", TimeSpan.FromSeconds(59)))
+			using (var globalMutex = factory.CreateLock("test_lock7", TimeSpan.FromSeconds(59)))
 			{
 			}
-			using (var globalLock = factory.CreateLock("test_lock7", TimeSpan.FromSeconds(60)))
+			using (var globalMutex = factory.CreateLock("test_lock7", TimeSpan.FromSeconds(60)))
 			{
 			}
 
 			try
 			{
-				using (var globalLock = factory.CreateLock("test_lock7", TimeSpan.FromSeconds(61)))
+				using (var globalMutex = factory.CreateLock("test_lock7", TimeSpan.FromSeconds(61)))
 				{
 				}
 
@@ -251,16 +251,16 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var client = new CloudEnvironment();
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests8"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests8"), lockProvider, consoleLog);
 
 			// Act
-			client.BreakAnyLeases("globallocktests8", "test_lock");
-			var globalLock = factory.CreateLock("test_lock");
-			var lease = globalLock.CurrentLeaseId;
-			globalLock.LockAsync("test_lock").Wait();
+			client.BreakAnyLeases("globalmutextests8", "test_lock");
+			var globalMutex = factory.CreateLock("test_lock");
+			var lease = globalMutex.CurrentLeaseId;
+			globalMutex.LockAsync("test_lock").Wait();
 
 			// Assert
-			Assert.IsTrue(globalLock.CurrentLeaseId == lease);
+			Assert.IsTrue(globalMutex.CurrentLeaseId == lease);
 		}
 
 
@@ -272,17 +272,17 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var client = new CloudEnvironment();
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests9"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests9"), lockProvider, consoleLog);
 
 			// Act
-			client.BreakAnyLeases("globallocktests9", "test_lock");
-			client.BreakAnyLeases("globallocktests9", "test_lock_alt");
-			var globalLock = factory.CreateLock("test_lock");
-			var lease = globalLock.CurrentLeaseId;
-			globalLock.LockAsync("test_lock_alt").Wait();
+			client.BreakAnyLeases("globalmutextests9", "test_lock");
+			client.BreakAnyLeases("globalmutextests9", "test_lock_alt");
+			var globalMutex = factory.CreateLock("test_lock");
+			var lease = globalMutex.CurrentLeaseId;
+			globalMutex.LockAsync("test_lock_alt").Wait();
 
 			// Assert II
-			Assert.IsTrue(globalLock.CurrentLeaseId != lease);
+			Assert.IsTrue(globalMutex.CurrentLeaseId != lease);
 		}
 
 
@@ -295,16 +295,16 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 			var result = string.Empty;
 			var consoleLog = new ConsoleLogService();
 			var lockProvider = new AzureLockStateProvider(consoleLog);
-			var factory = new AzureGlobalLockFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globallocktests10"), lockProvider, consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer) client.BlobClient.GetContainerReference("globalmutextests10"), lockProvider, consoleLog);
 
 			var thread1 = new Thread(
 				() =>
 				{
-					using (var globalLock = factory.CreateLock("test_lock"))
+					using (var globalMutex = factory.CreateLock("test_lock"))
 					{
 						result += "1";
 						Thread.Sleep(5000);
-						client.BreakAnyLeases("globallocktests10", "test_lock");
+						client.BreakAnyLeases("globalmutextests10", "test_lock");
 					}
 
 					Thread.Sleep(3000);
@@ -314,11 +314,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Storage.ConcurrencyTests
 				() =>
 				{
 					Thread.Sleep(3000); // Ensure it will enter later than the previous method
-					using (var globalLock = factory.CreateLock("test_lock")) result += "2";
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
 				});
 
 			// Act
-			client.BreakAnyLeases("globallocktests10", "test_lock");
+			client.BreakAnyLeases("globalmutextests10", "test_lock");
 			thread2.Start();
 			thread1.Start();
 			thread1.Join();

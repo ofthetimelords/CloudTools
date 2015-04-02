@@ -95,11 +95,11 @@
     <Compile Include="ExtendedQueue\ObjectModel\IOverflownMessageHandler.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IExtendedQueueFactory.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.KeepAlive.cs" />
-    <Compile Include="GlobalLockFramework\GlobalLockBase.cs" />
-    <Compile Include="GlobalLockFramework\ILockState.cs" />
-    <Compile Include="GlobalLockFramework\ILockStateProvider.cs" />
-    <Compile Include="GlobalLockFramework\IGlobalLock.cs" />
-    <Compile Include="GlobalLockFramework\IGlobalLockFactory.cs" />
+    <Compile Include="GlobalMutexFramework\GlobalMutexBase.cs" />
+    <Compile Include="GlobalMutexFramework\ILockState.cs" />
+    <Compile Include="GlobalMutexFramework\ILockStateProvider.cs" />
+    <Compile Include="GlobalMutexFramework\IGlobalMutex.cs" />
+    <Compile Include="GlobalMutexFramework\IGlobalMutexFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\NullLogService.cs" />
     <Compile Include="Infrastructure\ILogService.cs" />
