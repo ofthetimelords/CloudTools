@@ -108,7 +108,7 @@
   <ItemGroup>
     <Compile Include="ConsoleLogService.cs" />
     <Compile Include="CloudEnvironment.cs" />
-    <Compile Include="ConcurrencyTests\GlobalLockTests.cs" />
+    <Compile Include="ConcurrencyTests\GlobalMutexTests.cs" />
     <Compile Include="ConcurrencyTests\ExtendedQueueTests.cs" />
     <Compile Include="Mocks\ChaosMonkeyOverflownMessageHandler.cs" />
     <Compile Include="Models\ComplexModel.cs" />
