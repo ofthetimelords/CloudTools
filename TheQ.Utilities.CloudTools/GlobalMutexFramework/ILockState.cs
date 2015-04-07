@@ -14,7 +14,7 @@ using System.Linq;
 
 
 
-namespace TheQ.Utilities.CloudTools.Storage.GlobalLockFramework
+namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 {
 	/// <summary>
 	/// Represents the state of a lock for the Global Locking Framework.

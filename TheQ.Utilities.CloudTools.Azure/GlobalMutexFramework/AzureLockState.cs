@@ -11,12 +11,12 @@
 
 using System.Linq;
 
-using TheQ.Utilities.CloudTools.Storage.GlobalLockFramework;
+using TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
 
-namespace TheQ.Utilities.CloudTools.Azure.GlobalLockFramework
+namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 {
 	/// <summary>
 	///     An <see cref="ILockState" /> implementation for Windows Azure locks using BLOBs.
