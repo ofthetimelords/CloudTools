@@ -102,7 +102,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 				exception = ex;
 			}
 
-			if (exception != null && exception.StatusCode == 409 || exception.StatusCode == 412) 
+			if (exception != null && (exception.StatusCode == 409 || exception.StatusCode == 412))
 				this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
 
 			return state;
