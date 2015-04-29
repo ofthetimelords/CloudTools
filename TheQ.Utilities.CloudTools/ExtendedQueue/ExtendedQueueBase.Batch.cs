@@ -61,43 +61,48 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 						//messageOptions.QuickLogDebug("HandleMessages", "Attempting to listen for a new message in queue '{0}'", queue.Name);
 
 						var howManyMoreFit = messageOptions.MaximumCurrentMessages - rawMessages.Count;
-						var retrievedMessages = (await this.Get(invoker).GetMessagesAsync(howManyMoreFit > this.MaximumMessagesProvider.MaximumMessagesPerRequest
-							? this.MaximumMessagesProvider.MaximumMessagesPerRequest
-							: howManyMoreFit, messageOptions.MessageLeaseTime, messageOptions.CancelToken).ConfigureAwait(false)).ToList();
 
-						if (retrievedMessages.Count == 0 && rawMessages.Count == 0)
+						if (howManyMoreFit <= 0)
 						{
-							// No buffered messages, and none were retrieved from the cache.
-							//messageOptions.QuickLogDebug(
-							//	"HandleBatchMessages",
-							//	"No message available in queue '{0}'. Will wait for '{1}' before retrying.",
-							//	queue.Name,
-							//	messageOptions.PollFrequency.ToString("g", CultureInfo.InvariantCulture));
-
 							shouldDelayNextRequest = true;
 						}
 						else
 						{
-							// Keep trying to retrieve messages until there are no more or the quota is reached
-							if (retrievedMessages.Count > 0)
+							var retrievedMessages = (await this.Get(invoker).GetMessagesAsync(howManyMoreFit > this.MaximumMessagesProvider.MaximumMessagesPerRequest
+								? this.MaximumMessagesProvider.MaximumMessagesPerRequest
+								: howManyMoreFit,
+								messageOptions.MessageLeaseTime,
+								messageOptions.CancelToken).ConfigureAwait(false)).ToList();
+
+							if (retrievedMessages.Count == 0 && rawMessages.Count == 0)
 							{
-								rawMessages.AddRange(retrievedMessages);
-
-								if (rawMessages.Count < messageOptions.MaximumCurrentMessages) continue;
+								shouldDelayNextRequest = true;
 							}
+							else
+							{
+								// Keep trying to retrieve messages until there are no more or the quota is reached
+								if (retrievedMessages.Count > 0)
+								{
+									rawMessages.AddRange(retrievedMessages);
 
-							// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
-							convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.Get(invoker), m)));
-							//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
+									if (rawMessages.Count < messageOptions.MaximumCurrentMessages)
+										continue;
+								}
 
-							this.ProcessMessageInternalBatch(convertedMessages, ref keepAliveTask, batchCancellationToken, messageOptions, invoker);
+								// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
+								convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.Get(invoker), m)));
+								//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
-							break;
+								this.ProcessMessageInternalBatch(convertedMessages, ref keepAliveTask, batchCancellationToken, messageOptions, invoker);
+
+								break;
+							}
 						}
 					}
 					catch (TaskCanceledException)
 					{
-						//messageOptions.QuickLogDebug("HandleMessages", "The message checking task was cancelled on queue '{0}'", queue.Name);
+						if (messageOptions.CancelToken.IsCancellationRequested)
+							break;
 					}
 					catch (CloudToolsStorageException ex)
 					{
@@ -115,6 +120,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					// Delay the next polling attempt for a new message, since no messages were received last time.
 					if (shouldDelayNextRequest) await Task.Delay(messageOptions.PollFrequency, messageOptions.CancelToken).ConfigureAwait(false);
 				}
+
+				if (messageOptions.CancelToken.IsCancellationRequested)
+					return;
 			}
 		}
 

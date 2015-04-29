@@ -69,7 +69,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 				catch (TaskCanceledException)
 				{
-					this.Get(invoker).HandleTaskCancelled(messageOptions);
+					if (this.Get(invoker).HandleTaskCancelled(messageOptions))
+						return;
 				}
 				catch (CloudToolsStorageException ex)
 				{
@@ -96,9 +97,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     Error handler for cancelled task exception during serial message processing.
 		/// </summary>
 		/// <param name="messageOptions">The message options object.</param>
-		protected internal virtual void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		protected internal virtual bool HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
 		{
-			//messageOptions.QuickLogDebug("HandleMessages", "The message checking task was cancelled on queue '{0}'", queue.Name);
+			if (messageOptions.CancelToken.IsCancellationRequested)
+				return true;
+
+			return false;
 		}
 
 

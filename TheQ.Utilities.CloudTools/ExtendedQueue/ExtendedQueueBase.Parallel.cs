@@ -90,7 +90,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 				catch (TaskCanceledException)
 				{
-					throw;
+					if (messageOptions.CancelToken.IsCancellationRequested)
+						return;
 				}
 				catch (Exception ex)
 				{
@@ -149,7 +150,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					}
 					catch (TaskCanceledException)
 					{
-						//messageOptions.QuickLogDebug("HandleMessages", "The message checking task was cancelled on queue '{0}'", queue.Name);
 						throw;
 					}
 					catch (CloudToolsStorageException ex)

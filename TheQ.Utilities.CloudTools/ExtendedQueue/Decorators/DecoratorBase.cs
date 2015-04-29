@@ -275,9 +275,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override void HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		protected internal override bool HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
 		{
-			this.DecoratedQueue.HandleTaskCancelled(messageOptions);
+			return this.DecoratedQueue.HandleTaskCancelled(messageOptions);
 		}
 
 
