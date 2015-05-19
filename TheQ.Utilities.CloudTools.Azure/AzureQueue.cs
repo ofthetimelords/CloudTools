@@ -381,4 +381,5 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </returns>
 		public static CloudQueue ToCloudQueueMessage(AzureQueue queue) { return queue._queueReference; }
 	}
+
 }
