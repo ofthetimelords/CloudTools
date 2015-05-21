@@ -8,6 +8,9 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+4.0.2 | 2015/05/20
+! Removed unnecessary awaits
+
 4.0.1 | 2015/04/29
 ! Batch queues would throw if it couldn't retrieve any more mesasges.
 
