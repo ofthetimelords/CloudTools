@@ -71,11 +71,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task AddMessageAsync(IQueueMessage message)
+		public Task AddMessageAsync(IQueueMessage message)
 		{
 			try
 			{
-				await this._queueReference.AddMessageAsync((AzureQueueMessage) message);
+				return this._queueReference.AddMessageAsync((AzureQueueMessage) message);
 			}
 			catch (StorageException ex)
 			{
@@ -100,11 +100,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task AddMessageAsync(IQueueMessage message, CancellationToken cancellationToken)
+		public Task AddMessageAsync(IQueueMessage message, CancellationToken cancellationToken)
 		{
 			try
 			{
-				await this._queueReference.AddMessageAsync((AzureQueueMessage) message, cancellationToken);
+				return this._queueReference.AddMessageAsync((AzureQueueMessage) message, cancellationToken);
 			}
 			catch (StorageException ex)
 			{
@@ -127,7 +127,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			try
 			{
-				return (await this._queueReference.GetMessagesAsync(messageCount)).Select(c => (AzureQueueMessage) c);
+				return (await this._queueReference.GetMessagesAsync(messageCount).ConfigureAwait(false)).Select(c => (AzureQueueMessage) c);
 			}
 			catch (StorageException ex)
 			{
@@ -154,7 +154,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			try
 			{
-				return (await this._queueReference.GetMessagesAsync(messageCount, cancellationToken)).Select(c => (AzureQueueMessage) c);
+				return (await this._queueReference.GetMessagesAsync(messageCount, cancellationToken).ConfigureAwait(false)).Select(c => (AzureQueueMessage) c);
 			}
 			catch (StorageException ex)
 			{
@@ -184,7 +184,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			try
 			{
-				return (AzureQueueMessage) (await this._queueReference.GetMessageAsync(cancellationToken));
+				return (AzureQueueMessage) (await this._queueReference.GetMessageAsync(cancellationToken).ConfigureAwait(false));
 			}
 			catch (StorageException ex)
 			{
@@ -216,7 +216,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			try
 			{
-				return (await this._queueReference.GetMessagesAsync(messageCount, visibilityTimeout, null, null, cancellationToken)).Select(c => (AzureQueueMessage) c);
+				return (await this._queueReference.GetMessagesAsync(messageCount, visibilityTimeout, null, null, cancellationToken).ConfigureAwait(false)).Select(c => (AzureQueueMessage) c);
 			}
 			catch (StorageException ex)
 			{
@@ -285,11 +285,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields)
+		public Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields)
 		{
 			try
 			{
-				await this._queueReference.UpdateMessageAsync((AzureQueueMessage) message, visibilityTimeout, (MessageUpdateFields) (int) updateFields);
+				return this._queueReference.UpdateMessageAsync((AzureQueueMessage) message, visibilityTimeout, (MessageUpdateFields) (int) updateFields);
 			}
 			catch (StorageException ex)
 			{
@@ -322,11 +322,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields, CancellationToken cancellationToken)
+		public Task UpdateMessageAsync(IQueueMessage message, TimeSpan visibilityTimeout, QueueMessageUpdateFields updateFields, CancellationToken cancellationToken)
 		{
 			try
 			{
-				await this._queueReference.UpdateMessageAsync((AzureQueueMessage) message, visibilityTimeout, (MessageUpdateFields) (int) updateFields, cancellationToken);
+				return this._queueReference.UpdateMessageAsync((AzureQueueMessage) message, visibilityTimeout, (MessageUpdateFields) (int) updateFields, cancellationToken);
 			}
 			catch (StorageException ex)
 			{
