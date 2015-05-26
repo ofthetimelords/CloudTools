@@ -11,6 +11,7 @@
 
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -326,5 +327,89 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			// Assert
 			Assert.AreEqual("123", result);
 		}
+
+
+		[TestMethod]
+		public void TestLock_Lock_ManyLocks()
+		{
+			// Arrange
+			var client = new CloudEnvironment();
+			var result = string.Empty;
+			var consoleLog = new ConsoleLogService();
+			var lockProvider = new AzureLockStateProvider(consoleLog);
+			var factory = new AzureGlobalMutexFactory((AzureBlobContainer)client.BlobClient.GetContainerReference("globalmutextests11"), lockProvider, consoleLog);
+
+			var thread1 = new Thread(
+				() =>
+				{
+					using (var globalMutex = factory.CreateLock("test_lock"))
+					{
+						result += "1";
+						Trace.WriteLine("Thread 1 will sleep  for 90 seconds");
+						Thread.Sleep(TimeSpan.FromSeconds(90));
+						Trace.WriteLine("Thread 1 woke up");
+					}
+				});
+
+			var thread2 = new Thread(
+				() =>
+				{
+					Thread.Sleep(2000); // Ensure it will enter later than the previous method
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
+				});
+
+			var thread3 = new Thread(
+				() =>
+				{
+					Thread.Sleep(2000); // Ensure it will enter later than the previous method
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "3";
+				});
+
+			var thread4 = new Thread(
+				() =>
+				{
+					Thread.Sleep(2000); // Ensure it will enter later than the previous method
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "4";
+				});
+
+			var thread5 = new Thread(
+				() =>
+				{
+					Thread.Sleep(2000); // Ensure it will enter later than the previous method
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "5";
+				});
+
+			var thread6 = new Thread(
+				() =>
+				{
+					Thread.Sleep(1000); // Ensure it will enter later than the previous method
+					using (var globalMutex = factory.CreateLock("test_lock")) result += "6";
+				});
+
+			// Act
+			client.BreakAnyLeases("globalmutextests1", "test_lock");
+			thread6.Start();
+			thread5.Start();
+			thread4.Start();
+			thread3.Start();
+			thread2.Start();
+			thread1.Start();
+			thread1.Join();
+			thread2.Join();
+			thread3.Join();
+			thread4.Join();
+			thread5.Join();
+			thread6.Join();
+
+			// Assert
+			Trace.WriteLine(result);
+			Assert.IsTrue(result.StartsWith("1"));
+			Assert.IsTrue(result.Contains("2"));
+			Assert.IsTrue(result.Contains("3"));
+			Assert.IsTrue(result.Contains("4"));
+			Assert.IsTrue(result.Contains("5"));
+			Assert.IsTrue(result.Contains("6"));
+		}
+
 	}
 }
