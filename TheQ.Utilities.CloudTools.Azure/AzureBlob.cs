@@ -60,11 +60,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <summary>
 		///     Initiates an asynchronous operation to open a stream for reading from the blob.
 		/// </summary>
-		public async Task<Stream> OpenReadAsync()
+		public Task<Stream> OpenReadAsync()
 		{
 			try
 			{
-				return await this._blobReference.OpenReadAsync();
+				return this._blobReference.OpenReadAsync();
 			}
 			catch (StorageException ex)
 			{
@@ -77,11 +77,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <summary>
 		///     Initiates an asynchronous operation to open a stream for reading from the blob.
 		/// </summary>
-		public async Task<Stream> OpenReadAsync(CancellationToken cancellationToken)
+		public Task<Stream> OpenReadAsync(CancellationToken cancellationToken)
 		{
 			try
 			{
-				return await this._blobReference.OpenReadAsync(cancellationToken);
+				return this._blobReference.OpenReadAsync(cancellationToken);
 			}
 			catch (StorageException ex)
 			{
@@ -98,11 +98,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task FetchAttributesAsync()
+		public Task FetchAttributesAsync()
 		{
 			try
 			{
-				await this._blobReference.FetchAttributesAsync();
+				return this._blobReference.FetchAttributesAsync();
 			}
 			catch (StorageException ex)
 			{
@@ -123,11 +123,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task FetchAttributesAsync(CancellationToken cancellationToken)
+		public Task FetchAttributesAsync(CancellationToken cancellationToken)
 		{
 			try
 			{
-				await this._blobReference.FetchAttributesAsync(cancellationToken);
+				return this._blobReference.FetchAttributesAsync(cancellationToken);
 			}
 			catch (StorageException ex)
 			{
@@ -147,11 +147,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>object of type <c>int</c></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task<int> DownloadToByteArrayAsync(byte[] target, int index)
+		public Task<int> DownloadToByteArrayAsync(byte[] target, int index)
 		{
 			try
 			{
-				return await this._blobReference.DownloadToByteArrayAsync(target, index);
+				return this._blobReference.DownloadToByteArrayAsync(target, index);
 			}
 			catch (StorageException ex)
 			{
@@ -175,11 +175,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>object of type <c>int</c></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task<int> DownloadToByteArrayAsync(byte[] target, int index, CancellationToken cancellationToken)
+		public Task<int> DownloadToByteArrayAsync(byte[] target, int index, CancellationToken cancellationToken)
 		{
 			try
 			{
-				return await this._blobReference.DownloadToByteArrayAsync(target, index, cancellationToken);
+				return this._blobReference.DownloadToByteArrayAsync(target, index, cancellationToken);
 			}
 			catch (StorageException ex)
 			{
@@ -200,11 +200,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task UploadFromStreamAsync(Stream source)
+		public Task UploadFromStreamAsync(Stream source)
 		{
 			try
 			{
-				await this._blobReference.UploadFromStreamAsync(source);
+				return this._blobReference.UploadFromStreamAsync(source);
 			}
 			catch (StorageException ex)
 			{
@@ -229,11 +229,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task UploadFromStreamAsync(Stream source, CancellationToken cancellationToken)
+		public Task UploadFromStreamAsync(Stream source, CancellationToken cancellationToken)
 		{
 			try
 			{
-				await this._blobReference.UploadFromStreamAsync(source, cancellationToken);
+				return this._blobReference.UploadFromStreamAsync(source, cancellationToken);
 			}
 			catch (StorageException ex)
 			{
@@ -253,14 +253,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobReference.Name;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobReference.Name;
 			}
 		}
 
@@ -313,124 +306,6 @@ namespace TheQ.Utilities.CloudTools.Azure
 
 
 		/// <summary>
-		///     Initiates an asynchronous operation that acquires a lease on this container.
-		/// </summary>
-		/// <param name="leaseTime">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the span of time for which to acquire the lease, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, an infinite lease will be acquired. If not null, this must be greater than zero.</para>
-		/// </param>
-		/// <param name="proposedLeaseId">
-		///     <para>A string representing the proposed lease ID for the new lease, or <c>null</c></para>
-		///     <para>if no lease ID is proposed.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task<string> AcquireLeaseAsync(TimeSpan? leaseTime, string proposedLeaseId)
-		{
-			try
-			{
-				return await this._blobReference.AcquireLeaseAsync(leaseTime, proposedLeaseId);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
-
-
-
-		/// <summary>
-		///     Initiates an asynchronous operation that acquires a lease on this container.
-		/// </summary>
-		/// <param name="leaseTime">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the span of time for which to acquire the lease, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, an infinite lease will be acquired. If not null, this must be greater than zero.</para>
-		/// </param>
-		/// <param name="proposedLeaseId">
-		///     <para>A string representing the proposed lease ID for the new lease, or <c>null</c></para>
-		///     <para>if no lease ID is proposed.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task<string> AcquireLeaseAsync(TimeSpan? leaseTime, string proposedLeaseId, CancellationToken cancellationToken)
-		{
-			try
-			{
-				return await this._blobReference.AcquireLeaseAsync(leaseTime, proposedLeaseId, cancellationToken);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to renew a lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//public async Task RenewLeaseAsync(IAccessCondition accessCondition)
-		//{
-		//	try
-		//	{
-		//		await this._blobReference.RenewLeaseAsync((AzureAccessCondition) accessCondition);
-		//	}
-		//	catch (StorageException ex)
-		//	{
-		//		throw ex.Wrap();
-		//	}
-		//}
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to renew a lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <param name="cancellationToken">
-		/////     <para>A <see cref="CancellationToken" /></para>
-		/////     <para>to observe while waiting for a task to complete.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//public async Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
-		//{
-		//	try
-		//	{
-		//		await this._blobReference.RenewLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
-		//	}
-		//	catch (StorageException ex)
-		//	{
-		//		throw ex.Wrap();
-		//	}
-		//}
-
-
-
-		/// <summary>
 		///     Initiates an asynchronous operation to upload the contents of a <see langword="byte" /> array to a blob.
 		/// </summary>
 		/// <param name="buffer">An array of bytes.</param>
@@ -440,11 +315,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task UploadFromByteArrayAsync(byte[] buffer, int index, int count)
+		public Task UploadFromByteArrayAsync(byte[] buffer, int index, int count)
 		{
 			try
 			{
-				await this._blobReference.UploadFromByteArrayAsync(buffer, index, count);
+				return this._blobReference.UploadFromByteArrayAsync(buffer, index, count);
 			}
 			catch (StorageException ex)
 			{
@@ -468,71 +343,17 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>A <see cref="Task" /></para>
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task UploadFromByteArrayAsync(byte[] buffer, int index, int count, CancellationToken cancellationToken)
+		public Task UploadFromByteArrayAsync(byte[] buffer, int index, int count, CancellationToken cancellationToken)
 		{
 			try
 			{
-				await this._blobReference.UploadFromByteArrayAsync(buffer, index, count, cancellationToken);
+				return this._blobReference.UploadFromByteArrayAsync(buffer, index, count, cancellationToken);
 			}
 			catch (StorageException ex)
 			{
 				throw ex.Wrap();
 			}
 		}
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to release the lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//public async Task ReleaseLeaseAsync(IAccessCondition accessCondition)
-		//{
-		//	try
-		//	{
-		//		await this._blobReference.ReleaseLeaseAsync((AzureAccessCondition) accessCondition);
-		//	}
-		//	catch (StorageException ex)
-		//	{
-		//		throw ex.Wrap();
-		//	}
-		//}
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to release the lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <param name="cancellationToken">
-		/////     <para>A <see cref="CancellationToken" /></para>
-		/////     <para>to observe while waiting for a task to complete.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//public async Task ReleaseLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken)
-		//{
-		//	try
-		//	{
-		//		await this._blobReference.ReleaseLeaseAsync((AzureAccessCondition) accessCondition, cancellationToken);
-		//	}
-		//	catch (StorageException ex)
-		//	{
-		//		throw ex.Wrap();
-		//	}
-		//}
 
 
 
@@ -544,11 +365,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>object of type <c>bool</c></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task<bool> ExistsAsync()
+		public Task<bool> ExistsAsync()
 		{
 			try
 			{
-				return await this._blobReference.ExistsAsync();
+				return this._blobReference.ExistsAsync();
 			}
 			catch (StorageException ex)
 			{
@@ -570,11 +391,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>object of type <c>bool</c></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
-		public async Task<bool> ExistsAsync(CancellationToken cancellationToken)
+		public Task<bool> ExistsAsync(CancellationToken cancellationToken)
 		{
 			try
 			{
-				return await this._blobReference.ExistsAsync(cancellationToken);
+				return this._blobReference.ExistsAsync(cancellationToken);
 			}
 			catch (StorageException ex)
 			{
@@ -597,64 +418,6 @@ namespace TheQ.Utilities.CloudTools.Azure
 			try
 			{
 				return this._blobReference.DownloadToByteArray(target, index);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
-
-
-
-		/// <summary>
-		///     Initiates an asynchronous operation to <see langword="break" /> the current lease on this blob.
-		/// </summary>
-		/// <param name="breakPeriod">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the amount of time to allow the lease to remain, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, the <see langword="break" /> period is the remainder of the current lease, or zero for infinite leases.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object of type <see cref="TimeSpan" /></para>
-		///     <para>that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task<TimeSpan> BreakLeaseAsync(TimeSpan? breakPeriod)
-		{
-			try
-			{
-				return await this._blobReference.BreakLeaseAsync(breakPeriod);
-			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
-			}
-		}
-
-
-
-		/// <summary>
-		///     Initiates an asynchronous operation to <see langword="break" /> the current lease on this blob.
-		/// </summary>
-		/// <param name="breakPeriod">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the amount of time to allow the lease to remain, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, the <see langword="break" /> period is the remainder of the current lease, or zero for infinite leases.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object of type <see cref="TimeSpan" /></para>
-		///     <para>that represents the asynchronous operation.</para>
-		/// </returns>
-		public async Task<TimeSpan> BreakLeaseAsync(TimeSpan? breakPeriod, CancellationToken cancellationToken)
-		{
-			try
-			{
-				return await this._blobReference.BreakLeaseAsync(breakPeriod, cancellationToken);
 			}
 			catch (StorageException ex)
 			{

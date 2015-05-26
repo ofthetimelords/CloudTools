@@ -122,11 +122,17 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 			if (state.LockingBlob != null)
 			{
-				await ((CloudBlockBlob)(state.LockingBlob as AzureBlob)).ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
-				//await state.LockingBlob.ReleaseLeaseAsync(new AzureAccessCondition(AccessCondition.GenerateLeaseCondition(state.LeaseId)), cancelToken).ConfigureAwait(false);
-				
-				state.LockingBlob = null;
-				state.LeaseId = null;
+				try
+				{
+					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+
+					state.LockingBlob = null;
+					state.LeaseId = null;
+				}
+				catch (StorageException ex)
+				{
+					throw ex.Wrap();
+				}
 			}
 
 			return state;
@@ -153,13 +159,20 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 			if (!await state.LockingBlob.ExistsAsync(cancelToken).ConfigureAwait(false)) await state.LockingBlob.UploadFromByteArrayAsync(new byte[0], 0, 0, cancelToken).ConfigureAwait(false);
 
-			state.LeaseId =
-				await
-					state.LockingBlob.AcquireLeaseAsync(
-						isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
-						null,
-						cancelToken).ConfigureAwait(false);
-			state.LockName = newLockName;
+			try
+			{
+				state.LeaseId =
+					await
+						((CloudBlockBlob) (AzureBlob) state.LockingBlob).AcquireLeaseAsync(
+							isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
+							null,
+							cancelToken).ConfigureAwait(false);
+				state.LockName = newLockName;
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
 
 			return state;
 		}
@@ -176,11 +189,18 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		{
 			Guard.NotNull(state, "state");
 
-			if (state.LockingBlob != null) 
-				await ((CloudBlockBlob)(state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
-			//if (state.LockingBlob != null) await state.LockingBlob.RenewLeaseAsync(new AzureAccessCondition(AccessCondition.GenerateLeaseCondition(state.LeaseId)), cancelToken).ConfigureAwait(false);
 
-			return state;
+			try
+			{
+				if (state.LockingBlob != null)
+					await ((CloudBlockBlob) (state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+
+				return state;
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
 		}
 
 
@@ -209,9 +229,16 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		{
 			if (state.LockingBlob != null)
 			{
-				await state.LockingBlob.BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
-				state.LockingBlob = null;
-				state.LeaseId = null;
+				try
+				{
+					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
+					state.LockingBlob = null;
+					state.LeaseId = null;
+				}
+				catch (StorageException ex)
+				{
+					throw ex.Wrap();
+				}
 			}
 
 			return state;

@@ -301,7 +301,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					using (var globalMutex = factory.CreateLock("test_lock"))
 					{
 						result += "1";
-						Thread.Sleep(5000);
+						Thread.Sleep(10000);
 						client.BreakAnyLeases("globalmutextests10", "test_lock");
 					}
 
@@ -312,7 +312,8 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				() =>
 				{
 					Thread.Sleep(3000); // Ensure it will enter later than the previous method
-					using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
+					using (var globalMutex = factory.CreateLock("test_lock")) 
+						result += "2";
 				});
 
 			// Act

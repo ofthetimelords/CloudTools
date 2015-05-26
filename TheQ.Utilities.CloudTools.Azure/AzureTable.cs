@@ -15,7 +15,6 @@
 //using System.Threading;
 //using System.Threading.Tasks;
 
-//using Microsoft.WindowsAzure.Storage;
 //using Microsoft.WindowsAzure.Storage.Table;
 
 //using TheQ.Utilities.CloudTools.Storage.Internal;
@@ -42,12 +41,7 @@
 
 
 
-//		public string Name
-//		{
-//			get { return this._tableReference.Name; }
-//		}
-
-
+//		public string Name { get; set; }
 //		///// <summary>
 //		///// A factory method that creates a query that can be modified using LINQ. The query may be subsequently executed using one of the execution methods available for <see cref="T:Microsoft.WindowsAzure.Storage.Table.CloudTable"/>,
 //		/////             such as <see cref="M:Microsoft.WindowsAzure.Storage.Table.CloudTable.ExecuteQuery(Microsoft.WindowsAzure.Storage.Table.TableQuery,Microsoft.WindowsAzure.Storage.Table.TableRequestOptions,Microsoft.WindowsAzure.Storage.OperationContext)"/>, <see cref="M:Microsoft.WindowsAzure.Storage.Table.CloudTable.ExecuteQuerySegmented(Microsoft.WindowsAzure.Storage.Table.TableQuery,Microsoft.WindowsAzure.Storage.Table.TableContinuationToken,Microsoft.WindowsAzure.Storage.Table.TableRequestOptions,Microsoft.WindowsAzure.Storage.OperationContext)"/>, or <see cref="M:Microsoft.WindowsAzure.Storage.Table.CloudTable.ExecuteQuerySegmentedAsync(Microsoft.WindowsAzure.Storage.Table.TableQuery,Microsoft.WindowsAzure.Storage.Table.TableContinuationToken)"/>.
@@ -118,14 +112,7 @@
 //		/// <param name="operationContext">An <see cref="T:Microsoft.WindowsAzure.Storage.OperationContext" /> object that represents the context for the current operation.</param>
 //		public void Create()
 //		{
-//			try
-//			{
-//				this._tableReference.Create();
-//			}
-//			catch (StorageException ex)
-//			{
-//				throw ex.Wrap();
-//			}
+//			throw new NotImplementedException();
 //		}
 
 
@@ -138,14 +125,7 @@
 //		/// </returns>
 //		public Task CreateAsync()
 //		{
-//			try
-//			{
-//				return this._tableReference.CreateAsync();
-//			}
-//			catch (StorageException ex)
-//			{
-//				throw ex.Wrap();
-//			}
+//			throw new NotImplementedException();
 //		}
 
 
@@ -326,13 +306,10 @@
 //		{
 //			throw new NotImplementedException();
 //		}
-//		public Task<ITableResult> ExecuteAsync()
-//		{
-//			return null;
-//		}
 
 
-//		public ITableResult Execute(ITableOperation operation)
+
+//		ITableResult Execute(ITableOperation operation)
 //		{
 //			throw new NotImplementedException();
 //		}
@@ -363,15 +340,7 @@
 //		/// </returns>
 //		public Task<ITableResult> ExecuteAsync(ITableOperation operation, CancellationToken cancellationToken)
 //		{
-//						try
-//						{
-//							return this._tableReference.ExecuteAsync(operation, cancellationToken);
-//						}
-//			catch (StorageException ex)
-//			{
-//				throw ex.Wrap();
-//			}
-
+//			throw new NotImplementedException();
 //		}
 
 
@@ -388,15 +357,7 @@
 //		/// </returns>
 //		public IList<ITableResult> ExecuteBatch(ITableBatchOperation batch)
 //		{
-//						try
-//						{
-//							return this._tableReference.ExecuteBatch(batch);
-//						}
-//			catch (StorageException ex)
-//			{
-//				throw ex.Wrap();
-//			}
-
+//			throw new NotImplementedException();
 //		}
 
 
@@ -410,14 +371,7 @@
 //		/// </returns>
 //		public Task<IList<ITableResult>> ExecuteBatchAsync(ITableBatchOperation batch)
 //		{
-//			try
-//			{
-//				return this._tableReference.ExecuteBatchAsync(batch);
-//			}
-//			catch (StorageException ex)
-//			{
-//				throw ex.Wrap();
-//			}
+//			throw new NotImplementedException();
 //		}
 
 
@@ -432,14 +386,7 @@
 //		/// </returns>
 //		public Task<IList<ITableResult>> ExecuteBatchAsync(ITableBatchOperation batch, CancellationToken cancellationToken)
 //		{
-//			try
-//			{
-//				return this._tableReference.ExecuteBatchAsync(batch, cancellationToken);
-//			}
-//			catch (StorageException ex)
-//			{
-//				throw ex.Wrap();
-//			}
+//			throw new NotImplementedException();
 //		}
 
 
@@ -493,7 +440,7 @@
 //		/// <returns>
 //		///     An <see cref="AzureTable" /> wrapper.
 //		/// </returns>
-//		public static CloudTable ToCloudTable(AzureTable table)
+//		public static CloudTable ToCloudTableMessage(AzureTable table)
 //		{
 //			return table._tableReference;
 //		}

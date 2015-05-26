@@ -162,84 +162,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 
 
 		/// <summary>
-		///     Initiates an asynchronous operation that acquires a lease on this container.
-		/// </summary>
-		/// <param name="leaseTime">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the span of time for which to acquire the lease, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, an infinite lease will be acquired. If not null, this must be greater than zero.</para>
-		/// </param>
-		/// <param name="proposedLeaseId">
-		///     <para>A string representing the proposed lease ID for the new lease, or <c>null</c></para>
-		///     <para>if no lease ID is proposed.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		Task<string> AcquireLeaseAsync(TimeSpan? leaseTime, string proposedLeaseId);
-
-
-
-		/// <summary>
-		///     Initiates an asynchronous operation that acquires a lease on this container.
-		/// </summary>
-		/// <param name="leaseTime">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the span of time for which to acquire the lease, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, an infinite lease will be acquired. If not null, this must be greater than zero.</para>
-		/// </param>
-		/// <param name="proposedLeaseId">
-		///     <para>A string representing the proposed lease ID for the new lease, or <c>null</c></para>
-		///     <para>if no lease ID is proposed.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object that represents the asynchronous operation.</para>
-		/// </returns>
-		Task<string> AcquireLeaseAsync(TimeSpan? leaseTime, string proposedLeaseId, CancellationToken cancellationToken);
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to renew a lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//Task RenewLeaseAsync(IAccessCondition accessCondition);
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to renew a lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <param name="cancellationToken">
-		/////     <para>A <see cref="CancellationToken" /></para>
-		/////     <para>to observe while waiting for a task to complete.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
-
-
-
-		/// <summary>
 		///     Initiates an asynchronous operation to upload the contents of a <see langword="byte" /> array to a blob.
 		/// </summary>
 		/// <param name="buffer">An array of bytes.</param>
@@ -268,40 +190,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     <para>object that represents the asynchronous operation.</para>
 		/// </returns>
 		Task UploadFromByteArrayAsync(byte[] buffer, int index, int count, CancellationToken cancellationToken);
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to release the lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//Task ReleaseLeaseAsync(IAccessCondition accessCondition);
-
-
-
-		///// <summary>
-		/////     Initiates an asynchronous operation to release the lease on this blob.
-		///// </summary>
-		///// <param name="accessCondition">
-		/////     <para>An <see cref="Microsoft.WindowsAzure.Storage.AccessCondition" /></para>
-		/////     <para>object that represents the condition that must be met in order for the request to proceed, including a required lease ID.</para>
-		///// </param>
-		///// <param name="cancellationToken">
-		/////     <para>A <see cref="CancellationToken" /></para>
-		/////     <para>to observe while waiting for a task to complete.</para>
-		///// </param>
-		///// <returns>
-		/////     <para>A <see cref="Task" /></para>
-		/////     <para>object that represents the asynchronous operation.</para>
-		///// </returns>
-		//Task ReleaseLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
 
 
 
@@ -342,44 +230,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     The total number of bytes read into the buffer.
 		/// </returns>
 		int DownloadToByteArray(byte[] target, int index);
-
-
-
-		/// <summary>
-		///     Initiates an asynchronous operation to <see langword="break" /> the current lease on this blob.
-		/// </summary>
-		/// <param name="breakPeriod">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the amount of time to allow the lease to remain, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, the <see langword="break" /> period is the remainder of the current lease, or zero for infinite leases.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object of type <see cref="TimeSpan" /></para>
-		///     <para>that represents the asynchronous operation.</para>
-		/// </returns>
-		Task<TimeSpan> BreakLeaseAsync(TimeSpan? breakPeriod);
-
-
-
-		/// <summary>
-		///     Initiates an asynchronous operation to <see langword="break" /> the current lease on this blob.
-		/// </summary>
-		/// <param name="breakPeriod">
-		///     <para>A <see cref="TimeSpan" /></para>
-		///     <para>representing the amount of time to allow the lease to remain, which will be rounded down to seconds. If <c>null</c></para>
-		///     <para>, the <see langword="break" /> period is the remainder of the current lease, or zero for infinite leases.</para>
-		/// </param>
-		/// <param name="cancellationToken">
-		///     <para>A <see cref="CancellationToken" /></para>
-		///     <para>to observe while waiting for a task to complete.</para>
-		/// </param>
-		/// <returns>
-		///     <para>A <see cref="Task" /></para>
-		///     <para>object of type <see cref="TimeSpan" /></para>
-		///     <para>that represents the asynchronous operation.</para>
-		/// </returns>
-		Task<TimeSpan> BreakLeaseAsync(TimeSpan? breakPeriod, CancellationToken cancellationToken);
 
 
 

@@ -94,25 +94,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobPropertiesReference.ContentDisposition;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobPropertiesReference.ContentDisposition;
 			}
 			set
 			{
-				try
-				{
-					this._blobPropertiesReference.ContentDisposition = value;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				this._blobPropertiesReference.ContentDisposition = value;
 			}
 		}
 
@@ -148,25 +134,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobPropertiesReference.ContentLanguage;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobPropertiesReference.ContentLanguage;
 			}
 			set
 			{
-				try
-				{
-					this._blobPropertiesReference.ContentLanguage = value;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				this._blobPropertiesReference.ContentLanguage = value;
 			}
 		}
 
@@ -203,25 +175,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobPropertiesReference.ContentMD5;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobPropertiesReference.ContentMD5;
 			}
 			set
 			{
-				try
-				{
-					this._blobPropertiesReference.ContentMD5 = value;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				this._blobPropertiesReference.ContentMD5 = value;
 			}
 		}
 
@@ -240,25 +198,11 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobPropertiesReference.ContentType;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobPropertiesReference.ContentType;
 			}
 			set
 			{
-				try
-				{
-					this._blobPropertiesReference.ContentType = value;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				this._blobPropertiesReference.ContentType = value;
 			}
 		}
 
@@ -273,14 +217,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobPropertiesReference.ETag;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobPropertiesReference.ETag;
 			}
 		}
 
@@ -296,14 +233,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			get
 			{
-				try
-				{
-					return this._blobPropertiesReference.LastModified;
-				}
-				catch (StorageException ex)
-				{
-					throw ex.Wrap();
-				}
+				return this._blobPropertiesReference.LastModified;
 			}
 		}
 
