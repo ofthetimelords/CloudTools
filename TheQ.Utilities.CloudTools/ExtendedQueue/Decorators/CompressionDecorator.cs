@@ -26,8 +26,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		/// <param name="decoratedQueue">The queue to decorate.</param>
 		public CompressionDecorator(ExtendedQueueBase decoratedQueue) :base(decoratedQueue) { }
 
-		protected internal override Stream GetByteEncoder(Stream originalConverter) { return new DeflateStream(originalConverter, CompressionMode.Compress, true); }
+		protected internal override Task<Stream> GetByteEncoder(Stream originalConverter) { return Task.FromResult<Stream>(new DeflateStream(originalConverter, CompressionMode.Compress, true)); }
 
-		protected internal override Stream GetByteDecoder(Stream originalConverter) { return new DeflateStream(originalConverter, CompressionMode.Decompress, true); }
+		protected internal override Task<Stream> GetByteDecoder(Stream originalConverter) { return Task.FromResult<Stream>(new DeflateStream(originalConverter, CompressionMode.Decompress, true)); }
 	}
 }

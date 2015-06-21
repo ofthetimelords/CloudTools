@@ -93,7 +93,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 								convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.Get(invoker), m)));
 								//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
-								this.ProcessMessageInternalBatch(convertedMessages, ref keepAliveTask, batchCancellationToken, messageOptions, invoker);
+								keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
 
 								break;
 							}

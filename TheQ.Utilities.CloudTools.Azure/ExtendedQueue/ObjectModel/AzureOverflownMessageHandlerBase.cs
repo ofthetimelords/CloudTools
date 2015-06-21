@@ -22,6 +22,16 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel
 		protected const string OverflownMessagePrefix = "*Overflown*";
 
 
+		/// <summary>
+		/// Stores an overflown message, asynchronously.
+		/// </summary>
+		/// <param name="originalMessage">The original converted message.</param>
+		/// <param name="messagePointer">An identifier that joins a message on the overflown messages store and the queue.</param>
+		/// <param name="queueName">The name of the queue.</param>
+		/// <param name="token">A cancellation token.</param>
+		/// <returns>
+		/// A <see cref="Task" /> representing the current proccess.
+		/// </returns>
 		public abstract Task StoreOverflownMessageAsync(byte[] originalMessage, string messagePointer, string queueName, CancellationToken token);
 
 
@@ -47,7 +57,7 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel
 		/// <returns>The resulting message ID.</returns>
 		public string GetIdFromMessagePointer(byte[] pointerRaw)
 		{
-			Guard.NotNull(pointerRaw, "pointer");
+			Guard.NotNull(pointerRaw, "pointerRaw");
 			var isOverflown = true;
 
 			for (var i = 0; i < AzureOverflownMessageHandlerBase.OverflownMessagePrefix.Length; i++)

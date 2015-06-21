@@ -43,10 +43,20 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 
 
 
+		/// <summary>
+		/// Stores an overflown message, asynchronously.
+		/// </summary>
+		/// <param name="originalMessage">The original converted message.</param>
+		/// <param name="messagePointer">An identifier that joins a message on the overflown messages store and the queue.</param>
+		/// <param name="queueName">The name of the queue.</param>
+		/// <param name="token">A cancellation token.</param>
+		/// <returns>
+		/// A <see cref="Task" /> representing the current proccess.
+		/// </returns>
 		public override Task StoreOverflownMessageAsync(byte[] originalMessage, string messagePointer, string queueName, CancellationToken token)
 		{
 			Guard.NotNull(originalMessage, "originalMessage");
-			Guard.NotNull(messagePointer, "messageId");
+			Guard.NotNull(messagePointer, "messagePointer");
 			Guard.NotNull(queueName, "queueName");
 
 
@@ -57,11 +67,20 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 
 
 
+		/// <summary>
+		/// Removes the overflown message contents, asynchronously.
+		/// </summary>
+		/// <param name="id">The message identifier.</param>
+		/// <param name="queueName">The name of the queue.</param>
+		/// <param name="token">The cancellation token.</param>
+		/// <returns>
+		/// A <see cref="Task" /> representing the current proccess
+		/// </returns>
 		public override async Task RemoveOverflownContentsAsync(string id, string queueName, CancellationToken token)
 		{
 			try
 			{
-				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, id));
+				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, AzureBlobOverflownMessageHandler.OverflownBlobNameFormat, queueName, id));
 				await or.DeleteIfExistsAsync().ConfigureAwait(false);
 			}
 			catch (CloudToolsStorageException ex)
@@ -73,9 +92,18 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 
 
 
+		/// <summary>
+		/// Retrieves the overflown message contents, asynchronously.
+		/// </summary>
+		/// <param name="id">The message identifier.</param>
+		/// <param name="queueName">the name of the queue.</param>
+		/// <param name="token">The cancellation token.</param>
+		/// <returns>
+		/// A byte array with the overflown message contents.
+		/// </returns>
 		public override Task<byte[]> RetrieveOverflownMessageAsync(string id, string queueName, CancellationToken token)
 		{
-			var blobName = string.Format(CultureInfo.InvariantCulture, OverflownBlobNameFormat, queueName, id);
+			var blobName = string.Format(CultureInfo.InvariantCulture, AzureBlobOverflownMessageHandler.OverflownBlobNameFormat, queueName, id);
 
 			return this.OverflowContainer.DownloadByteArrayAsync(blobName, token);
 		}

@@ -66,7 +66,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override string GetOverflownMessageId(IQueueMessage message) { return this.OverflownMessageHandler.GetIdFromMessagePointer(message.AsBytes); }
+		protected internal override Task<string> GetOverflownMessageId(IQueueMessage message) { return Task.FromResult(this.OverflownMessageHandler.GetIdFromMessagePointer(message.AsBytes)); }
 
 
 

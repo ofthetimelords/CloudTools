@@ -36,7 +36,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		private ILogService LogService { get; set; }
 
 
-		protected internal override string SerializeMessageEntity(object messageEntity)
+		protected internal override Task<string> SerializeMessageEntity(object messageEntity)
 		{
 			return this.LogAction(
 				() => this.DecoratedQueue.SerializeMessageEntity(messageEntity),
@@ -45,7 +45,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Stream GetByteEncoder(Stream originalConverter)
+		protected internal override Task<Stream> GetByteEncoder(Stream originalConverter)
 		{
 			return this.LogAction(
 				() => this.DecoratedQueue.GetByteEncoder(originalConverter),
@@ -54,7 +54,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Stream GetByteDecoder(Stream originalConverter)
+		protected internal override Task<Stream> GetByteDecoder(Stream originalConverter)
 		{
 			return this.LogAction(
 				() => this.DecoratedQueue.GetByteDecoder(originalConverter),
@@ -63,7 +63,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override byte[] PostProcessMessage(byte[] originalContents)
+		protected internal override Task<byte[]> PostProcessMessage(byte[] originalContents)
 		{
 			return this.LogAction(
 				() => this.DecoratedQueue.PostProcessMessage(originalContents),
@@ -168,7 +168,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override string GetOverflownMessageId(IQueueMessage message)
+		protected internal override Task<string> GetOverflownMessageId(IQueueMessage message)
 		{
 			return this.LogAction(
 				() => this.DecoratedQueue.GetOverflownMessageId(message),

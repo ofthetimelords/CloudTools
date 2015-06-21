@@ -179,7 +179,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		void DeleteMessage(string messageId, string popReceipt);
 
 
-
 		/// <summary>
 		///     Initiates an asynchronous operation to update the visibility timeout and optionally the content of a message.
 		/// </summary>

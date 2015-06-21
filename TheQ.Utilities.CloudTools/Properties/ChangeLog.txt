@@ -8,6 +8,12 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+5.0.0 | 2015/06/22
+/ Converted the code (almost completely) to async, including missing parts.
+/ Simplified
++ Added one integration test to test queues' keep-alive capabilities.
+
+
 4.0.2 | 2015/05/20
 ! Removed unnecessary awaits
 

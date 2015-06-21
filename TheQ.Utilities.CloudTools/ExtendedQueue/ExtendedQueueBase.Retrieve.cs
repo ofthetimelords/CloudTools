@@ -43,7 +43,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		internal virtual async Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token, ExtendedQueueBase invoker)
 		{
 			var msgBytes = message.ActualMessage.AsBytes;
-			var overflownId = (message.OverflowId = this.Get(invoker).GetOverflownMessageId(message.ActualMessage));
+			var overflownId = (message.OverflowId = await this.Get(invoker).GetOverflownMessageId(message.ActualMessage).ConfigureAwait(false));
 			var wasOverflown = (message.WasOverflown = !string.IsNullOrWhiteSpace(overflownId));
 
 			msgBytes = await (wasOverflown
@@ -69,7 +69,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				converter.Seek(0, SeekOrigin.Begin);
 
-				using (var decoratedConverter = this.Get(invoker).GetByteDecoder(converter)) 
+				using (var decoratedConverter = await this.Get(invoker).GetByteDecoder(converter).ConfigureAwait(false)) 
 				using (var reader = new StreamReader(decoratedConverter)) 
 					return await reader.ReadToEndAsync().ConfigureAwait(false);
 			}
@@ -77,10 +77,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal abstract Stream GetByteDecoder(Stream originalConverter);
+		protected internal abstract Task<Stream> GetByteDecoder(Stream originalConverter);
 
 
-		protected internal abstract string GetOverflownMessageId(IQueueMessage message);
+		protected internal abstract Task<string> GetOverflownMessageId(IQueueMessage message);
 
 
 		protected internal abstract Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token);

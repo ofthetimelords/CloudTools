@@ -61,13 +61,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(entity, "entity");
 
-			var maxSize = this.MaximumSizeProvider.MaximumMessageSize *3/4;
+			var maxSize = this.MaximumSizeProvider.MaximumMessageSize;
 
 			var stringSource = entity as string;
-			var serialized = stringSource ?? this.Get(invoker).SerializeMessageEntity(entity);
+			var serialized = stringSource ?? await this.Get(invoker).SerializeMessageEntity(entity).ConfigureAwait(false);
 
 			var messageAsBytes = await this.Get(invoker).MessageContentsToByteArray(serialized, invoker).ConfigureAwait(false);
-			messageAsBytes = this.Get(invoker).PostProcessMessage(messageAsBytes);
+			messageAsBytes = await this.Get(invoker).PostProcessMessage(messageAsBytes).ConfigureAwait(false);
 
 			if (messageAsBytes.Length < maxSize) await this.Get(invoker).AddNonOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
 			else await this.Get(invoker).AddOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
@@ -85,7 +85,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			using (var converter = new MemoryStream(serializedContents.Length))
 			{
-				using (var decoratedConverter = this.Get(invoker).GetByteEncoder(converter))
+				using (var decoratedConverter = await this.Get(invoker).GetByteEncoder(converter).ConfigureAwait(false))
 				using (var writer = new StreamWriter(decoratedConverter))
 				{
 					await writer.WriteAsync(serializedContents).ConfigureAwait(false);
@@ -103,7 +103,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messageEntity">The message entity to serialise.</param>
 		/// <returns>A string representation of the entity.</returns>
-		protected internal abstract string SerializeMessageEntity(object messageEntity);
+		protected internal abstract Task<string> SerializeMessageEntity(object messageEntity);
 
 
 
@@ -112,7 +112,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="originalConverter">The original stream.</param>
 		/// <returns>The new stream.</returns>
-		protected internal abstract Stream GetByteEncoder(Stream originalConverter);
+		protected internal abstract Task<Stream> GetByteEncoder(Stream originalConverter);
 
 
 
@@ -121,7 +121,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="originalContents">The original byte array contents of the serialised message.</param>
 		/// <returns>The post-processed byte array message contents.</returns>
-		protected internal abstract byte[] PostProcessMessage(byte[] originalContents);
+		protected internal abstract Task<byte[]> PostProcessMessage(byte[] originalContents);
 
 
 

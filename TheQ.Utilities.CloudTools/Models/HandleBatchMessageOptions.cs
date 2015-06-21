@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
@@ -58,8 +59,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 			int poisonMessageThreshold,
 			int maximumCurrentMessages,
 			CancellationToken cancelToken,
-			[NotNull] Func<IList<QueueMessageWrapper>, IList<QueueMessageWrapper>> messageHandler,
-			[CanBeNull] Func<IList<QueueMessageWrapper>, IList<QueueMessageWrapper>> poisonHandler = null,
+			[NotNull] Func<IList<QueueMessageWrapper>, Task<IList<QueueMessageWrapper>>> messageHandler,
+			[CanBeNull] Func<IList<QueueMessageWrapper>, Task<IList<QueueMessageWrapper>>> poisonHandler = null,
 			[CanBeNull] Action<Exception> exceptionHandler = null)
 			: base(timeWindow, messageLeaseTime, pollFrequency, poisonMessageThreshold, cancelToken, exceptionHandler)
 
@@ -78,7 +79,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		///     and will be requeued automatically.
 		/// </summary>
 		[NotNull]
-		public Func<IList<QueueMessageWrapper>, IList<QueueMessageWrapper>> MessageHandler { get; private set; }
+		public Func<IList<QueueMessageWrapper>, Task<IList<QueueMessageWrapper>>> MessageHandler { get; private set; }
 
 
 		/// <summary>
@@ -86,7 +87,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		///     <para>. Returns a list of messages that have been handled successfully and should be removed. Messages that are not returned will not be removed and will be requeued automatically.</para>
 		/// </summary>
 		[CanBeNull]
-		public Func<IList<QueueMessageWrapper>, IList<QueueMessageWrapper>> PoisonHandler { get; private set; }
+		public Func<IList<QueueMessageWrapper>, Task<IList<QueueMessageWrapper>>> PoisonHandler { get; private set; }
 
 
 		/// <summary>

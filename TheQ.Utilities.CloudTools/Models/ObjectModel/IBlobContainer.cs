@@ -45,28 +45,5 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     <para>instance.</para>
 		/// </returns>
 		IBlob GetBlobReference(string blobName);
-
-
-
-		///// <summary>
-		/////     Renews a lease on a BLOB asynchronously.
-		///// </summary>
-		///// <param name="accessCondition">The access condition containing the lease ID.</param>
-		///// <returns>
-		/////     An asynchronous Task.
-		///// </returns>
-		//Task RenewLeaseAsync(IAccessCondition accessCondition);
-
-
-
-		///// <summary>
-		/////     Renews a lease on a BLOB asynchronously.
-		///// </summary>
-		///// <param name="accessCondition">The access condition containing the lease ID.</param>
-		///// <param name="cancellationToken">A cancellation token.</param>
-		///// <returns>
-		/////     An asynchronous Task.
-		///// </returns>
-		//Task RenewLeaseAsync(IAccessCondition accessCondition, CancellationToken cancellationToken);
 	}
 }

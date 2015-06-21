@@ -59,12 +59,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					{
 						receivedMessage = true;
 
-						this.Get(invoker).ProcessMessageInternal(
+						keepAliveTask = await this.Get(invoker).ProcessMessageInternal(
 							new QueueMessageWrapper(this.Get(invoker), message),
 							messageOptions,
 							messageSpecificCancellationTokenSource,
-							ref keepAliveTask,
-							this.Get(invoker));
+							this.Get(invoker)).ConfigureAwait(false);
 					}
 				}
 				catch (TaskCanceledException)

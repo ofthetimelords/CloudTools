@@ -41,25 +41,25 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal override string SerializeMessageEntity(object messageEntity)
+		protected internal override Task<string> SerializeMessageEntity(object messageEntity)
 		{
 			// Not a preferrable method; this is meant to be overriden by a decorator
 			using (var ms = new MemoryStream())
 			{
 				new BinaryFormatter().Serialize(ms, messageEntity);
-				return Convert.ToBase64String(ms.ToArray());
+				return Task.FromResult(Convert.ToBase64String(ms.ToArray()));
 			}
 		}
 
 
 
-		protected internal override Stream GetByteEncoder(Stream originalConverter) { return originalConverter; }
+		protected internal override Task<Stream> GetByteEncoder(Stream originalConverter) { return Task.FromResult(originalConverter); }
 
-		protected internal override Stream GetByteDecoder(Stream originalConverter) { return originalConverter; }
+		protected internal override Task<Stream> GetByteDecoder(Stream originalConverter) { return Task.FromResult(originalConverter); }
 
 
 
-		protected internal override byte[] PostProcessMessage(byte[] originalContents) { return originalContents; }
+		protected internal override Task<byte[]> PostProcessMessage(byte[] originalContents) { return Task.FromResult(originalContents); }
 
 
 
@@ -77,17 +77,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="token">The token.</param>
 		/// <returns></returns>
 		/// <exception cref="System.ArgumentException">Message wouldn't fit in the Queue.</exception>
-		protected internal override async Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
+		protected internal override Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			throw new NotSupportedException("Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes.");
 		}
 
 
 
-		protected internal override string GetOverflownMessageId(IQueueMessage message)
+		protected internal override Task<string> GetOverflownMessageId(IQueueMessage message)
 		{
 			// The default implementation does not support overflown messages, so it will have to assume that this is not an overflown message.
-			return string.Empty;
+			return Task.FromResult(string.Empty);
 		}
 
 

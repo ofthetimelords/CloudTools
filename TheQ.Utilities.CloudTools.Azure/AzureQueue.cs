@@ -343,7 +343,12 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     The underlying <see cref="CloudQueue" /> instance.
 		/// </returns>
-		public static implicit operator CloudQueue(AzureQueue queue) { return queue._queueReference; }
+		public static implicit operator CloudQueue(AzureQueue queue)
+		{
+			Guard.NotNull(queue, "queue");
+			
+			return queue._queueReference;
+		}
 
 
 
@@ -379,7 +384,12 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     An <see cref="AzureQueue" /> wrapper.
 		/// </returns>
-		public static CloudQueue ToCloudQueueMessage(AzureQueue queue) { return queue._queueReference; }
+		public static CloudQueue ToCloudQueueMessage(AzureQueue queue)
+		{
+			Guard.NotNull(queue, "queue");
+
+			return queue._queueReference;
+		}
 	}
 
 }

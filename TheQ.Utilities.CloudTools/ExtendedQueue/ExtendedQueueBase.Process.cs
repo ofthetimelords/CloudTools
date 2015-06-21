@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
@@ -14,6 +15,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
+		private readonly AsyncLock _lock = new AsyncLock();
+
 		/// <summary>
 		///     Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
 		/// </summary>
@@ -25,7 +28,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <returns>
 		///     True if the <paramref name="message" /> was deleted; <see langword="false" /> if it should be requeued and <see langword="checked" /> again.
 		/// </returns>
-		private bool WasPoisonMessageAndRemoved(
+		private async Task<bool> WasPoisonMessageAndRemoved(
 			[NotNull] HandleSerialMessageOptions messageOptions,
 			[NotNull] QueueMessageWrapper message,
 			[NotNull] object syncToken,
@@ -40,10 +43,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (message.ActualMessage.DequeueCount <= messageOptions.PoisonMessageThreshold)
 				return false;
 
-			if (messageOptions.PoisonHandler != null && !messageOptions.PoisonHandler(message))
+			if (messageOptions.PoisonHandler != null && !(await messageOptions.PoisonHandler(message).ConfigureAwait(false)))
 				return false;
 
-			this.Get(invoker).SyncDeleteMessage(syncToken, message, messageSpecificCancellationTokenSource, this.Get(invoker));
+			await this.Get(invoker).SyncDeleteMessage(syncToken, message, messageSpecificCancellationTokenSource, this.Get(invoker)).ConfigureAwait(false);
 
 			return true;
 		}
@@ -58,7 +61,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="message">The message to delete.</param>
 		/// <param name="messageSpecificCancellationTokenSource">The message-specific cancellation token.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
-		private void SyncDeleteMessage(
+		private async Task SyncDeleteMessage(
 			[NotNull] object syncToken,
 			[NotNull] QueueMessageWrapper message,
 			[CanBeNull] CancellationTokenSource messageSpecificCancellationTokenSource,
@@ -67,18 +70,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			Guard.NotNull(message, "message");
 			Guard.NotNull(syncToken, "syncToken");
 
-			lock (syncToken)
+			if (messageSpecificCancellationTokenSource != null)
+				messageSpecificCancellationTokenSource.Cancel();
+
+			using (var alock = await this._lock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
 			{
 				// Cancel all other waiting operations before deleting.
-				if (messageSpecificCancellationTokenSource != null)
-					messageSpecificCancellationTokenSource.Cancel();
 				this.Get(invoker).DeleteMessage(message.ActualMessage);
 
 				if (message.WasOverflown)
 				{
 					try
 					{
-						this.Get(invoker).RemoveOverflownContentsAsync(message, messageSpecificCancellationTokenSource.Token).Wait(messageSpecificCancellationTokenSource.Token);
+						await this.Get(invoker).RemoveOverflownContentsAsync(message, messageSpecificCancellationTokenSource.Token).ConfigureAwait(false);
 					}
 					catch (CloudToolsStorageException ex)
 					{
@@ -99,11 +103,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageSpecificCancellationTokenSource">A cancellation token source that's specific to this message.</param>
 		/// <param name="keepAliveTask">A task that is responsible for keeping a <paramref name="message" /> alive while being processed.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
-		private void ProcessMessageInternal(
+		private async Task<Task> ProcessMessageInternal(
 			[NotNull] QueueMessageWrapper message,
 			[NotNull] HandleSerialMessageOptions messageOptions,
 			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource,
-			[CanBeNull] ref Task keepAliveTask,
 			ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(message, "message");
@@ -116,22 +119,24 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (messageOptions.TimeWindow.TotalSeconds > 0
 				&& (!message.ActualMessage.InsertionTime.HasValue || message.ActualMessage.InsertionTime.Value.UtcDateTime.Add(messageOptions.TimeWindow) < DateTime.UtcNow))
 			{
-				this.Get(invoker).SyncDeleteMessage(syncToken, message, messageSpecificCancellationTokenSource, invoker);
-				return;
+				await this.Get(invoker).SyncDeleteMessage(syncToken, message, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false);
+				return Task.FromResult<Task>(null);
 			}
 
 			// Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
-			if (this.Get(invoker).WasPoisonMessageAndRemoved(messageOptions, message, syncToken, messageSpecificCancellationTokenSource, invoker))
-				return;
+			if (await this.Get(invoker).WasPoisonMessageAndRemoved(messageOptions, message, syncToken, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false))
+				return Task.FromResult<Task>(null);
 
 			// Starts the background thread which ensures message leases stay fresh.
-			keepAliveTask = this.KeepMessageAlive(message.ActualMessage, messageOptions.MessageLeaseTime, messageSpecificCancellationTokenSource.Token, syncToken, this.Get(invoker));
+			var keepAliveTask = this.KeepMessageAlive(message.ActualMessage, messageOptions.MessageLeaseTime, messageSpecificCancellationTokenSource.Token, syncToken, this.Get(invoker));
 			using (var comboCancelToken = CancellationTokenSource.CreateLinkedTokenSource(messageSpecificCancellationTokenSource.Token, messageOptions.CancelToken))
 			{
 				// Execute the provided action and if successful, delete the message.
-				if (messageOptions.MessageHandler(message))
-					this.Get(invoker).SyncDeleteMessage(syncToken, message, comboCancelToken, invoker);
+				if (await messageOptions.MessageHandler(message).ConfigureAwait(false))
+					await this.Get(invoker).SyncDeleteMessage(syncToken, message, comboCancelToken, invoker).ConfigureAwait(false);
 			}
+
+			return keepAliveTask;
 		}
 
 
@@ -146,7 +151,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <returns>
 		///     Returns a list of <paramref name="messages" /> that were not poison <paramref name="messages" /> and should be further processed.
 		/// </returns>
-		private IList<QueueMessageWrapper> WerePoisonMessagesAndRemovedBatch(
+		private async Task<IList<QueueMessageWrapper>> WerePoisonMessagesAndRemovedBatch(
 			[NotNull] HandleBatchMessageOptions messageOptions,
 			[NotNull] IList<QueueMessageWrapper> messages,
 			[NotNull] object syncToken,
@@ -161,11 +166,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (poisonMessages.Count == 0)
 				return messages;
 
-			var handledMessages = messageOptions.PoisonHandler != null ? messageOptions.PoisonHandler(poisonMessages) : new List<QueueMessageWrapper>(poisonMessages);
+			var handledMessages = messageOptions.PoisonHandler != null ? await messageOptions.PoisonHandler(poisonMessages).ConfigureAwait(false) : new List<QueueMessageWrapper>(poisonMessages);
 
 
 			foreach (var message in handledMessages)
-				this.Get(invoker).SyncDeleteMessage(syncToken, message, null, invoker);
+				await this.Get(invoker).SyncDeleteMessage(syncToken, message, null, invoker).ConfigureAwait(false);
 
 			return messages.Except(handledMessages).ToList();
 		}
@@ -180,9 +185,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="batchCancellationToken">A cancellation token that's responsible for all tasks used in keep-alive.</param>
 		/// <param name="messageOptions">Initialisation options for the method that handles the messages.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
-		private void ProcessMessageInternalBatch(
+		private async Task<Task> ProcessMessageInternalBatch(
 			[NotNull] IList<QueueMessageWrapper> messages,
-			[CanBeNull] ref Task keepAliveTask,
 			[NotNull] CancellationTokenSource batchCancellationToken,
 			[NotNull] HandleBatchMessageOptions messageOptions,
 			ExtendedQueueBase invoker)
@@ -201,25 +205,27 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (oldMessages.Count > 0)
 			{
 				foreach (var message in messages)
-					this.Get(invoker).SyncDeleteMessage(syncToken, message, null, invoker);
+					await this.Get(invoker).SyncDeleteMessage(syncToken, message, null, invoker).ConfigureAwait(false);
 			}
 
 			// Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
-			var toBeProcessedMessages = this.Get(invoker).WerePoisonMessagesAndRemovedBatch(messageOptions, timeValidMessages, syncToken, invoker);
+			var toBeProcessedMessages = await this.Get(invoker).WerePoisonMessagesAndRemovedBatch(messageOptions, timeValidMessages, syncToken, invoker).ConfigureAwait(false);
 
 			if (toBeProcessedMessages.Count == 0)
-				return;
+				return Task.FromResult<Task>(null);
 
 			var generalCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(batchCancellationToken.Token, messageOptions.CancelToken).Token;
-			keepAliveTask = this.Get(invoker).KeepMessageAlive(messages, messageOptions.MessageLeaseTime, generalCancellationToken, syncToken, invoker);
+			var keepAliveTask = this.Get(invoker).KeepMessageAlive(messages, messageOptions.MessageLeaseTime, generalCancellationToken, syncToken, invoker);
 
-			var handledMessages = messageOptions.MessageHandler(messages);
+			var handledMessages = await messageOptions.MessageHandler(messages).ConfigureAwait(false);
 
 			batchCancellationToken.Cancel();
 
 			// Execute the provided action and if successful, delete the message.
 			foreach (var message in handledMessages)
-				this.Get(invoker).SyncDeleteMessage(syncToken, message, null, invoker);
+				await this.Get(invoker).SyncDeleteMessage(syncToken, message, null, invoker).ConfigureAwait(false);
+
+			return keepAliveTask;
 		}
 	}
 }

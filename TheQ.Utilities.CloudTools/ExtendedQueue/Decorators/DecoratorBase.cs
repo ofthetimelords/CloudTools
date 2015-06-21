@@ -396,28 +396,28 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override string SerializeMessageEntity(object messageEntity)
+		protected internal override Task<string> SerializeMessageEntity(object messageEntity)
 		{
 			return this.DecoratedQueue.SerializeMessageEntity(messageEntity);
 		}
 
 
 
-		protected internal override Stream GetByteEncoder(Stream originalConverter)
+		protected internal override Task<Stream> GetByteEncoder(Stream originalConverter)
 		{
 			return this.DecoratedQueue.GetByteEncoder(originalConverter);
 		}
 
 
 
-		protected internal override Stream GetByteDecoder(Stream originalConverter)
+		protected internal override Task<Stream> GetByteDecoder(Stream originalConverter)
 		{
 			return this.DecoratedQueue.GetByteDecoder(originalConverter);
 		}
 
 
 
-		protected internal override string GetOverflownMessageId(IQueueMessage message)
+		protected internal override Task<string> GetOverflownMessageId(IQueueMessage message)
 		{
 			return this.DecoratedQueue.GetOverflownMessageId(message);
 		}
@@ -452,7 +452,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override byte[] PostProcessMessage(byte[] originalContents)
+		protected internal override Task<byte[]> PostProcessMessage(byte[] originalContents)
 		{
 			return this.DecoratedQueue.PostProcessMessage(originalContents);
 		}

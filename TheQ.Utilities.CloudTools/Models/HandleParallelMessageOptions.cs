@@ -12,6 +12,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
@@ -58,8 +59,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 			int poisonMessageThreshold,
 			int maximumCurrentMessages,
 			CancellationToken cancelToken,
-			[NotNull] Func<QueueMessageWrapper, bool> messageHandler,
-			[CanBeNull] Func<QueueMessageWrapper, bool> poisonHandler = null,
+			[NotNull] Func<QueueMessageWrapper, Task<bool>> messageHandler,
+			[CanBeNull] Func<QueueMessageWrapper, Task<bool>> poisonHandler = null,
 			[CanBeNull] Action<Exception> exceptionHandler = null)
 			: base(timeWindow, messageLeaseTime, pollFrequency, poisonMessageThreshold, cancelToken, messageHandler, poisonHandler, exceptionHandler)
 		{

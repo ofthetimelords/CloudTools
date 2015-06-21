@@ -120,52 +120,46 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal void ProcessOneParallelMessage(HandleParallelMessageOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task ProcessOneParallelMessage(HandleParallelMessageOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
 		{
 			var messageSpecificCancellationTokenSource = new CancellationTokenSource();
-			var comboCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(messageSpecificCancellationTokenSource.Token, messageOptions.CancelToken).Token;
 			var currentMessage = message;
 
-			if (currentMessage == null) return;
+			if (currentMessage == null)
+				return;
 			Interlocked.Increment(ref activeMessageSlots[0]);
 
-			var actualTask = Task.Run(
-				() =>
-				{
-					Task keepAliveTask = null;
-					//messageOptions.QuickLogDebug(
-					//	"HandleMessages",
-					//	"Started processing queue's '{0}' message with ID '{1}' ({2} slots remaining)",
-					//	queue.Name,
-					//	currentMessage.Id,
-					//	messageOptions.MaximumCurrentMessages - Interlocked.Read(ref activeMessageSlots[0]));
+			Task keepAliveTask = null;
 
-					try
-					{
-						this.Get(invoker).ProcessMessageInternal(
-							new QueueMessageWrapper(this, currentMessage),
-							messageOptions,
-							messageSpecificCancellationTokenSource,
-							ref keepAliveTask, invoker);
-					}
-					catch (TaskCanceledException)
-					{
-						throw;
-					}
-					catch (CloudToolsStorageException ex)
-					{
-						this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
-					}
-					catch (Exception ex)
-					{
-						this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
-					}
-					finally
-					{
-						this.Get(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
-					}
-				},
-				comboCancellationToken);
+			//messageOptions.QuickLogDebug(
+			//	"HandleMessages",
+			//	"Started processing queue's '{0}' message with ID '{1}' ({2} slots remaining)",
+			//	queue.Name,
+			//	currentMessage.Id,
+			//	messageOptions.MaximumCurrentMessages - Interlocked.Read(ref activeMessageSlots[0]));
+
+			try
+			{
+				keepAliveTask =
+					await
+						this.Get(invoker).ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false);
+			}
+			catch (TaskCanceledException)
+			{
+				throw;
+			}
+			catch (CloudToolsStorageException ex)
+			{
+				this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
+			}
+			catch (Exception ex)
+			{
+				this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
+			}
+			finally
+			{
+				this.Get(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
+			}
 		}
 
 

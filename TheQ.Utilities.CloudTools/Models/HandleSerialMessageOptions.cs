@@ -12,6 +12,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
@@ -55,8 +56,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 			TimeSpan pollFrequency,
 			int poisonMessageThreshold,
 			CancellationToken cancelToken,
-			Func<QueueMessageWrapper, bool> messageHandler,
-			[CanBeNull] Func<QueueMessageWrapper, bool> poisonHandler = null,
+			Func<QueueMessageWrapper, Task<bool>> messageHandler,
+			[CanBeNull] Func<QueueMessageWrapper, Task<bool>> poisonHandler = null,
 			[CanBeNull] Action<Exception> exceptionHandler = null)
 			: base(timeWindow, messageLeaseTime, pollFrequency, poisonMessageThreshold, cancelToken, exceptionHandler)
 
@@ -73,7 +74,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		///     An action that specifies how a message should be handled. Returns a value indicating whether the message has been handled successfully and should be removed.
 		/// </summary>
 		[NotNull]
-		public Func<QueueMessageWrapper, bool> MessageHandler { get; private set; }
+		public Func<QueueMessageWrapper, Task<bool>> MessageHandler { get; private set; }
 
 
 		/// <summary>
@@ -81,6 +82,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		///     <para>. Returns a value indicating whether the message has been handled successfully and should be removed.</para>
 		/// </summary>
 		[CanBeNull]
-		public Func<QueueMessageWrapper, bool> PoisonHandler { get; private set; }
+		public Func<QueueMessageWrapper, Task<bool>> PoisonHandler { get; private set; }
 	}
 }

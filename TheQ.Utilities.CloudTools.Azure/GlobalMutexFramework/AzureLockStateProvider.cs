@@ -36,7 +36,11 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		/// Initializes a new instance of the <see cref="AzureLockStateProvider"/> class.
 		/// </summary>
 		/// <param name="logService">The logging service to use.</param>
-		public AzureLockStateProvider(ILogService logService) { this.LogService = logService; }
+		public AzureLockStateProvider(ILogService logService)
+		{
+			this.LogService = logService;
+		}
+
 
 
 		/// <summary>
@@ -64,7 +68,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 			if (!this.IsDisposed)
 			{
 				this.IsDisposed = true;
-				GC.SuppressFinalize(this);
+				//GC.SuppressFinalize(this);
 			}
 		}
 
@@ -94,8 +98,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 			try
 			{
 				// TODO: What if does not exist already, Exceptions
-				if (state.LeaseId != null) await this.UnregisterLockAsync(state, cancelToken).ConfigureAwait(false);
-				else await this.BreakLockInternal(state, cancelToken).ConfigureAwait(false);
+				await (state.LeaseId != null ? this.UnregisterLockAsync(state, cancelToken) : this.BreakLockInternal(state, cancelToken)).ConfigureAwait(false);
 			}
 			catch (CloudToolsStorageException ex)
 			{
@@ -120,12 +123,19 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		{
 			Guard.NotNull(state, "state");
 
-			if (state.LockingBlob != null)
+			try
 			{
-				await ((CloudBlockBlob)(AzureBlob) state.LockingBlob).ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
-				
-				state.LockingBlob = null;
-				state.LeaseId = null;
+				if (state.LockingBlob != null)
+				{
+					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+
+					state.LockingBlob = null;
+					state.LeaseId = null;
+				}
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
 			}
 
 			return state;
@@ -150,15 +160,23 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 			state.LockingBlob = state.LockingBlobContainer.GetBlobReference(newLockName);
 
-			if (!await state.LockingBlob.ExistsAsync(cancelToken).ConfigureAwait(false)) await state.LockingBlob.UploadFromByteArrayAsync(new byte[0], 0, 0, cancelToken).ConfigureAwait(false);
+			if (!await state.LockingBlob.ExistsAsync(cancelToken).ConfigureAwait(false))
+				await state.LockingBlob.UploadFromByteArrayAsync(new byte[0], 0, 0, cancelToken).ConfigureAwait(false);
 
-			state.LeaseId =
-				await
-					((CloudBlockBlob)(AzureBlob)state.LockingBlob).AcquireLeaseAsync(
-						isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
-						null,
-						cancelToken).ConfigureAwait(false);
-			state.LockName = newLockName;
+			try
+			{
+				state.LeaseId =
+					await
+						((CloudBlockBlob) (AzureBlob) state.LockingBlob).AcquireLeaseAsync(
+							isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
+							null,
+							cancelToken).ConfigureAwait(false);
+				state.LockName = newLockName;
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
 
 			return state;
 		}
@@ -175,8 +193,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		{
 			Guard.NotNull(state, "state");
 
-			if (state.LockingBlob != null) 
-				await ((CloudBlockBlob)(state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+			try
+			{
+				if (state.LockingBlob != null)
+					await ((CloudBlockBlob) (state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
 
 			return state;
 		}
@@ -205,12 +230,20 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		/// <returns>The lock state object, updated after the operation.</returns>
 		private async Task<AzureLockState> BreakLockInternal(AzureLockState state, CancellationToken cancelToken)
 		{
-			if (state.LockingBlob != null)
+			try
 			{
-				await ((CloudBlockBlob)(AzureBlob)state.LockingBlob).BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
-				state.LockingBlob = null;
-				state.LeaseId = null;
+				if (state.LockingBlob != null)
+				{
+					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
+					state.LockingBlob = null;
+					state.LeaseId = null;
+				}
 			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
+
 
 			return state;
 		}

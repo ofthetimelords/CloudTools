@@ -10,6 +10,7 @@
 // </summary>
 
 using System.Linq;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
@@ -29,7 +30,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) : base(decoratedQueue) { }
 
 
-		protected internal override string SerializeMessageEntity(object messageEntity) { return JsonConvert.SerializeObject(messageEntity, Formatting.None); }
+		protected internal override Task<string> SerializeMessageEntity(object messageEntity) { return Task.FromResult(JsonConvert.SerializeObject(messageEntity, Formatting.None)); }
 
 
 		protected internal override T DeserializeToObject<T>(string serializedContents) { return JsonConvert.DeserializeObject<T>(serializedContents); }

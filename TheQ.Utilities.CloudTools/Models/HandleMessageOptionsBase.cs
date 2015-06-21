@@ -67,17 +67,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 
 
 		/// <summary>
-		///     <list type="bullet">
-		///         <item>
-		///             <description></description>
-		///         </item>
-		///         <item>
-		///             <description>The time window within which a message is still valid for processing (older messages will be discarded).</description>
-		///         </item>
-		///         <item>
-		///             <description></description>
-		///         </item>
-		///     </list>
+		/// The time window within which a message is still valid for processing (older messages will be discarded).
 		/// </summary>
 		public TimeSpan TimeWindow { get; private set; }
 

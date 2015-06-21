@@ -56,7 +56,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						if (message.GetMessageContents<string>() == "END")
 						{
@@ -118,7 +118,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					5,
 					50,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						lock (locking)
 						{
@@ -179,7 +179,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					5,
 					50,
 					new CancellationToken(),
-					messages =>
+					async messages =>
 					{
 						lock (locking)
 						{
@@ -238,7 +238,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						result = message.GetMessageContents<string>();
 						mre.Set();
@@ -287,7 +287,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
@@ -349,7 +349,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					1,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
@@ -412,7 +412,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					1,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
@@ -475,7 +475,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						return true;
@@ -537,7 +537,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					message =>
+					async message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
@@ -568,5 +568,77 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				Assert.IsTrue(succeeded);
 			}
 		}
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestSerial_ParallelProcessingDelayed()
+		{
+			// Arrange
+			const int runCount = 10;
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test10");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-10");
+			var locking = new object();
+			var result = string.Empty;
+			var expected = string.Empty;
+			var sw = new Stopwatch();
+			long actuallyRun = 0;
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factory.Create(new AzureQueue(queue));
+
+
+			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleParallelMessageOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromSeconds(30),
+					TimeSpan.FromSeconds(30),
+					5,
+					50,
+					new CancellationToken(),
+					async message =>
+					{
+						lock (locking)
+						{
+							var character = message.GetMessageContents<string>();
+							result += character;
+						}
+
+						var innersw = new Stopwatch();
+						innersw.Start();
+
+						// Intentional spinning
+						while (true)
+						{
+							if (sw.Elapsed > TimeSpan.FromSeconds(70))
+								break;
+						}
+
+						if (Interlocked.Increment(ref actuallyRun) == runCount) mre.Set();
+
+						return true;
+					},
+					null,
+					ex => { throw ex; });
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				for (var i = 1; i < runCount + 1; i++) equeue.AddMessageEntity(((char)(i)).ToString(CultureInfo.InvariantCulture));
+				equeue.HandleMessagesInParallelAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(expected.All(c => result.Contains(c)));
+			}
+		}
+
 	}
 }
