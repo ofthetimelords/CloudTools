@@ -39,7 +39,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				if (messageOptions.ExceptionHandler != null)
 					messageOptions.ExceptionHandler(ex);
 			}
-			catch (Exception innerEx)
+			catch (Exception)
 			{
 				//if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
 			}

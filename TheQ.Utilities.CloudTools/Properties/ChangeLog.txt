@@ -10,9 +10,12 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 
 5.0.0 | 2015/06/22
 / Converted the code (almost completely) to async, including missing parts.
-/ Simplified
+! Removed Monitor-based locks, replaced with Stephen Toub's AsyncLock & AsyncSemaphore implementations.
 + Added one integration test to test queues' keep-alive capabilities.
 
+
+4.0.2 | 2015/05/20
+! Removed unnecessary awaits
 
 4.0.2 | 2015/05/20
 ! Removed unnecessary awaits

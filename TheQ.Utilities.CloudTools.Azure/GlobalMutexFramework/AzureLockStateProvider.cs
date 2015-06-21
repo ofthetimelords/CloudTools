@@ -123,19 +123,19 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		{
 			Guard.NotNull(state, "state");
 
-			try
+			if (state.LockingBlob != null)
 			{
-				if (state.LockingBlob != null)
+				try
 				{
 					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
-
-					state.LockingBlob = null;
-					state.LeaseId = null;
-				}
+				
+				state.LockingBlob = null;
+				state.LeaseId = null;
 			}
-			catch (StorageException ex)
-			{
-				throw ex.Wrap();
+				catch (StorageException ex)
+				{
+					throw ex.Wrap();
+				}
 			}
 
 			return state;
@@ -165,13 +165,13 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 			try
 			{
-				state.LeaseId =
-					await
+			state.LeaseId =
+				await
 						((CloudBlockBlob) (AzureBlob) state.LockingBlob).AcquireLeaseAsync(
-							isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
-							null,
-							cancelToken).ConfigureAwait(false);
-				state.LockName = newLockName;
+						isDefaultLeaseTime && !leaseTime.HasValue ? TimeSpan.FromSeconds(AzureLockStateProvider.DefaultLeaseTimeInSeconds) : leaseTime,
+						null,
+						cancelToken).ConfigureAwait(false);
+			state.LockName = newLockName;
 			}
 			catch (StorageException ex)
 			{
@@ -195,7 +195,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 			try
 			{
-				if (state.LockingBlob != null)
+			if (state.LockingBlob != null) 
 					await ((CloudBlockBlob) (state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
 			}
 			catch (StorageException ex)
@@ -232,12 +232,12 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		{
 			try
 			{
-				if (state.LockingBlob != null)
-				{
+			if (state.LockingBlob != null)
+			{
 					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
-					state.LockingBlob = null;
-					state.LeaseId = null;
-				}
+				state.LockingBlob = null;
+				state.LeaseId = null;
+			}
 			}
 			catch (StorageException ex)
 			{

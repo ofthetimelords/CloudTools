@@ -24,8 +24,16 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 {
+	/// <summary>
+	/// Provides logging capabilities to an ExtendedQueue instance.
+	/// </summary>
 	public class LoggingDecorator : DecoratorBase
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LoggingDecorator"/> class.
+		/// </summary>
+		/// <param name="decoratedQueue">The <see cref="ExtendedQueueBase"/> instance to decorate.</param>
+		/// <param name="logService">The logging service to use.</param>
 		public LoggingDecorator(ExtendedQueueBase decoratedQueue, ILogService logService) : base(decoratedQueue)
 		{
 			this.LogService = logService ?? new NullLogService();
