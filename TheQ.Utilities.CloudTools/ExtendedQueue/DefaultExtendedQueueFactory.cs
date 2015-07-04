@@ -36,22 +36,23 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DefaultExtendedQueueFactory"/> class.
+		/// Initializes a new instance of the <see cref="DefaultExtendedQueueFactory" /> class.
 		/// </summary>
-		/// <param name="policy">The exception policy that will be used by the logging decorator.</param>
-		/// <param name="messageProvider">An object that will generate a proper instance of <see cref="IQueueMessage"/>.</param>
+		/// <param name="messageProvider">An object that will generate a proper instance of <see cref="IQueueMessage" />.</param>
 		/// <param name="maximumMessageSizeProvider">An object that will report the maximum size of a message.</param>
+		/// <param name="maximumMessagePerRequestProvider">An object that will report the maximum amount of messages that can be retrieved per request.</param>
 		/// <param name="overflownMessageHandler">An object that handles messages that are overflown and should be recorded in a temporary storage.</param>
 		/// <param name="logService">The logging service to use.</param>
 		public DefaultExtendedQueueFactory(
-			IQueueMessageProvider messageProvider,
-			IMaximumMessageSizeProvider maximumMessageSizeProvider,
-			IMaximumMessagesPerRequestProvider maximumMessagePerRequestProvider,
-			IOverflownMessageHandler overflownMessageHandler,
-			ILogService logService)
+			[NotNull] IQueueMessageProvider messageProvider,
+			[NotNull] IMaximumMessageSizeProvider maximumMessageSizeProvider,
+			[NotNull] IMaximumMessagesPerRequestProvider maximumMessagePerRequestProvider,
+			[NotNull] IOverflownMessageHandler overflownMessageHandler,
+			[NotNull] ILogService logService)
 		{
 			Guard.NotNull(messageProvider, "messageProvider");
 			Guard.NotNull(maximumMessageSizeProvider, "maximumMessageSizeProvider");
+			Guard.NotNull(maximumMessagePerRequestProvider, "maximumMessagePerRequestProvider");
 			Guard.NotNull(overflownMessageHandler, "overflownMessageHandler");
 			Guard.NotNull(logService, "logService");
 
@@ -65,6 +66,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
+		/// <summary>
+		/// Creates an <see cref="IExtendedQueue" /> instance from a <see cref="IQueue" /> instance.
+		/// </summary>
+		/// <param name="original">The <see cref="IQueue" /> instance to wrap into an <see cref="IExtendedQueue" /> instance.</param>
+		/// <returns>
+		/// An <see cref="IExtendedQueue" /> instance backed by the <paramref name="original" /> instance.
+		/// </returns>
 		public IExtendedQueue Create(IQueue original)
 		{
 			var baseQueue = new ExtendedQueue(original, this.MessageProvider, this.MaximumMessageSizeProvider, this.MaximumMessagesProvider);

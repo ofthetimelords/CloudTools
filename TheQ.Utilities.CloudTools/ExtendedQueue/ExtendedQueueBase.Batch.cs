@@ -23,7 +23,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		public Task HandleMessagesInBatchAsync([NotNull] HandleBatchMessageOptions messageOptions) { return this.HandleMessagesInBatchAsync(messageOptions, this); }
+		public Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions) { return this.HandleMessagesInBatchAsync(messageOptions, this); }
 
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>.</para>
 		/// </returns>
 		[NotNull]
-		internal async Task HandleMessagesInBatchAsync([NotNull] HandleBatchMessageOptions messageOptions, ExtendedQueueBase invoker)
+		internal async Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions, ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -135,7 +135,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="keepAliveTask">The <see cref="Task"/> that keeps the message "alive".</param>
 		/// <param name="batchCancelToken">The cancellation token for the batch.</param>
 		private void BatchFinallyHandler(
-			[CanBeNull] HandleBatchMessageOptions messageOptions,
+			[CanBeNull] HandleMessagesBatchOptions messageOptions,
 			[CanBeNull] Task keepAliveTask,
 			[NotNull] CancellationTokenSource batchCancelToken)
 		{

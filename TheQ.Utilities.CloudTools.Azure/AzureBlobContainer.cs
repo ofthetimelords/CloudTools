@@ -108,7 +108,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     The underlying <see cref="CloudBlobContainer" /> instance.
 		/// </returns>
-		public static implicit operator CloudBlobContainer(AzureBlobContainer container) { return container._blobContainerReference; }
+		public static implicit operator CloudBlobContainer(AzureBlobContainer container) { return container != null ? container._blobContainerReference : null; }
 
 
 
@@ -119,6 +119,6 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     A <see cref="AzureBlobContainer" /> wrapper.
 		/// </returns>
-		public static implicit operator AzureBlobContainer(CloudBlobContainer container) { return new AzureBlobContainer(container); }
+		public static implicit operator AzureBlobContainer(CloudBlobContainer container) { return container != null ? new AzureBlobContainer(container) : null; }
 	}
 }

@@ -19,9 +19,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		public Task HandleMessagesAsync(HandleSerialMessageOptions messageOptions)
+		public Task HandleMessagesInSerialAsync(HandleMessagesSerialOptions messageOptions)
 		{
-			return this.HandleMessagesAsync(messageOptions, this);
+			return this.HandleMessagesInSerialAsync(messageOptions, this);
 		}
 
 
@@ -34,7 +34,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <returns>
 		///     A cancellable task representing the message processing procedure.
 		/// </returns>
-		internal async Task HandleMessagesAsync(HandleSerialMessageOptions messageOptions, ExtendedQueueBase invoker)
+		internal async Task HandleMessagesInSerialAsync(HandleMessagesSerialOptions messageOptions, ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -96,7 +96,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     Error handler for cancelled task exception during serial message processing.
 		/// </summary>
 		/// <param name="messageOptions">The message options object.</param>
-		protected internal virtual bool HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		protected internal virtual bool HandleTaskCancelled(HandleMessagesSerialOptions messageOptions)
 		{
 			if (messageOptions.CancelToken.IsCancellationRequested)
 				return true;
@@ -112,7 +112,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageOptions">The message options object.</param>
 		/// <param name="messageSpecificCancellationTokenSource">The message specific cancellation token source.</param>
 		/// <returns>An <see cref="IQueueMessage" /> instance.</returns>
-		protected internal virtual async Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
+		protected internal virtual async Task<IQueueMessage> GetMessageFromQueue(HandleMessagesSerialOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			return await this.GetMessageAsync(messageOptions.MessageLeaseTime, messageSpecificCancellationTokenSource.Token).ConfigureAwait(false);
 		}
@@ -127,7 +127,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="message">The message currently processing.</param>
 		/// <param name="messageSpecificCancellationTokenSource">The cancellation token for the message.</param>
 		protected internal virtual void SerialFinallyHandler(
-			[CanBeNull] HandleSerialMessageOptions messageOptions,
+			[CanBeNull] HandleMessagesSerialOptions messageOptions,
 			[CanBeNull] Task keepAliveTask,
 			[CanBeNull] IQueueMessage message,
 			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource)

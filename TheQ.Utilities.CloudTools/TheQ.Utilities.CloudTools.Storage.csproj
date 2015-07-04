@@ -96,22 +96,16 @@
     <Compile Include="Models\ObjectModel\CloudToolsStorageException.cs" />
     <Compile Include="ExtendedQueue\QueueMessageWrapper.cs" />
     <Compile Include="Infrastructure\LogHelper.cs" />
-    <Compile Include="Models\HandleMessageOptionsBase.cs" />
-    <Compile Include="Models\HandleParallelMessageOptions.cs" />
-    <Compile Include="Models\HandleBatchMessageOptions.cs" />
-    <Compile Include="Models\HandleSerialMessageOptions.cs" />
+    <Compile Include="Models\HandleMessagesOptionsBase.cs" />
+    <Compile Include="Models\HandleMessagesParallelOptions.cs" />
+    <Compile Include="Models\HandleMessagesBatchOptions.cs" />
+    <Compile Include="Models\HandleMessagesSerialOptions.cs" />
     <Compile Include="Models\ObjectModel\IBlob.cs" />
     <Compile Include="Models\ObjectModel\IBlobContainer.cs" />
-    <Compile Include="Models\ObjectModel\ITable.cs" />
     <Compile Include="Models\ObjectModel\IQueueMesssage.cs" />
     <Compile Include="Models\ObjectModel\IQueue.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IQueueMessageProvider.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueue.cs" />
-    <Compile Include="Models\ObjectModel\ITableBaseEntity.cs" />
-    <Compile Include="Models\ObjectModel\ITableBatchOperation.cs" />
-    <Compile Include="Models\ObjectModel\ITableOperation.cs" />
-    <Compile Include="Models\ObjectModel\ITableOperationProvider.cs" />
-    <Compile Include="Models\ObjectModel\ITableResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExtendedQueue\ObjectModel\IExtendedQueue.cs" />
   </ItemGroup>

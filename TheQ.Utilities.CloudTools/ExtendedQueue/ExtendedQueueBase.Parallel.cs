@@ -23,7 +23,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
 		/// <exception cref="ArgumentNullException">queue;Parameter 'queue' was null. or messageOptions;Parameter 'messageOptions' was not provided.</exception>
-		public Task HandleMessagesInParallelAsync([NotNull] HandleParallelMessageOptions messageOptions)
+		public Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions)
 		{
 			return this.HandleMessagesInParallelAsync(messageOptions, this);
 		}
@@ -42,7 +42,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>.</para>
 		/// </returns>
 		[NotNull]
-		internal async Task HandleMessagesInParallelAsync([NotNull] HandleParallelMessageOptions messageOptions, ExtendedQueueBase invoker = null)
+		internal async Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions, ExtendedQueueBase invoker = null)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -95,7 +95,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 				catch (Exception ex)
 				{
-					this.Get(invoker).HandleGeneralExceptions(messageOptions, ex, true);
+					this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
 				}
 			}
 		}
@@ -120,7 +120,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal async Task ProcessOneParallelMessage(HandleParallelMessageOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task ProcessOneParallelMessage(HandleMessagesParallelOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
 		{
 			var messageSpecificCancellationTokenSource = new CancellationTokenSource();
 			var currentMessage = message;
@@ -164,7 +164,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal async Task<List<IQueueMessage>> GetMessagesAsync(HandleParallelMessageOptions messageOptions, int freeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task<List<IQueueMessage>> GetMessagesAsync(HandleMessagesParallelOptions messageOptions, int freeMessageSlots, ExtendedQueueBase invoker)
 		{
 			return (await this.Get(invoker).GetMessagesAsync(freeMessageSlots > this.Get(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
 				? this.Get(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
@@ -176,7 +176,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		private void ParallelFinallyHandler(
-			[CanBeNull] HandleParallelMessageOptions messageOptions,
+			[CanBeNull] HandleMessagesParallelOptions messageOptions,
 			[CanBeNull] long[] activeMessageSlots,
 			[CanBeNull] Task keepAliveTask,
 			[CanBeNull] IQueueMessage currentMessage,

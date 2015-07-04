@@ -83,7 +83,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 //					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' message '{1}' started renewing on {2}", queue.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
-					if (syncToken != null) lock (syncToken) this.Get(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.Get(invoker)).Wait(cancelToken);
+					if (syncToken != null)
+						//using (await this._lock.LockAsync(cancelToken))
+							await this.Get(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.Get(invoker)).ConfigureAwait(false);
 					else await this.Get(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.Get(invoker)).ConfigureAwait(false);
 
 					//loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' message '{1}' completed renewing on {2}", queue.Name, message.Id, DateTimeOffset.Now.ToString("O"));
@@ -130,7 +132,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 //					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' for {1} batch messages started renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
-					if (syncToken != null) lock (syncToken) Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.Get(invoker)).ConfigureAwait(false));
+					if (syncToken != null)
+						//using (await this._lock.LockAsync(generalCancelToken))
+							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.Get(invoker)).ConfigureAwait(false));
 					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.Get(invoker)).ConfigureAwait(false));
 
 //					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' {1} messages completed renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));

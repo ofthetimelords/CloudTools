@@ -8,40 +8,56 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		protected internal virtual void HandleStorageExceptions([CanBeNull] HandleMessageOptionsBase messageOptions, [CanBeNull] CloudToolsStorageException ex)
+		/// <summary>
+		/// Defines a handler for storage related exceptions
+		/// </summary>
+		/// <param name="messageOptions">The options of this extended queue.</param>
+		/// <param name="exception">The <see cref="CloudToolsStorageException"/> that occurred.</param>
+		protected internal virtual void HandleStorageExceptions([CanBeNull] HandleMessagesOptionsBase messageOptions, [CanBeNull] CloudToolsStorageException exception)
 		{
-			if (Guard.IsAnyNull(messageOptions, ex))
+			if (Guard.IsAnyNull(messageOptions, exception))
 				return;
 
 			try
 			{
 				if (messageOptions.ExceptionHandler != null)
-					messageOptions.ExceptionHandler(ex);
+				{
+					messageOptions.ExceptionHandler(exception);
+					this.LogException(LogSeverity.Info, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' and was handled", this.Name);
+				}
+				{
+					this.LogException(LogSeverity.Warning, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
+				}
 			}
 			catch (Exception innerEx)
 			{
-				//if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
+				this.LogException(LogSeverity.Error, innerEx, "An unexpected exception occurred within the storage exception handler on queue '{0}'", this.Name);
 			}
 		}
 
 
 
-		protected internal virtual void HandleGeneralExceptions(
-			[CanBeNull] HandleMessageOptionsBase messageOptions,
-			[CanBeNull] Exception ex,
-			bool parallelYetExternal = false)
+		protected internal virtual void HandleGeneralExceptions([CanBeNull] HandleMessagesOptionsBase messageOptions, [CanBeNull] Exception exception)
 		{
-			if (Guard.IsAnyNull(messageOptions, ex))
+			if (Guard.IsAnyNull(messageOptions, exception))
 				return;
 
 			try
 			{
 				if (messageOptions.ExceptionHandler != null)
-					messageOptions.ExceptionHandler(ex);
+				{
+					messageOptions.ExceptionHandler(exception);
+					this.LogException(LogSeverity.Info, exception, "An unexpected exception occurred while processing messages on queue '{0}' and was handled", this.Name);
+				}
+				else
+				{
+					this.LogException(LogSeverity.Error, exception, "An unexpected exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
+				}
+
 			}
-			catch (Exception)
+			catch (Exception innerEx)
 			{
-				//if (messageOptions.ExceptionHandler != null) messageOptions.QuickLogError("HandleMessages", innerEx, "An error occurred in the custom exception message handler for queue '{0}'", queue.Name);
+				this.LogException(LogSeverity.Error, innerEx, "An unexpected exception occurred within the general exception handler on queue '{0}'", this.Name);
 			}
 		}
 	}

@@ -535,10 +535,13 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 
 
 		/// <summary>
-		///     Attempts to acquire a lease on a BLOB.
+		/// Attempts to acquire a lease on a BLOB.
 		/// </summary>
 		/// <param name="lockName">Name of the blob to acquire the lock upon.</param>
 		/// <param name="leaseTime">The lease time.</param>
+		/// <param name="isDefaultLeaseTime">if set to <c>true</c> then signifies that <paramref name="leaseTime"/> should use the default value.</param>
+		/// <returns>An asynchronous task.</returns>
+		/// <remarks>Note that a null value for <paramref name="leaseTime"/> doesn't necessarilly indicate a default value (use to fix infinite-lease bugs).</remarks>
 		private async Task TryAcquireLeaseAsync([NotNull] string lockName, TimeSpan? leaseTime, bool isDefaultLeaseTime)
 		{
 			Guard.NotNull(lockName, "lockName");

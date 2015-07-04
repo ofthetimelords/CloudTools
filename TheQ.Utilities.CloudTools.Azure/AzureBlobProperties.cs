@@ -92,14 +92,8 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public string ContentDisposition
 		{
-			get
-			{
-				return this._blobPropertiesReference.ContentDisposition;
-			}
-			set
-			{
-				this._blobPropertiesReference.ContentDisposition = value;
-			}
+			get { return this._blobPropertiesReference.ContentDisposition; }
+			set { this._blobPropertiesReference.ContentDisposition = value; }
 		}
 
 
@@ -132,14 +126,8 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public string ContentLanguage
 		{
-			get
-			{
-				return this._blobPropertiesReference.ContentLanguage;
-			}
-			set
-			{
-				this._blobPropertiesReference.ContentLanguage = value;
-			}
+			get { return this._blobPropertiesReference.ContentLanguage; }
+			set { this._blobPropertiesReference.ContentLanguage = value; }
 		}
 
 
@@ -173,14 +161,8 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public string ContentMD5
 		{
-			get
-			{
-				return this._blobPropertiesReference.ContentMD5;
-			}
-			set
-			{
-				this._blobPropertiesReference.ContentMD5 = value;
-			}
+			get { return this._blobPropertiesReference.ContentMD5; }
+			set { this._blobPropertiesReference.ContentMD5 = value; }
 		}
 
 
@@ -196,14 +178,8 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public string ContentType
 		{
-			get
-			{
-				return this._blobPropertiesReference.ContentType;
-			}
-			set
-			{
-				this._blobPropertiesReference.ContentType = value;
-			}
+			get { return this._blobPropertiesReference.ContentType; }
+			set { this._blobPropertiesReference.ContentType = value; }
 		}
 
 
@@ -215,10 +191,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public string ETag
 		{
-			get
-			{
-				return this._blobPropertiesReference.ETag;
-			}
+			get { return this._blobPropertiesReference.ETag; }
 		}
 
 
@@ -231,10 +204,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public DateTimeOffset? LastModified
 		{
-			get
-			{
-				return this._blobPropertiesReference.LastModified;
-			}
+			get { return this._blobPropertiesReference.LastModified; }
 		}
 
 
@@ -246,7 +216,10 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     The underlying <see cref="BlobProperties" /> instance.
 		/// </returns>
-		public static implicit operator BlobProperties(AzureBlobProperties properties) { return properties._blobPropertiesReference; }
+		public static implicit operator BlobProperties(AzureBlobProperties properties)
+		{
+			return properties != null ? properties._blobPropertiesReference : null;
+		}
 
 
 
@@ -257,6 +230,9 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     A <see cref="AzureBlobProperties" /> wrapper.
 		/// </returns>
-		public static implicit operator AzureBlobProperties(BlobProperties properties) { return new AzureBlobProperties(properties); }
+		public static implicit operator AzureBlobProperties(BlobProperties properties)
+		{
+			return properties != null ? new AzureBlobProperties(properties) : null;
+		}
 	}
 }

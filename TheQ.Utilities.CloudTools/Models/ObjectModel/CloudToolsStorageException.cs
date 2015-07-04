@@ -122,11 +122,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     <para>The <paramref name="info" /></para>
 		///     <para>parameter is a <see langword="null" /> reference (Nothing in Visual Basic).</para>
 		/// </exception>
-		/// <PermissionSet>
-		///     <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*"
-		///         PathDiscovery="*AllFiles*" />
-		///     <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter" />
-		/// </PermissionSet>
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue("StatusCode", this.StatusCode);
@@ -143,7 +138,6 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// <returns>
 		/// A string representation of the current exception.
 		/// </returns>
-		/// <PermissionSet><IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" PathDiscovery="*AllFiles*"/></PermissionSet>
 		public override string ToString() { return base.ToString() + Environment.NewLine + "[Status Code: " + (this.StatusCode) + "][Error Code:" + this.ErrorCode + "]"; }
 	}
 }

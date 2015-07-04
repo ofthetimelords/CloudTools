@@ -34,11 +34,11 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 
 
 		/// <summary>
-		///     <para>Gets a <see cref="Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer" /></para>
+		///     <para>Gets a <see cref="IBlobContainer" /></para>
 		///     <para>object representing the blob's container.</para>
 		/// </summary>
 		/// <value>
-		///     <para>A <see cref="Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer" /></para>
+		///     <para>A <see cref="IBlobContainer" /></para>
 		///     <para>object.</para>
 		/// </value>
 		IBlobContainer Container { get; }

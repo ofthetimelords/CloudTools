@@ -22,6 +22,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
 		/// <summary>
+		/// Used internally to mark the severity of a logged event.
+		/// </summary>
+		protected internal enum LogSeverity
+		{
+			Debug = 0,
+			Critical = 1,
+			Error = 2,
+			Warning = 3,
+			Info = 4
+		}
+
+	
+		/// <summary>
 		/// Gets or sets the maximum message size provider.
 		/// </summary>
 		/// <value>
@@ -62,6 +75,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <value>
 		///     A string containing the name of the queue.
 		/// </value>
+		[NotNull]
 		public virtual string Name
 		{
 			get { return this.OriginalQueue.Name; }
@@ -272,5 +286,27 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			return this.OriginalQueue.UpdateMessageAsync(message, visibilityTimeout, updateFields, cancellationToken);
 		}
+
+
+
+		/// <summary>
+		/// Logs an <see cref="Exception"/>.
+		/// </summary>
+		/// <param name="severity">The severity of the exception.</param>
+		/// <param name="exception">The <see cref="Exception"/> itself.</param>
+		/// <param name="details">The details of the log message.</param>
+		/// <param name="formatArguments">The string formatting arguments of the details message.</param>
+		protected internal abstract void LogException(LogSeverity severity, Exception exception, string details = null, params string[] formatArguments);
+
+
+
+		/// <summary>
+		/// Logs a message.
+		/// </summary>
+		/// <param name="severity">The severity of the message.</param>
+		/// <param name="message">The message's text.</param>
+		/// <param name="details">The details of the log message.</param>
+		/// <param name="formatArguments">The string formatting arguments of the details message.</param>
+		protected internal abstract void LogAction(LogSeverity severity, string message = null, string details = null, params string[] formatArguments);
 	}
 }

@@ -22,6 +22,7 @@ using TheQ.Utilities.CloudTools.Azure;
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators;
+using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Tests.Integration.Azure.Mocks;
 using TheQ.Utilities.CloudTools.Tests.Integration.Azure.Models;
@@ -50,7 +51,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -77,7 +78,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				queue.Clear();
 				for (var i = 0; i < runCount; i++) equeue.AddMessageEntity(i.ToString(CultureInfo.InvariantCulture));
 				equeue.AddMessageEntity("END");
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				mre.WaitOne();
@@ -105,13 +106,13 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			long actuallyRun = 0;
 			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
-
+			var lck = new AsyncLock();
 
 			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleParallelMessageOptions(
+				var options = new HandleMessagesParallelOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -120,9 +121,9 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					new CancellationToken(),
 					async message =>
 					{
-						lock (locking)
+						using (await lck.LockAsync())
 						{
-							var character = message.GetMessageContents<string>();
+							var character = await message.GetMessageContentsAsync<string>();
 							result += character;
 						}
 
@@ -167,12 +168,13 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			long actuallyRun = 0;
 			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
+			var lck = new AsyncLock();
 
 			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleBatchMessageOptions(
+				var options = new HandleMessagesBatchOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -181,7 +183,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					new CancellationToken(),
 					async messages =>
 					{
-						lock (locking)
+						using (await lck.LockAsync())
 						{
 							foreach (var message in messages)
 							{
@@ -232,7 +234,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -253,7 +255,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				overflow.CreateIfNotExists();
 				queue.Clear();
 				equeue.AddMessageEntity(expected);
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				mre.WaitOne();
@@ -281,7 +283,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -302,7 +304,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				overflow.CreateIfNotExists();
 				queue.Clear();
 				equeue.AddMessageEntity(expected);
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				mre.WaitOne();
@@ -343,7 +345,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -368,7 +370,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				overflow.CreateIfNotExists();
 				queue.Clear();
 				equeue.AddMessageEntity(expected);
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				mre.WaitOne();
@@ -406,7 +408,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -431,7 +433,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				overflow.CreateIfNotExists();
 				queue.Clear();
 				equeue.AddMessageEntity(expected);
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				mre.WaitOne();
@@ -469,7 +471,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -493,7 +495,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				overflow.CreateIfNotExists();
 				queue.Clear();
 				equeue.AddMessageEntity(expected);
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				mre.WaitOne();
@@ -531,7 +533,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleSerialMessageOptions(
+				var options = new HandleMessagesSerialOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromMinutes(2),
 					TimeSpan.FromSeconds(30),
@@ -560,7 +562,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					succeeded = true;
 				}
 
-				equeue.HandleMessagesAsync(options);
+				equeue.HandleMessagesInSerialAsync(options);
 
 				// Assert
 				sw.Stop();
@@ -572,7 +574,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 		[TestCategory("Integration - ExtendedQueue")]
 		[TestMethod]
-		public void TestSerial_ParallelProcessingDelayed()
+		public void TestSerial_SerialProcessingDelayed()
 		{
 			// Arrange
 			const int runCount = 10;
@@ -586,13 +588,86 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			long actuallyRun = 0;
 			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
+			var lck = new AsyncLock();
 
 
 			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
 
 			using (var mre = new ManualResetEvent(false))
 			{
-				var options = new HandleParallelMessageOptions(
+				var options = new HandleMessagesSerialOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromSeconds(30),
+					TimeSpan.FromSeconds(30),
+					5,
+					new CancellationToken(),
+					async message =>
+					{
+						using (await lck.LockAsync())
+						{
+							var character = message.GetMessageContents<string>();
+							result += character;
+						}
+
+						var innersw = new Stopwatch();
+						innersw.Start();
+
+						// Intentional spinning
+						while (true)
+						{
+							if (sw.Elapsed > TimeSpan.FromSeconds(70))
+								break;
+						}
+
+						if (Interlocked.Increment(ref actuallyRun) == runCount) mre.Set();
+
+						return true;
+					},
+					null,
+					ex => { throw ex; });
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				for (var i = 1; i < runCount + 1; i++) equeue.AddMessageEntity(((char)(i)).ToString(CultureInfo.InvariantCulture));
+				equeue.HandleMessagesInSerialAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(expected.All(c => result.Contains(c)));
+			}
+		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestSerial_ParallelProcessingDelayed()
+		{
+			// Arrange
+			const int runCount = 10;
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test11");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-11");
+			var locking = new object();
+			var result = string.Empty;
+			var expected = string.Empty;
+			var sw = new Stopwatch();
+			long actuallyRun = 0;
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factory.Create(new AzureQueue(queue));
+			var lck = new AsyncLock();
+
+
+			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleMessagesParallelOptions(
 					TimeSpan.FromSeconds(0),
 					TimeSpan.FromSeconds(30),
 					TimeSpan.FromSeconds(30),
@@ -601,7 +676,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					new CancellationToken(),
 					async message =>
 					{
-						lock (locking)
+						using (await lck.LockAsync())
 						{
 							var character = message.GetMessageContents<string>();
 							result += character;

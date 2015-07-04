@@ -488,7 +488,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>The underlying <see cref="CloudBlockBlob" /></para>
 		///     <para>instance.</para>
 		/// </returns>
-		public static implicit operator CloudBlockBlob(AzureBlob blob) { return blob._blobReference; }
+		public static implicit operator CloudBlockBlob(AzureBlob blob) { return blob != null ? blob._blobReference : null; }
 
 
 
@@ -505,6 +505,6 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>An <see cref="AzureBlob" /></para>
 		///     <para>instance</para>
 		/// </returns>
-		public static implicit operator AzureBlob(CloudBlockBlob blob) { return new AzureBlob(blob); }
+		public static implicit operator AzureBlob(CloudBlockBlob blob) { return blob != null ? new AzureBlob(blob) : null; }
 	}
 }

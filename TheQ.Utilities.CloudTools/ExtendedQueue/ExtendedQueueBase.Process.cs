@@ -29,7 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     True if the <paramref name="message" /> was deleted; <see langword="false" /> if it should be requeued and <see langword="checked" /> again.
 		/// </returns>
 		private async Task<bool> WasPoisonMessageAndRemoved(
-			[NotNull] HandleSerialMessageOptions messageOptions,
+			[NotNull] HandleMessagesSerialOptions messageOptions,
 			[NotNull] QueueMessageWrapper message,
 			[NotNull] object syncToken,
 			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource,
@@ -73,7 +73,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (messageSpecificCancellationTokenSource != null)
 				messageSpecificCancellationTokenSource.Cancel();
 
-			using (var alock = await this._lock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
+			//using (await this._lock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
 			{
 				// Cancel all other waiting operations before deleting.
 				this.Get(invoker).DeleteMessage(message.ActualMessage);
@@ -105,7 +105,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		private async Task<Task> ProcessMessageInternal(
 			[NotNull] QueueMessageWrapper message,
-			[NotNull] HandleSerialMessageOptions messageOptions,
+			[NotNull] HandleMessagesSerialOptions messageOptions,
 			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource,
 			ExtendedQueueBase invoker)
 		{
@@ -152,7 +152,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     Returns a list of <paramref name="messages" /> that were not poison <paramref name="messages" /> and should be further processed.
 		/// </returns>
 		private async Task<IList<QueueMessageWrapper>> WerePoisonMessagesAndRemovedBatch(
-			[NotNull] HandleBatchMessageOptions messageOptions,
+			[NotNull] HandleMessagesBatchOptions messageOptions,
 			[NotNull] IList<QueueMessageWrapper> messages,
 			[NotNull] object syncToken,
 			ExtendedQueueBase invoker)
@@ -188,7 +188,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		private async Task<Task> ProcessMessageInternalBatch(
 			[NotNull] IList<QueueMessageWrapper> messages,
 			[NotNull] CancellationTokenSource batchCancellationToken,
-			[NotNull] HandleBatchMessageOptions messageOptions,
+			[NotNull] HandleMessagesBatchOptions messageOptions,
 			ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(messages, "messages");

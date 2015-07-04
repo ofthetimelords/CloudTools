@@ -14,12 +14,15 @@ using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 {
+	/// <summary>
+	/// Creates an implementation of <see cref="DefaultExtendedQueueFactory"/> while applying standard options that are valid for Azure.
+	/// </summary>
+	/// <remarks>It adds the </remarks>
 	public class AzureExtendedQueueFactory : DefaultExtendedQueueFactory
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AzureExtendedQueueFactory"/> class.
 		/// </summary>
-		/// <param name="policy">The exception policy that will be used by the logging decorator.</param>
 		/// <param name="overflowContainer">The overflow container.</param>
 		/// <param name="logService">The logging service to use.</param>
 		public AzureExtendedQueueFactory(

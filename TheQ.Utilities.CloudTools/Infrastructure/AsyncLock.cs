@@ -70,7 +70,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 
 
 
-	internal class AsyncLock
+	public class AsyncLock
 	{
 		private readonly Task<Releaser> _releaser;
 		private readonly AsyncSemaphore _semaphore;
@@ -108,7 +108,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 
 
 
-		internal struct Releaser : IDisposable
+		public struct Releaser : IDisposable
 		{
 			private readonly AsyncLock _toRelease;
 

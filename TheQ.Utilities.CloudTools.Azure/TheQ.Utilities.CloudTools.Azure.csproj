@@ -108,7 +108,6 @@
     <Compile Include="GlobalMutexFramework\AzureLockState.cs" />
     <Compile Include="GlobalMutexFramework\AzureLockStateProvider.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="AzureTable.cs" />
     <Compile Include="StorageExceptionHelper.cs" />
     <Compile Include="AzureBlobProperties.cs" />
     <Compile Include="AzureBlob.cs" />
