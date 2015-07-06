@@ -77,62 +77,83 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <summary>
 		/// Gets or sets a value indicating whether this message was overflown to a secondary store.
 		/// </summary>
-		/// <value>
-		///   <c>true</c> if the message's contents were overflown; otherwise, <c>false</c>.
-		/// </value>
-		public bool WasOverflown
+		public bool GetWasOverflown()
 		{
-			get
-			{
-				if (!this._initialized)
-					this.EnsureMetadataIsPopulated();
+			if (!this._initialized)
+				this.EnsureMetadataIsPopulated();
 
-				return this._wasOverflown;
-			}
-			protected internal set { this._wasOverflown = value; }
+			return this._wasOverflown;
 		}
+
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this message was overflown to a secondary store.
+		/// </summary>
+		public async Task<bool> GetWasOverflownAsync()
+		{
+			if (!this._initialized)
+				await this.EnsureMetadataIsPopulatedAsync().ConfigureAwait(false);
+
+			return this._wasOverflown;
+		}
+
+
+
+		protected internal bool SetWasOverflown(bool wasOverflown)
+		{
+			return this._wasOverflown = wasOverflown;
+		}
+
 
 
 		/// <summary>
 		/// Gets or sets the overflow identifier, used to link a message's overflown contents from the marker message in the queue.
 		/// </summary>
-		/// <value>
-		/// A string representing the overflow identifier.
-		/// </value>
 		[CanBeNull]
-		public string OverflowId
+		public string GetOverflowId()
 		{
-			get
-			{
-				if (!this._initialized)
-					this.EnsureMetadataIsPopulated();
+			if (!this._initialized)
+				this.EnsureMetadataIsPopulated();
 
-				return this._overflowId;
-			}
-			protected internal set { this._overflowId = value; }
+			return this._overflowId;
+		}
+
+
+		/// <summary>
+		/// Gets or sets the overflow identifier asynchronously, used to link a message's overflown contents from the marker message in the queue.
+		/// </summary>
+		[CanBeNull]
+		public async Task<string> GetOverflowIdAsync()
+		{
+			if (!this._initialized)
+				await this.EnsureMetadataIsPopulatedAsync().ConfigureAwait(false);
+
+			return this._overflowId;
+		}
+
+
+
+		protected internal string SetOverflowId(string overflowId)
+		{
+			return this._overflowId = overflowId;
 		}
 
 
 
 		/// <summary>
-		/// Ensures that any metadata, such as <see cref="OverflowId"/> are assigned proper values by decoding the message's contents (which might be an expensive operation).
+		/// Ensures that any metadata, such as OverflowId are assigned proper values by decoding the message's contents (which might be an expensive operation).
 		/// </summary>
 		public void EnsureMetadataIsPopulated()
 		{
-			this.GetMessageContentsAsync<object>().Wait();
+			this.GetMessageContents<object>();
 		}
 
 
 		/// <summary>
-		/// Ensures that any metadata, such as <see cref="OverflowId"/> are assigned proper values by decoding the message's contents (which might be an expensive operation) asynchronously.
+		/// Ensures that any metadata, such as OverflowId are assigned proper values by decoding the message's contents (which might be an expensive operation) asynchronously.
 		/// </summary>
 		/// <returns>A <see cref="Task"/> representing the asynchronous process.</returns>
 		public async Task EnsureMetadataIsPopulatedAsync() { await this.GetMessageContentsAsync<object>().ConfigureAwait(false); }
-
-
-
-		[NotNull]
-		public T GetMessageContents<T>() { return this.GetMessageContentsAsync<T>().Result; }
 
 
 
@@ -150,7 +171,22 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				this._initialized = true;
 			}
 
-			return (T) this._rawContent;
+			return (T)this._rawContent;
+		}
+
+
+
+		/// <remarks>Wrapped it within a Task to avoid potential thread locking bugs (i.e. cases where ConfigureAwait(false) may have been forgotten.</remarks>
+		[NotNull]
+		public T GetMessageContents<T>()
+		{
+			if (!this._initialized)
+			{
+				this._rawContent = Task.Run(() => this.ParentQueue.DecodeMessageAsync<T>(this, CancellationToken.None)).Result;
+				this._initialized = true;
+			}
+
+			return (T)this._rawContent;
 		}
 	}
 }

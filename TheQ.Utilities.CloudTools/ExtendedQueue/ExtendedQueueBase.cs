@@ -296,6 +296,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="exception">The <see cref="Exception"/> itself.</param>
 		/// <param name="details">The details of the log message.</param>
 		/// <param name="formatArguments">The string formatting arguments of the details message.</param>
+		[StringFormatMethod("details")]
 		protected internal abstract void LogException(LogSeverity severity, Exception exception, string details = null, params string[] formatArguments);
 
 
@@ -307,6 +308,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="message">The message's text.</param>
 		/// <param name="details">The details of the log message.</param>
 		/// <param name="formatArguments">The string formatting arguments of the details message.</param>
+		[StringFormatMethod("details")]
 		protected internal abstract void LogAction(LogSeverity severity, string message = null, string details = null, params string[] formatArguments);
 	}
 }

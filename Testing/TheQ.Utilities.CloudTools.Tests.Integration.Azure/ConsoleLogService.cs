@@ -25,7 +25,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 		/// <param name="message">The error's message.</param>
 		/// <param name="details">The error's additional details.</param>
 		/// <param name="category">The error's category.</param>
-		public void Critical(Exception exception, string category = null, string details = null) { Trace.WriteLine("Error: " + exception.Message + Environment.NewLine, category); }
+		public void Critical(Exception exception, string category = null, string details = null) { Trace.WriteLine("Error: " + exception.Message + " | " + details + Environment.NewLine, category); }
 
 
 
@@ -37,7 +37,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 		/// <returns>
 		///     True if the <paramref name="message" /> was registered successfully; <see langword="false" /> if an error occurred.
 		/// </returns>
-		public void Error(string message, string category = null, string details = null) { Trace.WriteLine("Error: " + message + Environment.NewLine, category); }
+		public void Error(string message, string category = null, string details = null) { Trace.WriteLine("Error: " + message + " | " + details + Environment.NewLine, category); }
 
 
 
@@ -49,7 +49,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 		/// <returns>
 		///     True if the message was registered successfully; <see langword="false" /> if an error occurred.
 		/// </returns>
-		public void Error(Exception exception, string category = null, string details = null) { Trace.WriteLine("Error: " + exception + Environment.NewLine, category); }
+		public void Error(Exception exception, string category = null, string details = null) { Trace.WriteLine("Error: " + exception + " | " + details + Environment.NewLine, category); }
 
 
 
@@ -71,7 +71,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 		/// <returns>
 		///     True if the <paramref name="message" /> was registered successfully; <see langword="false" /> if an error occurred.
 		/// </returns>
-		public void Info(string message, string category = null, string details = null) { Trace.WriteLine("Info: " + message + Environment.NewLine, category); }
+		public void Info(string message, string category = null, string details = null) { Trace.WriteLine("Info: " + message + " | " + details + Environment.NewLine, category); }
 
 
 
@@ -83,7 +83,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 		/// <returns>
 		///     True if the <paramref name="message" /> was registered successfully; <see langword="false" /> if an error occurred.
 		/// </returns>
-		public void Debug(string message, string category = null, string details = null) { Trace.WriteLine("Debug: " + message + Environment.NewLine, category); }
+		public void Debug(string message, string category = null, string details = null) { Trace.WriteLine("Debug: " + message + " | " + details + Environment.NewLine, category); }
 
 
 

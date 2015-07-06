@@ -9,11 +9,8 @@
 // 
 // </summary>
 
-using System.Linq;
-
 using Microsoft.WindowsAzure.Storage;
 
-using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 

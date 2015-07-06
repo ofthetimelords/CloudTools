@@ -234,5 +234,32 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			return properties != null ? new AzureBlobProperties(properties) : null;
 		}
+
+
+		/// <summary>
+		///     Creates an <see cref="AzureBlobContainer"/> from a <see cref="BlobProperties" /> instance.
+		/// </summary>
+		/// <param name="blobProperties">The <see cref="BlobProperties" /> instance.</param>
+		/// <returns>
+		///     A <see cref="AzureBlobProperties" /> wrapper.
+		/// </returns>
+		public static AzureBlobProperties FromCloudBlobContainer(BlobProperties blobProperties)
+		{
+			return blobProperties;
+		}
+
+
+
+		/// <summary>
+		///     Retrieves the underlying <see cref="BlobProperties" /> instance from this <see cref="AzureBlobContainer"/> instance.
+		/// </summary>
+		/// <param name="blobProperties">The underlying <see cref="BlobProperties" /> instance.</param>
+		/// <returns>
+		///     An <see cref="AzureBlobProperties" /> wrapper.
+		/// </returns>
+		public static BlobProperties ToCloudBlobContainer(AzureBlobProperties blobProperties)
+		{
+			return blobProperties;
+		}
 	}
 }

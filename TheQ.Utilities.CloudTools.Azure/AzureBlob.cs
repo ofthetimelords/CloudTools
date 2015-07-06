@@ -251,10 +251,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </value>
 		public string Name
 		{
-			get
-			{
-				return this._blobReference.Name;
-			}
+			get { return this._blobReference.Name; }
 		}
 
 
@@ -488,7 +485,10 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>The underlying <see cref="CloudBlockBlob" /></para>
 		///     <para>instance.</para>
 		/// </returns>
-		public static implicit operator CloudBlockBlob(AzureBlob blob) { return blob != null ? blob._blobReference : null; }
+		public static implicit operator CloudBlockBlob(AzureBlob blob)
+		{
+			return blob != null ? blob._blobReference : null;
+		}
 
 
 
@@ -505,6 +505,39 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     <para>An <see cref="AzureBlob" /></para>
 		///     <para>instance</para>
 		/// </returns>
-		public static implicit operator AzureBlob(CloudBlockBlob blob) { return blob != null ? new AzureBlob(blob) : null; }
+		public static implicit operator AzureBlob(CloudBlockBlob blob)
+		{
+			return blob != null ? new AzureBlob(blob) : null;
+		}
+
+
+
+
+
+		/// <summary>
+		///     Creates an <see cref="AzureBlob"/> from a <see cref="CloudBlockBlob" /> instance.
+		/// </summary>
+		/// <param name="blob">The <see cref="CloudBlockBlob" /> instance.</param>
+		/// <returns>
+		///     A <see cref="AzureBlob" /> wrapper.
+		/// </returns>
+		public static AzureBlob FromCloudBlockBlob(CloudBlockBlob blob)
+		{
+			return blob;
+		}
+
+
+
+		/// <summary>
+		///     Retrieves the underlying <see cref="CloudBlockBlob" /> instance from this <see cref="AzureBlob"/> instance.
+		/// </summary>
+		/// <param name="blob">The underlying <see cref="CloudBlockBlob" /> instance.</param>
+		/// <returns>
+		///     An <see cref="AzureBlob" /> wrapper.
+		/// </returns>
+		public static CloudBlockBlob ToCloudBlockBlob(AzureBlob blob)
+		{
+			return blob;
+		}
 	}
 }

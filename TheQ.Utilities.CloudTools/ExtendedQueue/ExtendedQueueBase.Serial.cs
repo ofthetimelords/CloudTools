@@ -54,34 +54,38 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 				try
 				{
-					message = await this.Get(invoker).GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
+					this.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
+
+					message = await this.This(invoker).GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					if (message != null)
 					{
+						this.LogAction(LogSeverity.Debug, "One message found in the queue and will be processed", "Queue: {0}, Message ID: {1}", this.Name, message.Id);
 						receivedMessage = true;
 
-						keepAliveTask = await this.Get(invoker).ProcessMessageInternal(
-							new QueueMessageWrapper(this.Get(invoker), message),
+						keepAliveTask = await this.This(invoker).ProcessMessageInternal(
+							new QueueMessageWrapper(this.This(invoker), message),
 							messageOptions,
 							messageSpecificCancellationTokenSource,
-							this.Get(invoker)).ConfigureAwait(false);
+							this.This(invoker)).ConfigureAwait(false);
 					}
+					else this.LogAction(LogSeverity.Debug, "No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
 				}
 				catch (TaskCanceledException)
 				{
-					if (this.Get(invoker).HandleTaskCancelled(messageOptions))
+					if (this.This(invoker).HandleTaskCancelled(messageOptions))
 						return;
 				}
 				catch (CloudToolsStorageException ex)
 				{
-					this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
+					this.This(invoker).HandleStorageExceptions(messageOptions, ex);
 				}
 				catch (Exception ex)
 				{
-					this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
+					this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
 				}
 				finally
 				{
-					this.Get(invoker).SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
+					this.This(invoker).SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
 				}
 
 				// Delay the next polling attempt for a new message, since no messages were received last time.
@@ -98,6 +102,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageOptions">The message options object.</param>
 		protected internal virtual bool HandleTaskCancelled(HandleMessagesSerialOptions messageOptions)
 		{
+			this.LogAction(LogSeverity.Info, "Attempting to cancel No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
 			if (messageOptions.CancelToken.IsCancellationRequested)
 				return true;
 
@@ -137,7 +142,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			// Cancel any outstanding jobs due to the faulted operation (the keepalive task should have been cancelled)
 			if (keepAliveTask != null && !keepAliveTask.IsCompleted)
-				//if (message != null) messageOptions.QuickLogDebug("HandleMessages", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs", queue.Name, message.Id);
+				if (message != null) this.LogAction(LogSeverity.Warning, "Message was not processed successfully", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs", this.Name, message.Id);
 				messageSpecificCancellationTokenSource.Cancel();
 		}
 	}

@@ -58,19 +58,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				{
 					try
 					{
-						//messageOptions.QuickLogDebug("HandleMessages", "Attempting to listen for a new message in queue '{0}'", queue.Name);
+						this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
 
 						var howManyMoreFit = messageOptions.MaximumCurrentMessages - rawMessages.Count;
 
-						if (howManyMoreFit <= 0)
+						//if (howManyMoreFit <= 0)
+						//{
+						//	this.LogAction(LogSeverity.Debug, "The batch is full, will try again later", "Queue: {0}", this.Name);
+						//	shouldDelayNextRequest = true;
+						//}
+						//else
 						{
-							shouldDelayNextRequest = true;
-						}
-						else
-						{
-							var retrievedMessages = (await this.Get(invoker).GetMessagesAsync(howManyMoreFit > this.MaximumMessagesProvider.MaximumMessagesPerRequest
-								? this.MaximumMessagesProvider.MaximumMessagesPerRequest
-								: howManyMoreFit,
+							var retrievedMessages = (await this.This(invoker).GetMessagesAsync(
+								Math.Min(this.MaximumMessagesProvider.MaximumMessagesPerRequest, howManyMoreFit),
 								messageOptions.MessageLeaseTime,
 								messageOptions.CancelToken).ConfigureAwait(false)).ToList();
 
@@ -90,7 +90,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 								}
 
 								// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
-								convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.Get(invoker), m)));
+								convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.This(invoker), m)));
 								//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
 								keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
@@ -106,15 +106,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					}
 					catch (CloudToolsStorageException ex)
 					{
-						this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
+						this.This(invoker).HandleStorageExceptions(messageOptions, ex);
 					}
 					catch (Exception ex)
 					{
-						this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
+						this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
 					}
 					finally
 					{
-						this.Get(invoker).BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
+						this.This(invoker).BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
 					}
 
 					// Delay the next polling attempt for a new message, since no messages were received last time.

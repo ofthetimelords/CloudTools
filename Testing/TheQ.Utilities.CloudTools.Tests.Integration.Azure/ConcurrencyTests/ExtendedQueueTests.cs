@@ -577,7 +577,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 		public void TestSerial_SerialProcessingDelayed()
 		{
 			// Arrange
-			const int runCount = 10;
+			const int runCount = 3;
 			var client = new CloudEnvironment();
 			var queue = client.QueueClient.GetQueueReference("test10");
 			var overflow = client.BlobClient.GetContainerReference("overflownqueues-10");
@@ -605,19 +605,21 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					{
 						using (await lck.LockAsync())
 						{
+							var innersw = new Stopwatch();
+							innersw.Start();
+							// Intentional spinning
+							while (true)
+							{
+								if (innersw.Elapsed > TimeSpan.FromSeconds(33))
+									break;
+							}
+
+
 							var character = message.GetMessageContents<string>();
+
 							result += character;
 						}
 
-						var innersw = new Stopwatch();
-						innersw.Start();
-
-						// Intentional spinning
-						while (true)
-						{
-							if (sw.Elapsed > TimeSpan.FromSeconds(70))
-								break;
-						}
 
 						if (Interlocked.Increment(ref actuallyRun) == runCount) mre.Set();
 
@@ -649,7 +651,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 		public void TestSerial_ParallelProcessingDelayed()
 		{
 			// Arrange
-			const int runCount = 10;
+			const int runCount = 3;
 			var client = new CloudEnvironment();
 			var queue = client.QueueClient.GetQueueReference("test11");
 			var overflow = client.BlobClient.GetContainerReference("overflownqueues-11");
@@ -688,7 +690,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 						// Intentional spinning
 						while (true)
 						{
-							if (sw.Elapsed > TimeSpan.FromSeconds(70))
+							if (innersw.Elapsed > TimeSpan.FromSeconds(70))
 								break;
 						}
 
@@ -715,5 +717,80 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			}
 		}
 
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestSerial_BatchProcessingDelayed()
+		{
+			// Arrange
+			const int runCount = 30;
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test12");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-12");
+			var locking = new object();
+			var result = string.Empty;
+			var expected = string.Empty;
+			var sw = new Stopwatch();
+			long actuallyRun = 0;
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factory.Create(new AzureQueue(queue));
+			var lck = new AsyncLock();
+
+
+			for (var i = 1; i < runCount + 1; i++) expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleMessagesBatchOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromSeconds(30),
+					TimeSpan.FromSeconds(30),
+					5,
+					10,
+					new CancellationToken(),
+					async messages =>
+					{
+						using (await lck.LockAsync())
+						{
+							foreach (var message in messages)
+							{
+								var character = message.GetMessageContents<string>();
+								result += character;
+
+								var innersw = new Stopwatch();
+								innersw.Start();
+
+								// Intentional spinning
+								while (true)
+								{
+									if (innersw.Elapsed > TimeSpan.FromSeconds(5))
+										break;
+								}
+							}
+						}
+
+						if (result.Length == runCount) mre.Set();
+
+						return messages;
+					},
+					null,
+					ex => { throw ex; });
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				for (var i = 1; i < runCount + 1; i++) equeue.AddMessageEntity(((char)(i)).ToString(CultureInfo.InvariantCulture));
+				equeue.HandleMessagesInBatchAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(expected.All(c => result.Contains(c)));
+			}
+		}
 	}
 }

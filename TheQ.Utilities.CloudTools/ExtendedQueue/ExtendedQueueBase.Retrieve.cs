@@ -43,14 +43,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		internal virtual async Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token, ExtendedQueueBase invoker)
 		{
 			var msgBytes = message.ActualMessage.AsBytes;
-			var overflownId = (message.OverflowId = await this.Get(invoker).GetOverflownMessageId(message.ActualMessage).ConfigureAwait(false));
-			var wasOverflown = (message.WasOverflown = !string.IsNullOrWhiteSpace(overflownId));
+			var overflownId = (message.SetOverflowId(await this.This(invoker).GetOverflownMessageId(message.ActualMessage).ConfigureAwait(false)));
+			var wasOverflown = (message.SetWasOverflown(!string.IsNullOrWhiteSpace(overflownId)));
 
 			msgBytes = await (wasOverflown
-				? this.Get(invoker).GetOverflownMessageContentsAsync(message.ActualMessage, overflownId, token)
-				: this.Get(invoker).GetNonOverflownMessageContentsAsync(message.ActualMessage, token)).ConfigureAwait(false);
+				? this.This(invoker).GetOverflownMessageContentsAsync(message.ActualMessage, overflownId, token)
+				: this.This(invoker).GetNonOverflownMessageContentsAsync(message.ActualMessage, token)).ConfigureAwait(false);
 
-			var serialized = await this.Get(invoker).ByteArrayToSerializedMessageContents(msgBytes, this.Get(invoker)).ConfigureAwait(false);
+			var serialized = await this.This(invoker).ByteArrayToSerializedMessageContents(msgBytes, this.This(invoker)).ConfigureAwait(false);
 
 			return typeof(T) == typeof(string) ? (T)(object)serialized : this.DeserializeToObject<T>(serialized);
 		}
@@ -69,7 +69,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				converter.Seek(0, SeekOrigin.Begin);
 
-				using (var decoratedConverter = await this.Get(invoker).GetByteDecoder(converter).ConfigureAwait(false)) 
+				using (var decoratedConverter = await this.This(invoker).GetByteDecoder(converter).ConfigureAwait(false)) 
 				using (var reader = new StreamReader(decoratedConverter)) 
 					return await reader.ReadToEndAsync().ConfigureAwait(false);
 			}

@@ -78,33 +78,29 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				try
 				{
-//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' message '{1}' waiting to renew on {2}", queue.Name, message.Id, DateTimeOffset.Now.ToString("O"));
+					this.LogAction(LogSeverity.Debug, "Waiting to renew a queue message", "Queue's '{0}' message '{1}' waiting to renew on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 					await Task.Delay(TimeSpan.FromSeconds(messageLeaseTime.TotalSeconds * .75), cancelToken).ConfigureAwait(false);
-//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' message '{1}' started renewing on {2}", queue.Name, message.Id, DateTimeOffset.Now.ToString("O"));
+					this.LogAction(LogSeverity.Debug, "Started renewing a queue message", "Queue's '{0}' message '{1}' started renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
 					if (syncToken != null)
 						//using (await this._lock.LockAsync(cancelToken))
-							await this.Get(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.Get(invoker)).ConfigureAwait(false);
-					else await this.Get(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.Get(invoker)).ConfigureAwait(false);
+							await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
+					else await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
 
-					//loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' message '{1}' completed renewing on {2}", queue.Name, message.Id, DateTimeOffset.Now.ToString("O"));
+					this.LogAction(LogSeverity.Debug, "Renewed queue message", "Queue's '{0}' message '{1}' completed renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 				}
-				//catch (CloudToolsStorageException ex)
-				//{
-				//	if (string.Equals(ex.ErrorCode, "MessageNotFound", StringComparison.OrdinalIgnoreCase))
-				//	{
-				//		loggingService.QuickLogError(
-				//			"KeepMessageAlive",
-				//			ex,
-				//			"A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.",
-				//			queue.Name);
-				//		break;
-				//	}
+				catch (CloudToolsStorageException ex)
+				{
+					if (string.Equals(ex.ErrorCode, "MessageNotFound", StringComparison.OrdinalIgnoreCase))
+					{
+						this.LogAction(LogSeverity.Error, "Message not Found during keep-alive occurred", "A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.", this.Name);
+						break;
+					}
 
-				//	loggingService.QuickLogError("KeepMessageAlive", ex, "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", queue.Name);
-				//	break;
-				//}
+					this.LogAction(LogSeverity.Debug, "Error during keep-alive occurred", "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", this.Name);
+					break;
+				}
 				catch (OperationCanceledException)
 				{
 					return;
@@ -126,37 +122,33 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				try
 				{
 					var endingSooner = messages.Min(m => m.ActualMessage.NextVisibleTime.Value);
-//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' for {1} batch messages waiting to renew on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
-
+					this.LogAction(LogSeverity.Debug, "Waiting to renew batch queue messages", "Queue's '{0}' for {1} batch messages waiting to renew on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
 					await Task.Delay(TimeSpan.FromSeconds(endingSooner.UtcDateTime.Subtract(DateTime.UtcNow).TotalSeconds * .50), generalCancelToken).ConfigureAwait(false);
-//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' for {1} batch messages started renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
+					this.LogAction(LogSeverity.Debug, "Started renewing batch queue messages", "Queue's '{0}' for {1} batch messages started renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
+					//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' for {1} batch messages started renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
 					if (syncToken != null)
 						//using (await this._lock.LockAsync(generalCancelToken))
-							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.Get(invoker)).ConfigureAwait(false));
-					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.Get(invoker)).ConfigureAwait(false));
+							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
+					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
 
-//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' {1} messages completed renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
+					this.LogAction(LogSeverity.Debug, "Renewed batch queue messages", "Queue's '{0}' {1} messages completed renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
 				}
-				//catch (CloudToolsStorageException ex)
-				//{
-				//	if (ex.StatusCode != 404 && ex.StatusCode != 409 && ex.StatusCode != 412)
-				//		throw;
+				catch (CloudToolsStorageException ex)
+				{
+					if (ex.StatusCode != 404 && ex.StatusCode != 409 && ex.StatusCode != 412)
+						throw;
 
-				//	if (string.Equals(ex.ErrorCode, "MessageNotFound", StringComparison.OrdinalIgnoreCase))
-				//	{
-				//		loggingService.QuickLogError(
-				//			"KeepMessageAlive",
-				//			ex,
-				//			"A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.",
-				//			queue.Name);
-				//		break;
-				//	}
+					if (string.Equals(ex.ErrorCode, "MessageNotFound", StringComparison.OrdinalIgnoreCase))
+					{
+						this.LogAction(LogSeverity.Error, "Message not Found during keep-alive occurred", "A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.", this.Name);
+						break;
+					}
 
-				//	loggingService.QuickLogError("KeepMessageAlive", ex, "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", queue.Name);
-				//	break;
-				//}
+					this.LogAction(LogSeverity.Debug, "Error during keep-alive occurred", "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", this.Name);
+					break;
+				}
 				catch (OperationCanceledException)
 				{
 					return;
@@ -181,7 +173,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			if (cancelToken.IsCancellationRequested) return;
 
-			await this.Get(invoker).UpdateMessageAsync(message, messageLeaseTime, QueueMessageUpdateFields.Visibility, cancelToken).ConfigureAwait(false);
+			await this.This(invoker).UpdateMessageAsync(message, messageLeaseTime, QueueMessageUpdateFields.Visibility, cancelToken).ConfigureAwait(false);
 		}
 	}
 }

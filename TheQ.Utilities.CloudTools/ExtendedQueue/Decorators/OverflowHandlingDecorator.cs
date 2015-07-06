@@ -57,6 +57,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		/// <returns>A <see cref="Task"/> representing the asynchronous process.</returns>
 		protected internal override async Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
+			this.LogAction(LogSeverity.Debug, "Calling OverflowHandlingDecorator.AddOverflownMessageAsync");
 			var id = Guid.NewGuid().ToString("D", CultureInfo.InvariantCulture);
 
 			await this.OverflownMessageHandler.StoreOverflownMessageAsync(messageContents, id, this.Name, token).ConfigureAwait(false);
@@ -66,20 +67,26 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<string> GetOverflownMessageId(IQueueMessage message) { return Task.FromResult(this.OverflownMessageHandler.GetIdFromMessagePointer(message.AsBytes)); }
+		protected internal override Task<string> GetOverflownMessageId(IQueueMessage message)
+		{
+			this.LogAction(LogSeverity.Debug, "Calling OverflowHandlingDecorator.GetOverflownMessageId");
+			return Task.FromResult(this.OverflownMessageHandler.GetIdFromMessagePointer(message.AsBytes));
+		}
 
 
 
 		protected internal override Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token)
 		{
+			this.LogAction(LogSeverity.Debug, "Calling OverflowHandlingDecorator.GetOverflownMessageContentsAsync, of type " + this.OverflownMessageHandler.GetType().FullName);
 			return this.OverflownMessageHandler.RetrieveOverflownMessageAsync(id, this.Name, token);
 		}
 
 
 
-		protected internal override Task RemoveOverflownContentsAsync(QueueMessageWrapper message, CancellationToken token)
+		protected internal override async Task RemoveOverflownContentsAsync(QueueMessageWrapper message, CancellationToken token)
 		{
-			return this.OverflownMessageHandler.RemoveOverflownContentsAsync(message.OverflowId, this.Name, token);
+			this.LogAction(LogSeverity.Debug, "Calling OverflowHandlingDecorator.RemoveOverflownContentsAsync, of type " + this.OverflownMessageHandler.GetType().FullName);
+			await this.OverflownMessageHandler.RemoveOverflownContentsAsync(await message.GetOverflowIdAsync().ConfigureAwait(false), this.Name, token).ConfigureAwait(false);
 		}
 	}
 }

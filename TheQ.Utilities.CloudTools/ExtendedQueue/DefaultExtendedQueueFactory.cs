@@ -75,6 +75,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </returns>
 		public IExtendedQueue Create(IQueue original)
 		{
+
 			var baseQueue = new ExtendedQueue(original, this.MessageProvider, this.MaximumMessageSizeProvider, this.MaximumMessagesProvider);
 
 			var compressibleQueue = new CompressionDecorator(baseQueue);
@@ -82,6 +83,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			var overflowQueue = new OverflowHandlingDecorator(jsonQueue, this.OverflownMessageHandler);
 			var loggedQueue = new LoggingDecorator(overflowQueue, this.LogService);
 
+			loggedQueue.LogAction(ExtendedQueueBase.LogSeverity.Info,
+				"Created a new IExtendedQueue instance using the DefaultExtendedQueueFactory instance",
+				"Queue name: {0}, Actual type of the factory: {1}",
+				original.Name,
+				this.GetType().FullName);
+			;
 			return loggedQueue;
 		}
 	}

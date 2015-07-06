@@ -60,7 +60,12 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel
 			Guard.NotNull(pointerRaw, "pointerRaw");
 			var isOverflown = true;
 
-			for (var i = 0; i < AzureOverflownMessageHandlerBase.OverflownMessagePrefix.Length; i++)
+			var targetLength = AzureOverflownMessageHandlerBase.OverflownMessagePrefix.Length;
+
+			if (pointerRaw.Length < targetLength)
+				return string.Empty;
+
+			for (var i = 0; i < targetLength; i++)
 				if (pointerRaw[i] != AzureOverflownMessageHandlerBase.OverflownMessagePrefix[i])
 				{
 					isOverflown = false;

@@ -30,9 +30,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) : base(decoratedQueue) { }
 
 
-		protected internal override Task<string> SerializeMessageEntity(object messageEntity) { return Task.FromResult(JsonConvert.SerializeObject(messageEntity, Formatting.None)); }
+
+		protected internal override Task<string> SerializeMessageEntity(object messageEntity)
+		{
+			this.LogAction(LogSeverity.Debug, "Calling JsonSerialiserDecorator.SerializeMessageEntity");
+			return Task.FromResult(JsonConvert.SerializeObject(messageEntity, Formatting.None));
+		}
 
 
-		protected internal override T DeserializeToObject<T>(string serializedContents) { return JsonConvert.DeserializeObject<T>(serializedContents); }
+
+		protected internal override T DeserializeToObject<T>(string serializedContents)
+		{
+			this.LogAction(LogSeverity.Debug, "Calling JsonSerialiserDecorator.DeserializeToObject");
+			return JsonConvert.DeserializeObject<T>(serializedContents);
+		}
 	}
 }

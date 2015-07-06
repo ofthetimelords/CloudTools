@@ -120,5 +120,34 @@ namespace TheQ.Utilities.CloudTools.Azure
 		///     A <see cref="AzureBlobContainer" /> wrapper.
 		/// </returns>
 		public static implicit operator AzureBlobContainer(CloudBlobContainer container) { return container != null ? new AzureBlobContainer(container) : null; }
+
+
+
+
+		/// <summary>
+		///     Creates an <see cref="AzureBlobContainer"/> from a <see cref="CloudBlobContainer" /> instance.
+		/// </summary>
+		/// <param name="blobContainer">The <see cref="CloudBlobContainer" /> instance.</param>
+		/// <returns>
+		///     A <see cref="AzureBlobContainer" /> wrapper.
+		/// </returns>
+		public static AzureBlobContainer FromCloudBlobContainer(CloudBlobContainer blobContainer)
+		{
+			return blobContainer;
+		}
+
+
+
+		/// <summary>
+		///     Retrieves the underlying <see cref="CloudBlobContainer" /> instance from this <see cref="AzureBlobContainer"/> instance.
+		/// </summary>
+		/// <param name="blobContainer">The underlying <see cref="CloudBlobContainer" /> instance.</param>
+		/// <returns>
+		///     An <see cref="AzureBlobContainer" /> wrapper.
+		/// </returns>
+		public static CloudBlobContainer ToCloudBlobContainer(AzureBlobContainer blobContainer)
+		{
+			return blobContainer;
+		}
 	}
 }

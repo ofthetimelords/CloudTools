@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.Infrastructure;
+using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
@@ -45,6 +46,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		private ILogService LogService { get; set; }
 
 
+		[StringFormatMethod("details")]
 		protected internal override void LogException(LogSeverity severity, Exception exception, string details = null, params string[] formatArguments)
 		{
 			switch (severity)
@@ -63,6 +65,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
+		[StringFormatMethod("details")]
 		protected internal override void LogAction(LogSeverity severity, string message = null, string details = null, params string[] formatArguments)
 		{
 			switch (severity)
