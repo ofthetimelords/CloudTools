@@ -38,7 +38,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\Output\vLatest\Eirtight.Utilities.CloudTools.Storage.xml</DocumentationFile>
+    <DocumentationFile>..\Output\vLatest\TheQ.Utilities.CloudTools.Azure.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
