@@ -61,16 +61,22 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(entity, "entity");
 
+			this.LogAction(LogSeverity.Info, "Added a message", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
 			var maxSize = this.MaximumSizeProvider.MaximumMessageSize;
 
 			var stringSource = entity as string;
-			var serialized = stringSource ?? await this.Get(invoker).SerializeMessageEntity(entity).ConfigureAwait(false);
+			var serialized = stringSource ?? await this.This(invoker).SerializeMessageEntity(entity).ConfigureAwait(false);
 
-			var messageAsBytes = await this.Get(invoker).MessageContentsToByteArray(serialized, invoker).ConfigureAwait(false);
-			messageAsBytes = await this.Get(invoker).PostProcessMessage(messageAsBytes).ConfigureAwait(false);
+			var messageAsBytes = await this.This(invoker).MessageContentsToByteArray(serialized, invoker).ConfigureAwait(false);
+			messageAsBytes = await this.This(invoker).PostProcessMessage(messageAsBytes).ConfigureAwait(false);
 
-			if (messageAsBytes.Length < maxSize) await this.Get(invoker).AddNonOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
-			else await this.Get(invoker).AddOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
+			if (messageAsBytes.Length < maxSize)
+				await this.This(invoker).AddNonOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
+			else
+			{
+				this.LogAction(LogSeverity.Debug, "Message will be overflown", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
+				await this.This(invoker).AddOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
+			}
 		}
 
 
@@ -85,7 +91,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			using (var converter = new MemoryStream(serializedContents.Length))
 			{
-				using (var decoratedConverter = await this.Get(invoker).GetByteEncoder(converter).ConfigureAwait(false))
+				using (var decoratedConverter = await this.This(invoker).GetByteEncoder(converter).ConfigureAwait(false))
 				using (var writer = new StreamWriter(decoratedConverter))
 				{
 					await writer.WriteAsync(serializedContents).ConfigureAwait(false);

@@ -345,9 +345,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </returns>
 		public static implicit operator CloudQueue(AzureQueue queue)
 		{
-			Guard.NotNull(queue, "queue");
-			
-			return queue._queueReference;
+			return queue != null ? queue._queueReference : null;
 		}
 
 
@@ -359,7 +357,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     A <see cref="AzureQueue" /> wrapper.
 		/// </returns>
-		public static implicit operator AzureQueue(CloudQueue queue) { return new AzureQueue(queue); }
+		public static implicit operator AzureQueue(CloudQueue queue) { return queue != null ? new AzureQueue(queue) : null; }
 
 
 
@@ -372,7 +370,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </returns>
 		public static AzureQueue FromCloudQueue(CloudQueue queue)
 		{
-			return new AzureQueue(queue);
+			return queue;
 		}
 
 
@@ -384,11 +382,9 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     An <see cref="AzureQueue" /> wrapper.
 		/// </returns>
-		public static CloudQueue ToCloudQueueMessage(AzureQueue queue)
+		public static CloudQueue ToCloudQueue(AzureQueue queue)
 		{
-			Guard.NotNull(queue, "queue");
-
-			return queue._queueReference;
+			return queue;
 		}
 	}
 

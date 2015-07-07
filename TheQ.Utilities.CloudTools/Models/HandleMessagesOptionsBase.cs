@@ -24,10 +24,10 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 	/// <summary>
 	///     <para>Input arguments for the ExtendedQueue framework.</para>
 	/// </summary>
-	public abstract class HandleMessageOptionsBase
+	public abstract class HandleMessagesOptionsBase
 	{
 		/// <summary>
-		///     <para>Initializes a new instance of the <see cref="HandleMessageOptionsBase" /></para>
+		///     <para>Initializes a new instance of the <see cref="HandleMessagesOptionsBase" /></para>
 		///     <para>class.</para>
 		/// </summary>
 		/// <param name="timeWindow">
@@ -42,7 +42,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models
 		/// <exception cref="ArgumentException">
 		///     Message Lease Time cannot be lower than 30 seconds! or Poll Frequency cannot be lower than 1 second! or Poison Message Threshold cannot be lower than 1
 		/// </exception>
-		protected HandleMessageOptionsBase(
+		protected HandleMessagesOptionsBase(
 			TimeSpan timeWindow,
 			TimeSpan messageLeaseTime,
 			TimeSpan pollFrequency,

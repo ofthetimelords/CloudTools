@@ -71,7 +71,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		Task HandleMessagesInBatchAsync([NotNull] HandleBatchMessageOptions messageOptions);
+		Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions);
 
 
 
@@ -80,7 +80,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		Task HandleMessagesInParallelAsync([NotNull] HandleParallelMessageOptions messageOptions);
+		Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions);
 
 
 
@@ -89,17 +89,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		Task HandleMessagesAsync([NotNull] HandleSerialMessageOptions messageOptions);
+		Task HandleMessagesInSerialAsync([NotNull] HandleMessagesSerialOptions messageOptions);
 
 
 
 		/// <summary>
-		///     This member is intended for internal usage only. Converts an incoming message to an entity.
+		///     This member is intended for <c>internal</c> usage only. Converts an incoming message to an entity.
 		/// </summary>
 		/// <typeparam name="T">The type of the object to attempt to deserialise to.</typeparam>
-		/// <param name="message">The original message.</param>
+		/// <param name="message">The original <paramref name="message"/>.</param>
 		/// <param name="token">An optional cancellation token.</param>
 		/// <returns>The contents of the message as an instance of type <typeparamref name="T" />.</returns>
-		Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token);
+		Task<T> DecodeMessageAsync<T>([NotNull] QueueMessageWrapper message, CancellationToken token);
 	}
 }

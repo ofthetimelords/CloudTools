@@ -9,11 +9,8 @@
 // 
 // </summary>
 
-using System.Linq;
-
 using Microsoft.WindowsAzure.Storage;
 
-using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
 
@@ -34,9 +31,9 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </returns>
 		public static CloudToolsStorageException Wrap(this StorageException sourceException)
 		{
-			Guard.NotNull(sourceException, "sourceException");
+			if (sourceException == null)
+				return null;
 
-			//if (ex.RequestInformation.ExtendedErrorInformation.ErrorCode != BlobErrorCodeStrings.LeaseAlreadyPresent && ex.HttpStatusCode != (int) HttpStatusCode.Conflict)
 			var status = sourceException.RequestInformation != null ? sourceException.RequestInformation.HttpStatusCode : 0;
 			var error = sourceException.RequestInformation != null && sourceException.RequestInformation.ExtendedErrorInformation != null
 				? sourceException.RequestInformation.ExtendedErrorInformation.ErrorCode

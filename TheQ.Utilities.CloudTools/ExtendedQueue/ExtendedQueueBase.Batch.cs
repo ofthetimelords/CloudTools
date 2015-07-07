@@ -23,7 +23,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		public Task HandleMessagesInBatchAsync([NotNull] HandleBatchMessageOptions messageOptions) { return this.HandleMessagesInBatchAsync(messageOptions, this); }
+		public Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions) { return this.HandleMessagesInBatchAsync(messageOptions, this); }
 
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>.</para>
 		/// </returns>
 		[NotNull]
-		internal async Task HandleMessagesInBatchAsync([NotNull] HandleBatchMessageOptions messageOptions, ExtendedQueueBase invoker)
+		internal async Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions, ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -58,45 +58,42 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				{
 					try
 					{
-						//messageOptions.QuickLogDebug("HandleMessages", "Attempting to listen for a new message in queue '{0}'", queue.Name);
+						this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
 
 						var howManyMoreFit = messageOptions.MaximumCurrentMessages - rawMessages.Count;
 
-						if (howManyMoreFit <= 0)
+						IList<IQueueMessage> retrievedMessages;
+						
+						if (howManyMoreFit > 0)
+							retrievedMessages = (await this.This(invoker).GetMessagesAsync(
+							Math.Min(this.MaximumMessagesProvider.MaximumMessagesPerRequest, howManyMoreFit),
+							messageOptions.MessageLeaseTime,
+							messageOptions.CancelToken).ConfigureAwait(false)).ToList();
+						else
+							retrievedMessages = new List<IQueueMessage>();
+
+						if (retrievedMessages.Count == 0 && rawMessages.Count == 0)
 						{
 							shouldDelayNextRequest = true;
 						}
 						else
 						{
-							var retrievedMessages = (await this.Get(invoker).GetMessagesAsync(howManyMoreFit > this.MaximumMessagesProvider.MaximumMessagesPerRequest
-								? this.MaximumMessagesProvider.MaximumMessagesPerRequest
-								: howManyMoreFit,
-								messageOptions.MessageLeaseTime,
-								messageOptions.CancelToken).ConfigureAwait(false)).ToList();
-
-							if (retrievedMessages.Count == 0 && rawMessages.Count == 0)
+							// Keep trying to retrieve messages until there are no more or the quota is reached
+							if (retrievedMessages.Count > 0)
 							{
-								shouldDelayNextRequest = true;
+								rawMessages.AddRange(retrievedMessages);
+
+								if (rawMessages.Count < messageOptions.MaximumCurrentMessages)
+									continue;
 							}
-							else
-							{
-								// Keep trying to retrieve messages until there are no more or the quota is reached
-								if (retrievedMessages.Count > 0)
-								{
-									rawMessages.AddRange(retrievedMessages);
 
-									if (rawMessages.Count < messageOptions.MaximumCurrentMessages)
-										continue;
-								}
+							// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
+							convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.This(invoker), m)));
+							//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
-								// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
-								convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.Get(invoker), m)));
-								//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
+							keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
 
-								keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
-
-								break;
-							}
+							break;
 						}
 					}
 					catch (TaskCanceledException)
@@ -106,15 +103,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					}
 					catch (CloudToolsStorageException ex)
 					{
-						this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
+						this.This(invoker).HandleStorageExceptions(messageOptions, ex);
 					}
 					catch (Exception ex)
 					{
-						this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
+						this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
 					}
 					finally
 					{
-						this.Get(invoker).BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
+						this.This(invoker).BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
 					}
 
 					// Delay the next polling attempt for a new message, since no messages were received last time.
@@ -135,7 +132,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="keepAliveTask">The <see cref="Task"/> that keeps the message "alive".</param>
 		/// <param name="batchCancelToken">The cancellation token for the batch.</param>
 		private void BatchFinallyHandler(
-			[CanBeNull] HandleBatchMessageOptions messageOptions,
+			[CanBeNull] HandleMessagesBatchOptions messageOptions,
 			[CanBeNull] Task keepAliveTask,
 			[NotNull] CancellationTokenSource batchCancelToken)
 		{

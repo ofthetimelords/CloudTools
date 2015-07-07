@@ -58,7 +58,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Initiates an asynchronous operation to add a <paramref name="message" /> to the queue.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>A <see cref=".CloudQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		/// <returns>
@@ -73,7 +73,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Initiates an asynchronous operation to add a <paramref name="message" /> to the queue.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>A <see cref="IQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		/// <param name="cancellationToken">
@@ -94,7 +94,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// <param name="messageCount">The number of messages to retrieve.</param>
 		/// <returns>
 		///     <para>A <see cref="Task" /></para>
-		///     <para>object that is an enumerable collection of type <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
 		Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount);
@@ -111,7 +111,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// </param>
 		/// <returns>
 		///     <para>A <see cref="Task" /></para>
-		///     <para>object that is an enumerable collection of type <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
 		Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount, CancellationToken cancellationToken);
@@ -131,7 +131,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// </param>
 		/// <returns>
 		///     <para>A <see cref="Task" /></para>
-		///     <para>object of type <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>object of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
 		Task<IQueueMessage> GetMessageAsync(TimeSpan? visibilityTimeout, CancellationToken cancellationToken);
@@ -153,7 +153,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		/// </param>
 		/// <returns>
 		///     <para>A <see cref="Task" /></para>
-		///     <para>object that is an enumerable collection of type <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>object that is an enumerable collection of type <see cref="IQueueMessage" /></para>
 		///     <para>that represents the asynchronous operation.</para>
 		/// </returns>
 		Task<IEnumerable<IQueueMessage>> GetMessagesAsync(int messageCount, TimeSpan? visibilityTimeout, CancellationToken cancellationToken);
@@ -161,10 +161,10 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 
 
 		/// <summary>
-		///     Deletes a message.
+		///     Deletes a <paramref name="message"/>.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>A <see cref=".CloudQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		void DeleteMessage(IQueueMessage message);
@@ -183,7 +183,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Initiates an asynchronous operation to update the visibility timeout and optionally the content of a message.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>A <see cref="IQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		/// <param name="visibilityTimeout">
@@ -191,7 +191,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     <para>specifying the visibility timeout interval.</para>
 		/// </param>
 		/// <param name="updateFields">
-		///     <para>A set of <see cref="Microsoft.WindowsAzure.Storage.Queue.MessageUpdateFields" /></para>
+		///     <para>A set of <see cref="QueueMessageUpdateFields" /></para>
 		///     <para>values that specify which parts of the <paramref name="message" /> are to be updated.</para>
 		/// </param>
 		/// <returns>
@@ -206,7 +206,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Initiates an asynchronous operation to update the visibility timeout and optionally the content of a message.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref="Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage" /></para>
+		///     <para>A <see cref="IQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		/// <param name="visibilityTimeout">
@@ -214,7 +214,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     <para>specifying the visibility timeout interval.</para>
 		/// </param>
 		/// <param name="updateFields">
-		///     <para>A set of <see cref="Microsoft.WindowsAzure.Storage.Queue.MessageUpdateFields" /></para>
+		///     <para>A set of <see cref="QueueMessageUpdateFields" /></para>
 		///     <para>values that specify which parts of the <paramref name="message" /> are to be updated.</para>
 		/// </param>
 		/// <param name="cancellationToken">

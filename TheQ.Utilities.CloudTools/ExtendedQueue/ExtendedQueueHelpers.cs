@@ -18,7 +18,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="invoker">The previous instance.</param>
 		/// <returns></returns>
 		[DebuggerStepThrough]
-		public static ExtendedQueueBase Get(this ExtendedQueueBase source, ExtendedQueueBase invoker)
+		public static ExtendedQueueBase This(this ExtendedQueueBase source, ExtendedQueueBase invoker)
 		{
 			return invoker ?? source;
 		}

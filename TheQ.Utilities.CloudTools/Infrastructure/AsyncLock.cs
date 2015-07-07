@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 {
 	// http://blogs.msdn.com/b/pfxteam/archive/2012/02/12/10266983.aspx
+	[Obsolete]
 	internal class AsyncSemaphore
 	{
 		private static readonly Task Completed = Task.FromResult(true);
@@ -70,7 +71,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 
 
 
-	internal class AsyncLock
+	[Obsolete]
+	public class AsyncLock
 	{
 		private readonly Task<Releaser> _releaser;
 		private readonly AsyncSemaphore _semaphore;
@@ -108,7 +110,8 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 
 
 
-		internal struct Releaser : IDisposable
+		[Obsolete]
+		public struct Releaser : IDisposable
 		{
 			private readonly AsyncLock _toRelease;
 

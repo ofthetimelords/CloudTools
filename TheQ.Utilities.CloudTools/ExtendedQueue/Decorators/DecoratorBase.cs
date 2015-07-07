@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
+using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
 
@@ -133,6 +134,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
+		/// <summary>
+		///     Adds an object (message entity) to the list.
+		/// </summary>
+		/// <param name="entity">The entity to add.</param>
 		public override void AddMessageEntity(object entity)
 		{
 			this.DecoratedQueue.AddMessageEntity(entity, this);
@@ -191,7 +196,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<IQueueMessage> GetMessageFromQueue(HandleSerialMessageOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
+		protected internal override Task<IQueueMessage> GetMessageFromQueue(HandleMessagesSerialOptions messageOptions, CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			return this.DecoratedQueue.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource);
 		}
@@ -259,21 +264,21 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override void HandleGeneralExceptions(HandleMessageOptionsBase messageOptions, Exception ex, bool parallelYetExternal = false)
+		protected internal override void HandleGeneralExceptions(HandleMessagesOptionsBase messageOptions, Exception ex)
 		{
-			this.DecoratedQueue.HandleGeneralExceptions(messageOptions, ex, parallelYetExternal);
+			this.DecoratedQueue.HandleGeneralExceptions(messageOptions, ex);
 		}
 
 
 
-		protected internal override void HandleStorageExceptions(HandleMessageOptionsBase messageOptions, CloudToolsStorageException ex)
+		protected internal override void HandleStorageExceptions(HandleMessagesOptionsBase messageOptions, CloudToolsStorageException ex)
 		{
 			this.DecoratedQueue.HandleStorageExceptions(messageOptions, ex);
 		}
 
 
 
-		protected internal override bool HandleTaskCancelled(HandleSerialMessageOptions messageOptions)
+		protected internal override bool HandleTaskCancelled(HandleMessagesSerialOptions messageOptions)
 		{
 			return this.DecoratedQueue.HandleTaskCancelled(messageOptions);
 		}
@@ -288,7 +293,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 		protected internal override void SerialFinallyHandler(
-			HandleSerialMessageOptions messageOptions,
+			HandleMessagesSerialOptions messageOptions,
 			Task keepAliveTask,
 			IQueueMessage message,
 			CancellationTokenSource messageSpecificCancellationTokenSource)
@@ -467,6 +472,20 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
 			return this.DecoratedQueue.AddOverflownMessageAsync(messageContents, token);
+		}
+
+
+
+		protected internal override void LogException(LogSeverity severity, Exception exception, string details = null, params string[] formatArguments)
+		{
+			this.DecoratedQueue.LogException(severity, exception, details, formatArguments);
+		}
+
+
+
+		protected internal override void LogAction(LogSeverity severity, string message = null, string details = null, params string[] formatArguments)
+		{
+			this.DecoratedQueue.LogAction(severity, message, details, formatArguments);
 		}
 	}
 }

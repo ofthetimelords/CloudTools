@@ -108,7 +108,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     The underlying <see cref="CloudBlobContainer" /> instance.
 		/// </returns>
-		public static implicit operator CloudBlobContainer(AzureBlobContainer container) { return container._blobContainerReference; }
+		public static implicit operator CloudBlobContainer(AzureBlobContainer container) { return container != null ? container._blobContainerReference : null; }
 
 
 
@@ -119,6 +119,35 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     A <see cref="AzureBlobContainer" /> wrapper.
 		/// </returns>
-		public static implicit operator AzureBlobContainer(CloudBlobContainer container) { return new AzureBlobContainer(container); }
+		public static implicit operator AzureBlobContainer(CloudBlobContainer container) { return container != null ? new AzureBlobContainer(container) : null; }
+
+
+
+
+		/// <summary>
+		///     Creates an <see cref="AzureBlobContainer"/> from a <see cref="CloudBlobContainer" /> instance.
+		/// </summary>
+		/// <param name="blobContainer">The <see cref="CloudBlobContainer" /> instance.</param>
+		/// <returns>
+		///     A <see cref="AzureBlobContainer" /> wrapper.
+		/// </returns>
+		public static AzureBlobContainer FromCloudBlobContainer(CloudBlobContainer blobContainer)
+		{
+			return blobContainer;
+		}
+
+
+
+		/// <summary>
+		///     Retrieves the underlying <see cref="CloudBlobContainer" /> instance from this <see cref="AzureBlobContainer"/> instance.
+		/// </summary>
+		/// <param name="blobContainer">The underlying <see cref="CloudBlobContainer" /> instance.</param>
+		/// <returns>
+		///     An <see cref="AzureBlobContainer" /> wrapper.
+		/// </returns>
+		public static CloudBlobContainer ToCloudBlobContainer(AzureBlobContainer blobContainer)
+		{
+			return blobContainer;
+		}
 	}
 }

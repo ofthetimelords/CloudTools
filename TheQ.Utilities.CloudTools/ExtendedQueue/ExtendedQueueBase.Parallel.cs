@@ -23,7 +23,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <returns>A cancellable task representing the message processing procedure.</returns>
 		/// <exception cref="ArgumentNullException">queue;Parameter 'queue' was null. or messageOptions;Parameter 'messageOptions' was not provided.</exception>
-		public Task HandleMessagesInParallelAsync([NotNull] HandleParallelMessageOptions messageOptions)
+		public Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions)
 		{
 			return this.HandleMessagesInParallelAsync(messageOptions, this);
 		}
@@ -42,7 +42,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>.</para>
 		/// </returns>
 		[NotNull]
-		internal async Task HandleMessagesInParallelAsync([NotNull] HandleParallelMessageOptions messageOptions, ExtendedQueueBase invoker = null)
+		internal async Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions, ExtendedQueueBase invoker = null)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -58,35 +58,30 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				{
 					if (messageOptions.CancelToken.IsCancellationRequested) return;
 
-					//messageOptions.QuickLogDebug("HandleMessages", "Ready to contact queue '{0}' for a batch of new messages (maximum '{1}')", queue.Name, messageOptions.MaximumCurrentMessages);
+
+					this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
 					var freeMessageSlots = messageOptions.MaximumCurrentMessages - (int)Interlocked.Read(ref activeMessageSlots[0]);
 
-					if (await ExtendedQueueBase.DelayOnNoParallelMessages(freeMessageSlots, internalZeroThreadsWait).ConfigureAwait(false)) continue;
+					if (await this.DelayOnNoParallelMessages(freeMessageSlots, messageOptions.MaximumCurrentMessages, internalZeroThreadsWait).ConfigureAwait(false)) continue;
 
-					//messageOptions.QuickLogDebug(
-					//	"HandleMessages",
-					//	"Ready to request a batch of messages on queue '{0}', '{1}' free slots out of {2}",
-					//	queue.Name,
-					//	freeMessageSlots,
-					//	messageOptions.MaximumCurrentMessages);
-					var messages = await this.Get(invoker).GetMessagesAsync(messageOptions, freeMessageSlots, this.Get(invoker)).ConfigureAwait(false);
+					this.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
+					var messages = await this.This(invoker).GetMessagesAsync(messageOptions, freeMessageSlots, this.This(invoker)).ConfigureAwait(false);
 
 					if (messages.Count == 0)
 					{
-						//messageOptions.QuickLogDebug(
-						//	"HandleMessages",
-						//	"No new messages are available for processing messages in queue '{0}' (0 out of '{1}'), will try again on {2}",
-						//	queue.Name,
-						//	messageOptions.MaximumCurrentMessages,
-						//	DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
+						this.LogAction(LogSeverity.Debug,
+							"No new messages are available",
+							"No new messages are available for processing in queue '{0}', will try again on {1}",
+							this.Name,
+							internalZeroThreadsWait.ToString("g", CultureInfo.InvariantCulture));
 						await Task.Delay(messageOptions.PollFrequency, messageOptions.CancelToken).ConfigureAwait(false);
 						continue;
 					}
 
-					//messageOptions.QuickLogDebug("HandleMessages", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count, queue.Name);
+					this.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
 
 					foreach (var message in messages)
-						this.Get(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.Get(invoker));
+						Task.Run(() => this.This(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.This(invoker)));
 				}
 				catch (TaskCanceledException)
 				{
@@ -95,23 +90,23 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 				catch (Exception ex)
 				{
-					this.Get(invoker).HandleGeneralExceptions(messageOptions, ex, true);
+					this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
 				}
 			}
 		}
 
 
 
-		protected internal static async Task<bool> DelayOnNoParallelMessages(int freeMessageSlots, TimeSpan internalZeroThreadsWait)
+		protected internal async Task<bool> DelayOnNoParallelMessages(int freeMessageSlots, int totalMessageSlots, TimeSpan internalZeroThreadsWait)
 		{
 			if (freeMessageSlots == 0)
 			{
-				//messageOptions.QuickLogDebug(
-				//	"HandleMessages",
-				//	"No free threads are available for processing messages in queue '{0}' (0 out of '{1}'), will try again on {2}",
-				//	queue.Name,
-				//	messageOptions.MaximumCurrentMessages,
-				//	DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture));
+				this.LogAction(LogSeverity.Debug,
+					"No free threads for incoming messages are available",
+					"No free threads are available for processing messages in queue '{0}' (0 out of '{1}'), will try again on {2}",
+					this.Name,
+					totalMessageSlots.ToString(),
+					internalZeroThreadsWait.ToString("g", CultureInfo.InvariantCulture));
 				await Task.Delay(internalZeroThreadsWait).ConfigureAwait(false);
 				return true;
 			}
@@ -120,7 +115,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal async Task ProcessOneParallelMessage(HandleParallelMessageOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task ProcessOneParallelMessage(HandleMessagesParallelOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
 		{
 			var messageSpecificCancellationTokenSource = new CancellationTokenSource();
 			var currentMessage = message;
@@ -131,18 +126,18 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			Task keepAliveTask = null;
 
-			//messageOptions.QuickLogDebug(
-			//	"HandleMessages",
-			//	"Started processing queue's '{0}' message with ID '{1}' ({2} slots remaining)",
-			//	queue.Name,
-			//	currentMessage.Id,
-			//	messageOptions.MaximumCurrentMessages - Interlocked.Read(ref activeMessageSlots[0]));
+			this.LogAction(LogSeverity.Debug,
+				"Started processing a message",
+				"Started processing queue's '{0}' message with ID '{1}' ({2} slots remaining)",
+				this.Name,
+				currentMessage.Id,
+				(messageOptions.MaximumCurrentMessages - Interlocked.Read(ref activeMessageSlots[0])).ToString());
 
 			try
 			{
 				keepAliveTask =
 					await
-						this.Get(invoker).ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false);
+						this.This(invoker).ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false);
 			}
 			catch (TaskCanceledException)
 			{
@@ -150,24 +145,24 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				this.Get(invoker).HandleStorageExceptions(messageOptions, ex);
+				this.This(invoker).HandleStorageExceptions(messageOptions, ex);
 			}
 			catch (Exception ex)
 			{
-				this.Get(invoker).HandleGeneralExceptions(messageOptions, ex);
+				this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
 			}
 			finally
 			{
-				this.Get(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
+				this.This(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
 			}
 		}
 
 
 
-		protected internal async Task<List<IQueueMessage>> GetMessagesAsync(HandleParallelMessageOptions messageOptions, int freeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task<List<IQueueMessage>> GetMessagesAsync(HandleMessagesParallelOptions messageOptions, int freeMessageSlots, ExtendedQueueBase invoker)
 		{
-			return (await this.Get(invoker).GetMessagesAsync(freeMessageSlots > this.Get(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
-				? this.Get(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
+			return (await this.This(invoker).GetMessagesAsync(freeMessageSlots > this.This(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
+				? this.This(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
 				: freeMessageSlots,
 				messageOptions.MessageLeaseTime,
 				messageOptions.CancelToken).ConfigureAwait(false)).ToList();
@@ -176,7 +171,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		private void ParallelFinallyHandler(
-			[CanBeNull] HandleParallelMessageOptions messageOptions,
+			[CanBeNull] HandleMessagesParallelOptions messageOptions,
 			[CanBeNull] long[] activeMessageSlots,
 			[CanBeNull] Task keepAliveTask,
 			[CanBeNull] IQueueMessage currentMessage,
@@ -191,12 +186,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				if (currentMessage != null)
 				{
-					//messageOptions.QuickLogDebug("HandleMessages", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs on {1}", queue.Name, currentMessage.Id);
-					//messageOptions.QuickLogDebug("HandleMessages", "Queue '{0}': currently active threads: {1}", queue.Name, Interlocked.Read(ref activeMessageSlots[0]));
+					this.LogAction(LogSeverity.Warning,
+						"Message processing was faulted; cancelling",
+						"Queue's '{0}' message '{1}', processing faulted; cancelling related jobs for this message",
+						this.Name,
+						currentMessage.Id);
 				}
 				messageSpecificCancellationTokenSource.Cancel();
 			}
-			//else if (currentMessage != null) messageOptions.QuickLogDebug("HandleMessages", "Queue '{0}': currently active threads: {1}", queue.Name, Interlocked.Read(ref activeMessageSlots[0]));
 		}
 	}
 }

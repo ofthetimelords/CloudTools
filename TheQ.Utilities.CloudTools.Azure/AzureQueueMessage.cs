@@ -270,9 +270,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </returns>
 		public static implicit operator CloudQueueMessage(AzureQueueMessage message)
 		{
-			Guard.NotNull(message, "message");
-
-			return message._queueMessageReference;
+			return message != null ? message._queueMessageReference : null;
 		}
 
 
@@ -284,7 +282,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// <returns>
 		///     A <see cref="AzureQueueMessage" /> wrapper.
 		/// </returns>
-		public static implicit operator AzureQueueMessage(CloudQueueMessage message) { return new AzureQueueMessage(message); }
+		public static implicit operator AzureQueueMessage(CloudQueueMessage message) { return message != null ? new AzureQueueMessage(message) : null; }
 
 
 
@@ -297,7 +295,21 @@ namespace TheQ.Utilities.CloudTools.Azure
 		/// </returns>
 		public static AzureQueueMessage FromCloudQueueMessage(CloudQueueMessage message)
 		{
-			return new AzureQueueMessage(message);
+			return message;
+		}
+
+
+
+		/// <summary>
+		///     Retrieves the underlying <see cref="CloudQueueMessage" /> instance from this <see cref="AzureQueueMessage"/> instance.
+		/// </summary>
+		/// <param name="message">The underlying <see cref="CloudQueueMessage" /> instance.</param>
+		/// <returns>
+		///     An <see cref="AzureQueueMessage" /> wrapper.
+		/// </returns>
+		public static CloudQueueMessage ToCloudQueueMessage(AzureQueueMessage message)
+		{
+			return message;
 		}
 	}
 }
