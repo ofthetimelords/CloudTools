@@ -62,41 +62,38 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 						var howManyMoreFit = messageOptions.MaximumCurrentMessages - rawMessages.Count;
 
-						//if (howManyMoreFit <= 0)
-						//{
-						//	this.LogAction(LogSeverity.Debug, "The batch is full, will try again later", "Queue: {0}", this.Name);
-						//	shouldDelayNextRequest = true;
-						//}
-						//else
+						IList<IQueueMessage> retrievedMessages;
+						
+						if (howManyMoreFit > 0)
+							retrievedMessages = (await this.This(invoker).GetMessagesAsync(
+							Math.Min(this.MaximumMessagesProvider.MaximumMessagesPerRequest, howManyMoreFit),
+							messageOptions.MessageLeaseTime,
+							messageOptions.CancelToken).ConfigureAwait(false)).ToList();
+						else
+							retrievedMessages = new List<IQueueMessage>();
+
+						if (retrievedMessages.Count == 0 && rawMessages.Count == 0)
 						{
-							var retrievedMessages = (await this.This(invoker).GetMessagesAsync(
-								Math.Min(this.MaximumMessagesProvider.MaximumMessagesPerRequest, howManyMoreFit),
-								messageOptions.MessageLeaseTime,
-								messageOptions.CancelToken).ConfigureAwait(false)).ToList();
-
-							if (retrievedMessages.Count == 0 && rawMessages.Count == 0)
+							shouldDelayNextRequest = true;
+						}
+						else
+						{
+							// Keep trying to retrieve messages until there are no more or the quota is reached
+							if (retrievedMessages.Count > 0)
 							{
-								shouldDelayNextRequest = true;
+								rawMessages.AddRange(retrievedMessages);
+
+								if (rawMessages.Count < messageOptions.MaximumCurrentMessages)
+									continue;
 							}
-							else
-							{
-								// Keep trying to retrieve messages until there are no more or the quota is reached
-								if (retrievedMessages.Count > 0)
-								{
-									rawMessages.AddRange(retrievedMessages);
 
-									if (rawMessages.Count < messageOptions.MaximumCurrentMessages)
-										continue;
-								}
+							// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
+							convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.This(invoker), m)));
+							//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
-								// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
-								convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.This(invoker), m)));
-								//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
+							keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
 
-								keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
-
-								break;
-							}
+							break;
 						}
 					}
 					catch (TaskCanceledException)
