@@ -99,7 +99,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		protected internal async Task<bool> DelayOnNoParallelMessages(int freeMessageSlots, int totalMessageSlots, TimeSpan internalZeroThreadsWait)
 		{
-			if (freeMessageSlots == 0)
+			if (freeMessageSlots <= 0)
 			{
 				this.LogAction(LogSeverity.Debug,
 					"No free threads for incoming messages are available",
