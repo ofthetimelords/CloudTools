@@ -19,6 +19,27 @@ namespace TheQ.Utilities.CloudTools.Storage.Infrastructure
 	/// </summary>
 	public class StatisticsContainer
 	{
+		/// <summary>
+		/// Returns a string that represents the current object.
+		/// </summary>
+		/// <returns>
+		/// A string that represents the current object.
+		/// </returns>
+		public override string ToString()
+		{
+			return string.Format("Queue Statistics | All slots: {0}, Busy Slots: {1}, Listeners: {2}, # of Successful M.: {3}, # of Reenqueued M.: {4}, Total Reenqueues: {5}, # of Poison M.: {6}, # of Faulted: {7}",
+				this.AllMessageSlots,
+				this.BusyMessageSlots,
+				this.CurrentListeners,
+				this.TotalSuccessfulMessages,
+				this.TotalReenqueuedMessages,
+				this.TotalReenqueuesCount,
+				this.TotalPoisonMessages,
+				this.TotalFaultedMessages);
+		}
+
+
+
 		private int _busyMessageSlots;
 		private int _allMessageSlots;
 		private int _currentListeners;
