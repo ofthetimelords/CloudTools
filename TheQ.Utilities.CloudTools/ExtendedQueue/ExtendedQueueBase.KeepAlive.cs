@@ -84,7 +84,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 					// Attempt to update the expiration of a message.
 					if (syncToken != null)
-						//using (await this._lock.LockAsync(cancelToken))
+						using (await this._lock.LockAsync(cancelToken))
 							await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
 					else await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
 
@@ -129,7 +129,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 					// Attempt to update the expiration of a message.
 					if (syncToken != null)
-						//using (await this._lock.LockAsync(generalCancelToken))
+						using (await this._lock.LockAsync(generalCancelToken))
 							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
 					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
 

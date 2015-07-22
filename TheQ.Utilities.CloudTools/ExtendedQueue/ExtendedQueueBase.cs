@@ -21,6 +21,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	/// </summary>
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
+		protected ExtendedQueueBase()
+		{
+			this.Statistics = new StatisticsContainer();
+		}
+
 		/// <summary>
 		/// Used internally to mark the severity of a logged event.
 		/// </summary>
@@ -81,6 +86,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			get { return this.OriginalQueue.Name; }
 		}
 
+
+		/// <summary>
+		/// Gets the statistics of this queue, for all its lifetime.
+		/// </summary>
+		/// <value>
+		/// An object containing certain queue statistics (current and aggregate).
+		/// </value>
+		public StatisticsContainer Statistics { get; protected internal set; }
 
 
 		/// <summary>

@@ -46,6 +46,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
+
+			this.Statistics.IncreaseListeners();
+			this.Statistics.IncreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+			
 			// Used to allow to pass it as a reference
 			long[] activeMessageSlots = { 0 };
 
@@ -56,11 +60,20 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				try
 				{
-					if (messageOptions.CancelToken.IsCancellationRequested) return;
+					if (messageOptions.CancelToken.IsCancellationRequested)
+					{
+						this.Statistics.DecreaseListeners();
+						this.Statistics.DecreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+						return;
+					}
 
 
 					this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
-					var freeMessageSlots = messageOptions.MaximumCurrentMessages - (int)Interlocked.Read(ref activeMessageSlots[0]);
+					var busySlots = (int) Interlocked.Read(ref activeMessageSlots[0]);
+					var freeMessageSlots = messageOptions.MaximumCurrentMessages - busySlots;
+
+					this.Statistics.IncreaseBusyMessageSlots(busySlots);
+
 
 					if (await this.DelayOnNoParallelMessages(freeMessageSlots, messageOptions.MaximumCurrentMessages, internalZeroThreadsWait).ConfigureAwait(false)) continue;
 
@@ -86,7 +99,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				catch (TaskCanceledException)
 				{
 					if (messageOptions.CancelToken.IsCancellationRequested)
+					{
+						this.Statistics.DecreaseListeners();
+						this.Statistics.DecreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+						this.Statistics.DecreaseBusyMessageSlots((int)activeMessageSlots[0]);
 						return;
+					}
 				}
 				catch (Exception ex)
 				{
@@ -155,6 +173,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				this.This(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
 			}
+
+			this.Statistics.DecreaseBusyMessageSlots();
 		}
 
 

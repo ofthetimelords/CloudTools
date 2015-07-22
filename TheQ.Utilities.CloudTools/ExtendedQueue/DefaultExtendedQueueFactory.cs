@@ -33,6 +33,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		private ILogService LogService { get; set; }
 
+		public IList<Func<ExtendedQueueBase, DecoratorBase>> Decorators { get; private set; }
+
 
 
 		/// <summary>
@@ -62,6 +64,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			this.MaximumMessagesProvider = maximumMessagePerRequestProvider;
 			this.OverflownMessageHandler = overflownMessageHandler;
 			this.LogService = logService;
+
+			this.Decorators = new List<Func<ExtendedQueueBase, DecoratorBase>>
+			{
+				q => new CompressionDecorator(q),
+				q => new JsonSerialiserDecorator(q),
+				q => new OverflowHandlingDecorator(q, this.OverflownMessageHandler),
+				q => new LoggingDecorator(q, this.LogService)
+			};
 		}
 
 
@@ -78,18 +88,18 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			var baseQueue = new ExtendedQueue(original, this.MessageProvider, this.MaximumMessageSizeProvider, this.MaximumMessagesProvider);
 
-			var compressibleQueue = new CompressionDecorator(baseQueue);
-			var jsonQueue = new JsonSerialiserDecorator(compressibleQueue);
-			var overflowQueue = new OverflowHandlingDecorator(jsonQueue, this.OverflownMessageHandler);
-			var loggedQueue = new LoggingDecorator(overflowQueue, this.LogService);
+			ExtendedQueueBase decoratedQueue = baseQueue;
+			foreach (var action in this.Decorators)
+				decoratedQueue = action(decoratedQueue);
 
-			loggedQueue.LogAction(ExtendedQueueBase.LogSeverity.Info,
+
+			decoratedQueue.LogAction(ExtendedQueueBase.LogSeverity.Info,
 				"Created a new IExtendedQueue instance using the DefaultExtendedQueueFactory instance",
 				"Queue name: {0}, Actual type of the factory: {1}",
 				original.Name,
 				this.GetType().FullName);
-			;
-			return loggedQueue;
+
+			return decoratedQueue;
 		}
 	}
 }

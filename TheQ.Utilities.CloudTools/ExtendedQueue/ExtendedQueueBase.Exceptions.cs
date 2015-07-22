@@ -18,6 +18,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (Guard.IsAnyNull(messageOptions, exception))
 				return;
 
+			this.Statistics.IncreaseCriticallyFaultedMessages();
+			this.Statistics.IncreaseReenqueuesCount();
+
 			try
 			{
 				if (messageOptions.ExceptionHandler != null)
@@ -25,6 +28,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					messageOptions.ExceptionHandler(exception);
 					this.LogException(LogSeverity.Info, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' and was handled", this.Name);
 				}
+				else
 				{
 					this.LogException(LogSeverity.Warning, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
 				}
@@ -41,6 +45,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			if (Guard.IsAnyNull(messageOptions, exception))
 				return;
+
+			this.Statistics.IncreaseCriticallyFaultedMessages();
+			this.Statistics.IncreaseReenqueuesCount();
 
 			try
 			{

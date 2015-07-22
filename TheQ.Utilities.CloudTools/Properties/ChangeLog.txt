@@ -8,6 +8,9 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+6.1.0 | 2015/07/22
++ Added some queue statistics for reference
+
 6.0.0 | 2015/07/06
 ! Bug on parallel processing; was actually performed serially (...)
 / Replaced the logging mechanism with something more flexible.

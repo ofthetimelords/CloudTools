@@ -84,6 +84,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				mre.WaitOne();
 				sw.Stop();
 				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Trace.WriteLine(equeue.Statistics);
 				Assert.AreEqual(expected, result);
 			}
 		}
@@ -211,6 +212,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				mre.WaitOne();
 				sw.Stop();
 				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Trace.WriteLine(equeue.Statistics);
 				Assert.IsTrue(expected.All(c => result.Contains(c)));
 			}
 		}
