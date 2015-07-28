@@ -72,8 +72,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			Guard.NotNull(message, "message");
 			Guard.NotNull(syncToken, "syncToken");
 
-			if (messageSpecificCancellationTokenSource != null)
-				messageSpecificCancellationTokenSource.Cancel();
 
 			using (await this._lock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
 			{
@@ -92,6 +90,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							throw;
 					}
 				}
+
+				if (messageSpecificCancellationTokenSource != null)
+					messageSpecificCancellationTokenSource.Cancel();
 			}
 		}
 

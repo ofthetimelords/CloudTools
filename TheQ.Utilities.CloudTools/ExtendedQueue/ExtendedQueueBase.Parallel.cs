@@ -94,7 +94,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					this.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
 
 					foreach (var message in messages)
-						Task.Run(() => this.This(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.This(invoker)));
+						this.This(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.This(invoker));
 				}
 				catch (TaskCanceledException)
 				{
