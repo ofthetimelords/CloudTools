@@ -88,6 +88,7 @@
     <Compile Include="GlobalMutexFramework\IGlobalMutexFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\AsyncLock.cs" />
+    <Compile Include="Infrastructure\StatisticsContainer.cs" />
     <Compile Include="Infrastructure\NullLogService.cs" />
     <Compile Include="Infrastructure\ILogService.cs" />
     <Compile Include="Internal\CodeAnnotations.cs" />

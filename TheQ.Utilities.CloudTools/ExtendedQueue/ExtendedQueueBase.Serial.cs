@@ -38,10 +38,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
+			this.Statistics.IncreaseListeners();
+			this.Statistics.IncreaseAllMessageSlots();
+
 			while (true)
 			{
 				if (messageOptions.CancelToken.IsCancellationRequested)
+				{
+					this.Statistics.DecreaseListeners();
+					this.Statistics.DecreaseAllMessageSlots();
 					return;
+				}
 
 				// When set to true, the queue won't wait before it requests another message
 				var receivedMessage = false;
@@ -59,6 +66,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					message = await this.This(invoker).GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					if (message != null)
 					{
+						this.Statistics.IncreaseBusyMessageSlots();
 						this.LogAction(LogSeverity.Debug, "One message found in the queue and will be processed", "Queue: {0}, Message ID: {1}", this.Name, message.Id);
 						receivedMessage = true;
 
@@ -73,7 +81,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				catch (TaskCanceledException)
 				{
 					if (this.This(invoker).HandleTaskCancelled(messageOptions))
+					{
+						this.Statistics.DecreaseListeners();
+						this.Statistics.DecreaseAllMessageSlots();
+						this.Statistics.DecreaseBusyMessageSlots();
 						return;
+					}
 				}
 				catch (CloudToolsStorageException ex)
 				{
@@ -87,6 +100,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				{
 					this.This(invoker).SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
 				}
+
+				this.Statistics.DecreaseBusyMessageSlots();
 
 				// Delay the next polling attempt for a new message, since no messages were received last time.
 				if (!receivedMessage)
@@ -142,8 +157,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			// Cancel any outstanding jobs due to the faulted operation (the keepalive task should have been cancelled)
 			if (keepAliveTask != null && !keepAliveTask.IsCompleted)
-				if (message != null) this.LogAction(LogSeverity.Warning, "Message was not processed successfully", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs", this.Name, message.Id);
-				messageSpecificCancellationTokenSource.Cancel();
+				if (message != null)
+				{
+					this.LogAction(LogSeverity.Warning, "Message was not processed successfully", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs", this.Name, message.Id);
+					messageSpecificCancellationTokenSource.Cancel();
+				}
 		}
 	}
 }

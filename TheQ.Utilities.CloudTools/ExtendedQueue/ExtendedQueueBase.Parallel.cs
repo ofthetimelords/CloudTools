@@ -46,6 +46,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
+
+			this.Statistics.IncreaseListeners();
+			this.Statistics.IncreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+			
 			// Used to allow to pass it as a reference
 			long[] activeMessageSlots = { 0 };
 
@@ -56,11 +60,20 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				try
 				{
-					if (messageOptions.CancelToken.IsCancellationRequested) return;
+					if (messageOptions.CancelToken.IsCancellationRequested)
+					{
+						this.Statistics.DecreaseListeners();
+						this.Statistics.DecreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+						return;
+					}
 
 
 					this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
-					var freeMessageSlots = messageOptions.MaximumCurrentMessages - (int)Interlocked.Read(ref activeMessageSlots[0]);
+					var busySlots = (int) Interlocked.Read(ref activeMessageSlots[0]);
+					var freeMessageSlots = messageOptions.MaximumCurrentMessages - busySlots;
+
+					this.Statistics.IncreaseBusyMessageSlots(busySlots);
+
 
 					if (await this.DelayOnNoParallelMessages(freeMessageSlots, messageOptions.MaximumCurrentMessages, internalZeroThreadsWait).ConfigureAwait(false)) continue;
 
@@ -81,12 +94,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					this.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
 
 					foreach (var message in messages)
-						Task.Run(() => this.This(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.This(invoker)));
+						this.This(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.This(invoker));
 				}
 				catch (TaskCanceledException)
 				{
 					if (messageOptions.CancelToken.IsCancellationRequested)
+					{
+						this.Statistics.DecreaseListeners();
+						this.Statistics.DecreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+						this.Statistics.DecreaseBusyMessageSlots((int)activeMessageSlots[0]);
 						return;
+					}
 				}
 				catch (Exception ex)
 				{
@@ -99,7 +117,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 		protected internal async Task<bool> DelayOnNoParallelMessages(int freeMessageSlots, int totalMessageSlots, TimeSpan internalZeroThreadsWait)
 		{
-			if (freeMessageSlots == 0)
+			if (freeMessageSlots <= 0)
 			{
 				this.LogAction(LogSeverity.Debug,
 					"No free threads for incoming messages are available",
@@ -155,6 +173,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				this.This(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
 			}
+
+			this.Statistics.DecreaseBusyMessageSlots();
 		}
 
 

@@ -84,6 +84,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				mre.WaitOne();
 				sw.Stop();
 				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Trace.WriteLine(equeue.Statistics);
 				Assert.AreEqual(expected, result);
 			}
 		}
@@ -121,6 +122,8 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					new CancellationToken(),
 					async message =>
 					{
+						Trace.WriteLine(equeue.Statistics);
+
 						using (await lck.LockAsync())
 						{
 							var character = await message.GetMessageContentsAsync<string>();
@@ -187,6 +190,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 						{
 							foreach (var message in messages)
 							{
+								Trace.WriteLine(equeue.Statistics);
 								var character = message.GetMessageContents<string>();
 								result += character;
 
@@ -211,6 +215,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				mre.WaitOne();
 				sw.Stop();
 				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Trace.WriteLine(equeue.Statistics);
 				Assert.IsTrue(expected.All(c => result.Contains(c)));
 			}
 		}

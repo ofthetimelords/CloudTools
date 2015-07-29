@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TheQ.Utilities.CloudTools.Storage.Infrastructure;
 using TheQ.Utilities.CloudTools.Storage.Internal;
 using TheQ.Utilities.CloudTools.Storage.Models;
 using TheQ.Utilities.CloudTools.Storage.Models.ObjectModel;
@@ -37,6 +38,25 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 	/// </summary>
 	public interface IExtendedQueue : IQueue
 	{
+		/// <summary>
+		/// Gets the statistics of this queue, for all its lifetime.
+		/// </summary>
+		/// <value>
+		/// An object containing certain queue statistics (current and aggregate).
+		/// </value>
+		StatisticsContainer Statistics { get; }
+
+
+		/// <summary>
+		/// Gets the name of the queue
+		/// </summary>
+		/// <value>
+		/// The name of the underlying queue.
+		/// </value>
+		string Name { get; }
+
+
+
 		/// <summary>
 		///     Adds an object (message entity) to the list asynchronously.
 		/// </summary>

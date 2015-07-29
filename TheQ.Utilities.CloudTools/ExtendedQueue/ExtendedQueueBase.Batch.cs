@@ -41,9 +41,18 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
+			this.Statistics.IncreaseListeners();
+			this.Statistics.IncreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+
+
 			while (true)
 			{
-				if (messageOptions.CancelToken.IsCancellationRequested) return;
+				if (messageOptions.CancelToken.IsCancellationRequested)
+				{
+					this.Statistics.DecreaseListeners();
+					this.Statistics.DecreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+					return;
+				}
 
 				// When set to true, the queue won't wait before it requests another message
 				var shouldDelayNextRequest = false;
@@ -91,6 +100,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.This(invoker), m)));
 							//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
+							this.Statistics.IncreaseBusyMessageSlots(convertedMessages.Count);
 							keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
 
 							break;
@@ -99,6 +109,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					catch (TaskCanceledException)
 					{
 						if (messageOptions.CancelToken.IsCancellationRequested)
+						{
+							this.Statistics.DecreaseListeners();
+							this.Statistics.DecreaseAllMessageSlots(messageOptions.MaximumCurrentMessages);
+							this.Statistics.DecreaseBusyMessageSlots(convertedMessages.Count);
+							return;
+						}
+						else if (batchCancellationToken.IsCancellationRequested)
 							break;
 					}
 					catch (CloudToolsStorageException ex)
@@ -114,12 +131,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 						this.This(invoker).BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
 					}
 
+
 					// Delay the next polling attempt for a new message, since no messages were received last time.
 					if (shouldDelayNextRequest) await Task.Delay(messageOptions.PollFrequency, messageOptions.CancelToken).ConfigureAwait(false);
 				}
 
-				if (messageOptions.CancelToken.IsCancellationRequested)
-					return;
+				this.Statistics.DecreaseBusyMessageSlots(convertedMessages.Count);
 			}
 		}
 

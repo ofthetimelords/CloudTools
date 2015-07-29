@@ -15,7 +15,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 {
 	public abstract partial class ExtendedQueueBase
 	{
-		//private readonly AsyncLock _lock = new AsyncLock();
+		private readonly AsyncLock _lock = new AsyncLock();
 
 		/// <summary>
 		///     Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
@@ -46,6 +46,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (messageOptions.PoisonHandler != null && !(await messageOptions.PoisonHandler(message).ConfigureAwait(false)))
 				return false;
 
+			this.Statistics.IncreasePoisonMessages();
+
 			await this.This(invoker).SyncDeleteMessage(syncToken, message, messageSpecificCancellationTokenSource, this.This(invoker)).ConfigureAwait(false);
 
 			return true;
@@ -70,10 +72,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			Guard.NotNull(message, "message");
 			Guard.NotNull(syncToken, "syncToken");
 
-			if (messageSpecificCancellationTokenSource != null)
-				messageSpecificCancellationTokenSource.Cancel();
 
-			//using (await this._lock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
+			using (await this._lock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
 			{
 				// Cancel all other waiting operations before deleting.
 				this.This(invoker).DeleteMessage(message.ActualMessage);
@@ -90,6 +90,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							throw;
 					}
 				}
+
+				if (messageSpecificCancellationTokenSource != null)
+					messageSpecificCancellationTokenSource.Cancel();
 			}
 		}
 
@@ -133,7 +136,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				// Execute the provided action and if successful, delete the message.
 				if (await messageOptions.MessageHandler(message).ConfigureAwait(false))
+				{
+					this.Statistics.IncreaseSuccessfulMessages();
 					await this.This(invoker).SyncDeleteMessage(syncToken, message, comboCancelToken, invoker).ConfigureAwait(false);
+				} else
+					this.Statistics.IncreaseReenqueuesCount();
 			}
 
 			return keepAliveTask;
@@ -171,6 +178,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			foreach (var message in handledMessages)
 				await this.This(invoker).SyncDeleteMessage(syncToken, message, null, invoker).ConfigureAwait(false);
+
+
+			this.Statistics.IncreasePoisonMessages(poisonMessages.Count);
 
 			return messages.Except(handledMessages).ToList();
 		}
@@ -218,12 +228,16 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			var keepAliveTask = this.This(invoker).KeepMessageAlive(messages, messageOptions.MessageLeaseTime, generalCancellationToken, syncToken, invoker);
 
 			var handledMessages = await messageOptions.MessageHandler(messages).ConfigureAwait(false);
-
+			this.Statistics.IncreaseSuccessfulMessages(handledMessages.Count);
 			batchCancellationToken.Cancel();
 
 			// Execute the provided action and if successful, delete the message.
 			foreach (var message in handledMessages)
 				await this.This(invoker).SyncDeleteMessage(syncToken, message, null, invoker).ConfigureAwait(false);
+
+			var nonHandledMessages = messages.Except(handledMessages).Count();
+			this.Statistics.IncreaseReenqueuesCount(nonHandledMessages);
+
 
 			return keepAliveTask;
 		}
