@@ -56,6 +56,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 		string Name { get; }
 
 
+		/// <summary>
+		/// Gets the underlying <see cref="IQueue"/> implementation.
+		/// </summary>
+		IQueue OriginalQueue { get; }
+
+
 
 		/// <summary>
 		///     Adds an object (message entity) to the list asynchronously.

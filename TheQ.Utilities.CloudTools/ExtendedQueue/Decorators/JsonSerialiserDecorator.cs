@@ -38,7 +38,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		}
 
 
-
 		protected internal override T DeserializeToObject<T>(string serializedContents)
 		{
 			this.LogAction(LogSeverity.Debug, "Calling JsonSerialiserDecorator.DeserializeToObject");

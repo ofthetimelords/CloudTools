@@ -86,10 +86,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		}
 
 
-		protected internal override IQueue OriginalQueue
+		public override IQueue OriginalQueue
 		{
 			get { return this.DecoratedQueue.OriginalQueue; }
-			set { this.DecoratedQueue.OriginalQueue = value; }
+			protected internal set { this.DecoratedQueue.OriginalQueue = value; }
 		}
 
 

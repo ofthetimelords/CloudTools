@@ -8,6 +8,9 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+6.2.1 | 2015/08/05
++ Added the ability to get the original queue in IExtendedQueue implementations
+
 6.1.1 | 2015/07/29
 ! Fixed an issue with unremoved messages on parallel processing
 

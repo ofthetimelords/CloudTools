@@ -62,7 +62,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <value>
 		/// An <see cref="IQueue"/> instance.
 		/// </value>
-		protected internal virtual IQueue OriginalQueue { get; set; }
+		public virtual IQueue OriginalQueue { get; protected internal set; }
 
 
 		/// <summary>
@@ -84,6 +84,18 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		public virtual string Name
 		{
 			get { return this.OriginalQueue.Name; }
+		}
+
+
+		/// <summary>
+		/// Gets the original <see cref="IQueue"/> that this implementation extends.
+		/// </summary>
+		/// <value>
+		/// The underlying <see cref="IQueue"/> object.
+		/// </value>
+		public IQueue Original
+		{
+			get { return this.OriginalQueue; }
 		}
 
 
