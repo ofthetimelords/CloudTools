@@ -11,11 +11,14 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 6.2.1 | 2015/08/05
 + Added the ability to get the original queue in IExtendedQueue implementations
 
+
 6.1.1 | 2015/07/29
 ! Fixed an issue with unremoved messages on parallel processing
 
+
 6.1.0 | 2015/07/22
 + Added some queue statistics for reference
+
 
 6.0.0 | 2015/07/06
 ! Bug on parallel processing; was actually performed serially (...)
@@ -33,14 +36,18 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 4.0.2 | 2015/05/20
 ! Removed unnecessary awaits
 
+
 4.0.2 | 2015/05/20
 ! Removed unnecessary awaits
+
 
 4.0.1 | 2015/04/29
 ! Batch queues would throw if it couldn't retrieve any more mesasges.
 
+
 4.0.0 | 2015/03/26
 ! Infinite lease time bug for the Azure implementation was inadvertently introduced. Again.
+
 
 3.0.0 | 2015/03/23
 / Converted the library to open source
@@ -51,9 +58,11 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 2.5.0.0 | 2015/01/24
 / Changed the implementation of Global Lock (again) in order to make it completely storage engine agnostic.
 
+
 2.1.0.0 | 2015/01/22
 / Package updates (JSON.net, Azure Storage).
 - Removed Factory helpers for Azure in order to enforce better programming practices and unit testability.
+
 
 2.0.0.0 | 2014/11/11
 / Refactored the implementation to use a (stripped down) abstraction of Azure concepts, in order to make portability easier for future platforms.
