@@ -8,6 +8,9 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+6.2.2 | 2015/08/13
+! Synchronisation bug while locking (duh)
+
 6.2.1 | 2015/08/05
 + Added the ability to get the original queue in IExtendedQueue implementations
 

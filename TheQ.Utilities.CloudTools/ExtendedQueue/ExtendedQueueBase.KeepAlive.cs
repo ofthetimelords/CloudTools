@@ -69,7 +69,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			[NotNull] IQueueMessage message,
 			TimeSpan messageLeaseTime,
 			CancellationToken cancelToken,
-			[CanBeNull] object syncToken,
+			[CanBeNull] AsyncLock asyncLock,
 			ExtendedQueueBase invoker)
 		{
 			Guard.NotNull(message, "message");
@@ -83,8 +83,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					this.LogAction(LogSeverity.Debug, "Started renewing a queue message", "Queue's '{0}' message '{1}' started renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
-					if (syncToken != null)
-						using (await this._lock.LockAsync(cancelToken))
+					if (asyncLock != null)
+						using (await asyncLock.LockAsync(cancelToken))
 							await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
 					else await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
 
@@ -114,7 +114,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			[NotNull] IList<QueueMessageWrapper> messages,
 			TimeSpan messageLeaseTime,
 			CancellationToken generalCancelToken,
-			[CanBeNull] object syncToken,
+			[CanBeNull] AsyncLock asyncLock,
 			ExtendedQueueBase invoker)
 		{
 			while (true)
@@ -128,8 +128,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' for {1} batch messages started renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
-					if (syncToken != null)
-						using (await this._lock.LockAsync(generalCancelToken))
+					if (asyncLock != null)
+						using (await asyncLock.LockAsync(generalCancelToken))
 							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
 					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
 
