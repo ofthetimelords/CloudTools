@@ -99,7 +99,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal bool SetWasOverflown(bool wasOverflown)
+		internal bool SetWasOverflown(bool wasOverflown)
 		{
 			return this._wasOverflown = wasOverflown;
 		}
@@ -133,7 +133,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal string SetOverflowId(string overflowId)
+		internal string SetOverflowId(string overflowId)
 		{
 			return this._overflowId = overflowId;
 		}

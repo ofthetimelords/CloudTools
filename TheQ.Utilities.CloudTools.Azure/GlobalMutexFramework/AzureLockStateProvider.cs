@@ -49,7 +49,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		/// <value>
 		/// An <see cref="ILogService"/> implementation.
 		/// </value>
-		private ILogService LogService { get; set; }
+	private ILogService LogService { get; set; }
 
 
 		/// <summary>

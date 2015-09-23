@@ -28,7 +28,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <typeparam name="T">The type of the object to attempt to deserialise to.</typeparam>
 		/// <param name="message">The original message.</param>
 		/// <param name="token">An optional cancellation token.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>The contents of the message as an instance of type <typeparamref name="T" />.</returns>
 		public virtual async Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token)
 		{
@@ -51,7 +50,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// Converts a raw message content to a string representing a serialised entity.
 		/// </summary>
 		/// <param name="messageBytes">The message as a byte array.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>The original serialised entity as a <see cref="string"/>.</returns>
 		protected internal virtual async Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
 		{
@@ -67,21 +65,55 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
+		/// <summary>
+		/// Processes the object during encoding on the byte level.
+		/// </summary>
+		/// <param name="originalConverter">The original stream.</param>
+		/// <returns>The new stream.</returns>
 		protected internal abstract Task<Stream> GetByteDecoder(Stream originalConverter);
 
 
+		/// <summary>
+		/// If supported, gets the ID used as a pointer to the overflown message contents.
+		/// </summary>
+		/// <param name="message">The message for which to retrieve the ID.</param>
+		/// <returns>The Overflow ID of the message as a <see cref="string"/>.</returns>
 		protected internal abstract Task<string> GetOverflownMessageId(IQueueMessage message);
 
 
+		/// <summary>
+		/// If supported, gets the contents of an overflown message.
+		/// </summary>
+		/// <param name="message">The message of which to get the contents.</param>
+		/// <param name="id">The Overflow ID.</param>
+		/// <param name="token">A cancellation token.</param>
+		/// <returns>The contents of the message as a byte array.</returns>
 		protected internal abstract Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token);
 
 
+		/// <summary>
+		/// Gets the contents of an overflown message.
+		/// </summary>
+		/// <param name="message">The message of which to get the contents.</param>
+		/// <param name="token">A cancellation token.</param>
+		/// <returns>The contents of the message as a byte array.</returns>
 		protected internal abstract Task<byte[]> GetNonOverflownMessageContentsAsync(IQueueMessage message, CancellationToken token);
 
 
+		/// <summary>
+		/// Attempts to deserialise a message to an object.
+		/// </summary>
+		/// <typeparam name="T">The type of the object to attempt to deserialise to.</typeparam>
+		/// <param name="serializedContents">The serialized contents of the message.</param>
+		/// <returns>An object of type <typeparamref name="T"/>.</returns>
 		protected internal abstract T DeserializeToObject<T>(string serializedContents);
 
 
+		/// <summary>
+		/// Cleans up the message contents that were stored outside of the message due to the contents being overflown.
+		/// </summary>
+		/// <param name="message">The message's contents.</param>
+		/// <param name="token">An optional cancellation token.</param>
 		protected internal abstract Task RemoveOverflownContentsAsync(QueueMessageWrapper message, CancellationToken token);
 	}
 }

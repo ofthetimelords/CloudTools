@@ -20,9 +20,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="message">The message to operate on.</param>
 		/// <param name="messageOptions">Initialisation options for this method.</param>
-		/// <param name="syncToken">A synchronisation token.</param>
+		/// <param name="asyncLock">An object that's responsible for synchronising access to shared resources in an asynchronous manner.</param>
 		/// <param name="messageSpecificCancellationTokenSource">The message-specific cancellation token.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>
 		///     True if the <paramref name="message" /> was deleted; <see langword="false" /> if it should be requeued and <see langword="checked" /> again.
 		/// </returns>
@@ -56,10 +55,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>Deletes an <see cref="IQueueMessage" /></para>
 		///     <para>under a synchronisation token and cancels related jobs (i.e. keep-alive operations).</para>
 		/// </summary>
-		/// <param name="syncToken">The synchronization token.</param>
+		/// <param name="asyncLock">An object that's responsible for synchronising access to shared resources in an asynchronous manner.</param>
 		/// <param name="message">The message to delete.</param>
 		/// <param name="messageSpecificCancellationTokenSource">The message-specific cancellation token.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		private async Task SyncDeleteMessage(
 			[NotNull] AsyncLock asyncLock,
 			[NotNull] QueueMessageWrapper message,
@@ -100,8 +98,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="message">The message to be processed.</param>
 		/// <param name="messageOptions">Initialisation options for the method that handles the messages.</param>
 		/// <param name="messageSpecificCancellationTokenSource">A cancellation token source that's specific to this message.</param>
-		/// <param name="keepAliveTask">A task that is responsible for keeping a <paramref name="message" /> alive while being processed.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
+		/// <param name="asyncLock">An object that's responsible for synchronising access to shared resources in an asynchronous manner.</param>
 		private async Task<Task> ProcessMessageInternal(
 			[NotNull] QueueMessageWrapper message,
 			[NotNull] HandleMessagesSerialOptions messageOptions,
@@ -149,8 +146,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="messages">The list of messages to operate on.</param>
 		/// <param name="messageOptions">Initialisation options for this method.</param>
-		/// <param name="syncToken">A synchronisation token.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
+		/// <param name="asyncLock">An object that's responsible for synchronising access to shared resources in an asynchronous manner.</param>
 		/// <returns>
 		///     Returns a list of <paramref name="messages" /> that were not poison <paramref name="messages" /> and should be further processed.
 		/// </returns>
@@ -186,10 +182,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     Processes <paramref name="messages" /> in batch.
 		/// </summary>
 		/// <param name="messages">The messages to be processed.</param>
-		/// <param name="keepAliveTask">A task that is responsible for keeping a message alive while being processed.</param>
+		/// <param name="asyncLock">An object that's responsible for synchronising access to shared resources in an asynchronous manner.</param>
 		/// <param name="batchCancellationToken">A cancellation token that's responsible for all tasks used in keep-alive.</param>
 		/// <param name="messageOptions">Initialisation options for the method that handles the messages.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		private async Task<Task> ProcessMessageInternalBatch(
 			[NotNull] IList<QueueMessageWrapper> messages,
 			[NotNull] CancellationTokenSource batchCancellationToken,

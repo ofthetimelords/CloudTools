@@ -342,7 +342,6 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 		/// <returns>
 		///     The current instance (to allow fluent usage).
 		/// </returns>
-		/// <exception cref="ArgumentNullException">The <paramref name="function" /> parameter was null.</exception>
 		public IGlobalMutex TryLock(string lockName, TimeSpan? leaseTime, out bool success)
 		{
 			success = Task.Run(() => this.TryLockInternal(lockName, leaseTime, false), this.CancelToken).Result;

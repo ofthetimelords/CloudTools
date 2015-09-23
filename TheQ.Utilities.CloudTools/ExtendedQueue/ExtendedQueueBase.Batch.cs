@@ -19,7 +19,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public abstract partial class ExtendedQueueBase
 	{
 		/// <summary>
-		///     Handles messages from the <paramref name="queue" /> in a serial manner, in an endless loop.
+		///     Handles messages from the queue in a serial manner, in an endless loop.
 		/// </summary>
 		/// <param name="queue">The queue to check for messages.</param>
 		/// <param name="messageOptions">Initialisation options for this method.</param>

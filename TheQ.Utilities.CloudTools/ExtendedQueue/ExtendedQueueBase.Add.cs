@@ -21,7 +21,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// Adds an object (message entity) to the list.
 		/// </summary>
 		/// <param name="entity">The entity to add.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		public virtual void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity, CancellationToken.None).Wait(); }
 
 
@@ -37,7 +36,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </summary>
 		/// <param name="entity">The entity to add.</param>
 		/// <param name="token">A cancellation token.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns></returns>
 		public virtual async Task AddMessageEntityAsync(object entity, CancellationToken token)
 		{
@@ -67,7 +65,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// Converts the contents of a serialised message to a byte array.
 		/// </summary>
 		/// <param name="serializedContents">The serialized message contents source.</param>
-		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>A byte array representation of the serialised message contents.</returns>
 		protected internal virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{

@@ -48,15 +48,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel
 
 
 		/// <summary>
-		/// Gets the name of the queue
-		/// </summary>
-		/// <value>
-		/// The name of the underlying queue.
-		/// </value>
-		string Name { get; }
-
-
-		/// <summary>
 		/// Gets the underlying <see cref="IQueue"/> implementation.
 		/// </summary>
 		IQueue OriginalQueue { get; }

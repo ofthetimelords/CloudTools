@@ -31,6 +31,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
+		/// <summary>
+		/// Serializes a message entity to string.
+		/// </summary>
+		/// <param name="messageEntity">The message entity to serialise.</param>
+		/// <returns>A string representation of the entity.</returns>
 		protected internal override Task<string> SerializeMessageEntity(object messageEntity)
 		{
 			this.LogAction(LogSeverity.Debug, "Calling JsonSerialiserDecorator.SerializeMessageEntity");

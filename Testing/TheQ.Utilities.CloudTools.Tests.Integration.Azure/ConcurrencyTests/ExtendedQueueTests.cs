@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -57,16 +58,16 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						if (message.GetMessageContents<string>() == "END")
 						{
 							mre.Set();
-							return true;
+							return Task.FromResult(true);
 						}
 
 						result += message.GetMessageContents<string>();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					ex => { throw ex; });
@@ -126,7 +127,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 
 						using (await lck.LockAsync())
 						{
-							var character = await message.GetMessageContentsAsync<string>();
+							var character = await message.GetMessageContentsAsync<string>().ConfigureAwait(false);
 							result += character;
 						}
 
@@ -245,11 +246,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						result = message.GetMessageContents<string>();
 						mre.Set();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					ex => { throw ex; });
@@ -294,11 +295,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					ex => { throw ex; });
@@ -356,11 +357,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					1,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					ex =>
@@ -419,11 +420,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					1,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					ex =>
@@ -482,10 +483,10 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					ex =>
@@ -544,11 +545,11 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					TimeSpan.FromSeconds(30),
 					5,
 					new CancellationToken(),
-					async message =>
+					message =>
 					{
 						result = message.GetMessageContents<ComplexModel>();
 						mre.Set();
-						return true;
+						return Task.FromResult(true);
 					},
 					null,
 					null);
@@ -737,7 +738,6 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			var result = string.Empty;
 			var expected = string.Empty;
 			var sw = new Stopwatch();
-			long actuallyRun = 0;
 			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
 			var equeue = factory.Create(new AzureQueue(queue));
 			var lck = new AsyncLock();

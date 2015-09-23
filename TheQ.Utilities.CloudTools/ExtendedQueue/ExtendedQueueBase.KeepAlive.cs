@@ -28,7 +28,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public abstract partial class ExtendedQueueBase
 	{
 		/// <summary>
-		///     Keeps the <paramref name="queue" /> <paramref name="message" /> enqueued by updating its invisible status and avoids accidental dequeuing, without a synchronisation token or a logging service.
+		///     Keeps the queue <paramref name="message" /> enqueued by updating its invisible status and avoids accidental dequeuing, without a synchronisation token or a logging service.
 		/// </summary>
 		/// <param name="message">The message to ensure stays enqueued.</param>
 		/// <param name="queue">The queue the <paramref name="message" /> belongs to.</param>
@@ -48,7 +48,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 		/// <summary>
-		///     Keeps the <paramref name="queue" /> <paramref name="message" /> enqueued by updating its invisible status and avoids accidental dequeuing.
+		///     Keeps the queue <paramref name="message" /> enqueued by updating its invisible status and avoids accidental dequeuing.
 		/// </summary>
 		/// <param name="message">The message to ensure stays enqueued.</param>
 		/// <param name="messageLeaseTime">The amount of time renewals should occur for (note; actual checks will be performed at 50% of this value to ensure latency handling).</param>

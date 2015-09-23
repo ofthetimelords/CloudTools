@@ -41,7 +41,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Internal
 		///     <para>Ensures that a string parameter is not <see langword="null" /> or a whitespace, otherwise throws an <see cref="ArgumentException" /></para>
 		///     <para>.</para>
 		/// </summary>
-		/// <param name="argument">The parameter to check for <see langword="null" /> & whitespace-only.</param>
+		/// <param name="argument">The parameter to check for is <see langword="null" /> or whitespace-only.</param>
 		/// <param name="name">The name of the parameter (used to display on the xception).</param>
 		/// <exception cref="ArgumentNullException">The parameter was null: + <paramref name="name" /></exception>
 		[DebuggerStepThrough]

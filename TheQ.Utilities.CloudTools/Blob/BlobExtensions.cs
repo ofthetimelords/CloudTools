@@ -26,14 +26,15 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 	public static class BlobExtensions
 	{
 		/// <summary>
-		///     A more refined approach to download a BLOB to a <see langword="byte" /> array.
+		/// A more refined approach to download a BLOB to a <see langword="byte" /> array.
 		/// </summary>
 		/// <param name="container">The BLOB container to operate on.</param>
 		/// <param name="blobName">The name of the BLOB to retrieve.</param>
-		/// <exception cref="System.ArgumentNullException">Parameter <paramref name="container" /> or <paramref name="blobName" /> is null.</exception>
+		/// <param name="token">An optional cancellation token.</param>
 		/// <returns>
-		///     A <see langword="byte" /> array of the retrieved data.
+		/// A <see langword="byte" /> array of the retrieved data.
 		/// </returns>
+		/// <exception cref="System.ArgumentNullException">Parameter <paramref name="container" /> or <paramref name="blobName" /> is null.</exception>
 		[NotNull]
 		public static async Task<byte[]> DownloadByteArrayAsync([NotNull] this IBlobContainer container, [NotNull] string blobName, CancellationToken token)
 		{
@@ -56,6 +57,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Blob
 		/// </summary>
 		/// <param name="blob">The BLOB reference to operate on.</param>
 		/// <exception cref="System.ArgumentNullException">Parameter <paramref name="blob" /> is null.</exception>
+		/// <param name="token">An optional cancellation token.</param>
 		/// <returns>
 		///     A <see langword="byte" /> array of the retrieved data.
 		/// </returns>

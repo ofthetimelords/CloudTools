@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.WindowsAzure.Storage.Queue;
 
 
 namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
@@ -58,7 +59,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Initiates an asynchronous operation to add a <paramref name="message" /> to the queue.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref=".CloudQueueMessage" /></para>
+		///     <para>A <see cref="CloudQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		/// <returns>
@@ -164,7 +165,7 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Deletes a <paramref name="message"/>.
 		/// </summary>
 		/// <param name="message">
-		///     <para>A <see cref=".CloudQueueMessage" /></para>
+		///     <para>A <see cref="CloudQueueMessage" /></para>
 		///     <para>object.</para>
 		/// </param>
 		void DeleteMessage(IQueueMessage message);
