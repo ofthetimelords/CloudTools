@@ -28,31 +28,21 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <typeparam name="T">The type of the object to attempt to deserialise to.</typeparam>
 		/// <param name="message">The original message.</param>
 		/// <param name="token">An optional cancellation token.</param>
-		/// <returns>The contents of the message as an instance of type <typeparamref name="T" />.</returns>
-		public virtual Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token) { return this.DecodeMessageAsync<T>(message, token, this); }
-
-
-		/// <summary>
-		///     This member is intended for internal usage only. Converts an incoming message to an entity.
-		/// </summary>
-		/// <typeparam name="T">The type of the object to attempt to deserialise to.</typeparam>
-		/// <param name="message">The original message.</param>
-		/// <param name="token">An optional cancellation token.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>The contents of the message as an instance of type <typeparamref name="T" />.</returns>
-		internal virtual async Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token, ExtendedQueueBase invoker)
+		public virtual async Task<T> DecodeMessageAsync<T>(QueueMessageWrapper message, CancellationToken token)
 		{
 			var msgBytes = message.ActualMessage.AsBytes;
-			var overflownId = (message.SetOverflowId(await this.This(invoker).GetOverflownMessageId(message.ActualMessage).ConfigureAwait(false)));
+			var overflownId = (message.SetOverflowId(await this.Top.GetOverflownMessageId(message.ActualMessage).ConfigureAwait(false)));
 			var wasOverflown = (message.SetWasOverflown(!string.IsNullOrWhiteSpace(overflownId)));
 
 			msgBytes = await (wasOverflown
-				? this.This(invoker).GetOverflownMessageContentsAsync(message.ActualMessage, overflownId, token)
-				: this.This(invoker).GetNonOverflownMessageContentsAsync(message.ActualMessage, token)).ConfigureAwait(false);
+				? this.Top.GetOverflownMessageContentsAsync(message.ActualMessage, overflownId, token)
+				: this.Top.GetNonOverflownMessageContentsAsync(message.ActualMessage, token)).ConfigureAwait(false);
 
-			var serialized = await this.This(invoker).ByteArrayToSerializedMessageContents(msgBytes, this.This(invoker)).ConfigureAwait(false);
+			var serialized = await this.Top.ByteArrayToSerializedMessageContents(msgBytes).ConfigureAwait(false);
 
-			return typeof(T) == typeof(string) ? (T)(object)serialized : this.DeserializeToObject<T>(serialized);
+			return typeof(T) == typeof(string) ? (T)(object)serialized : this.Top.DeserializeToObject<T>(serialized);
 		}
 
 
@@ -63,13 +53,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageBytes">The message as a byte array.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>The original serialised entity as a <see cref="string"/>.</returns>
-		protected internal virtual async Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes, ExtendedQueueBase invoker)
+		protected internal virtual async Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
 		{
 			using (var converter = new MemoryStream(messageBytes))
 			{
 				converter.Seek(0, SeekOrigin.Begin);
 
-				using (var decoratedConverter = await this.This(invoker).GetByteDecoder(converter).ConfigureAwait(false)) 
+				using (var decoratedConverter = await this.Top.GetByteDecoder(converter).ConfigureAwait(false)) 
 				using (var reader = new StreamReader(decoratedConverter)) 
 					return await reader.ReadToEndAsync().ConfigureAwait(false);
 			}

@@ -18,23 +18,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     Begins a task that receives messages serially and automatically manages their lifetime.
 		/// </summary>
 		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
-		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		public Task HandleMessagesInSerialAsync(HandleMessagesSerialOptions messageOptions)
-		{
-			return this.HandleMessagesInSerialAsync(messageOptions, this);
-		}
-
-
-
-		/// <summary>
-		///     Begins a task that receives messages serially and automatically manages their lifetime.
-		/// </summary>
-		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>
 		///     A cancellable task representing the message processing procedure.
 		/// </returns>
-		internal async Task HandleMessagesInSerialAsync(HandleMessagesSerialOptions messageOptions, ExtendedQueueBase invoker)
+		public async Task HandleMessagesInSerialAsync(HandleMessagesSerialOptions messageOptions)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -63,24 +51,23 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				{
 					this.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
 
-					message = await this.This(invoker).GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
+					message = await this.Top.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					if (message != null)
 					{
 						this.Statistics.IncreaseBusyMessageSlots();
 						this.LogAction(LogSeverity.Debug, "One message found in the queue and will be processed", "Queue: {0}, Message ID: {1}", this.Name, message.Id);
 						receivedMessage = true;
 
-						keepAliveTask = await this.This(invoker).ProcessMessageInternal(
-							new QueueMessageWrapper(this.This(invoker), message),
+						keepAliveTask = await this.Top.ProcessMessageInternal(
+							new QueueMessageWrapper(this.Top, message),
 							messageOptions,
-							messageSpecificCancellationTokenSource,
-							this.This(invoker)).ConfigureAwait(false);
+							messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					}
 					else this.LogAction(LogSeverity.Debug, "No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
 				}
 				catch (TaskCanceledException)
 				{
-					if (this.This(invoker).HandleTaskCancelled(messageOptions))
+					if (this.Top.HandleTaskCancelled(messageOptions))
 					{
 						this.Statistics.DecreaseListeners();
 						this.Statistics.DecreaseAllMessageSlots();
@@ -90,15 +77,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 				catch (CloudToolsStorageException ex)
 				{
-					this.This(invoker).HandleStorageExceptions(messageOptions, ex);
+					this.Top.HandleStorageExceptions(messageOptions, ex);
 				}
 				catch (Exception ex)
 				{
-					this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
+					this.Top.HandleGeneralExceptions(messageOptions, ex);
 				}
 				finally
 				{
-					this.This(invoker).SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
+					this.Top.SerialFinallyHandler(messageOptions, keepAliveTask, message, messageSpecificCancellationTokenSource);
 				}
 
 				this.Statistics.DecreaseBusyMessageSlots();

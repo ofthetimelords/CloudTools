@@ -40,6 +40,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected DecoratorBase(ExtendedQueueBase decoratedQueue)
 		{
 			this.DecoratedQueue = decoratedQueue;
+			this.DecoratedQueue.Top = this;
 		}
 
 
@@ -93,6 +94,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		}
 
 
+		protected internal override ExtendedQueueBase Top
+		{
+			get { return this.DecoratedQueue.Top; }
+			set { this.DecoratedQueue.Top = value; }
+		}
+
+
 
 		/// <summary>
 		///     Initiates an asynchronous operation to add a <paramref name="message" /> to the queue.
@@ -134,44 +142,19 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		/// <summary>
-		///     Adds an object (message entity) to the list.
-		/// </summary>
-		/// <param name="entity">The entity to add.</param>
-		public override void AddMessageEntity(object entity)
+		public override Task AddMessageEntityAsync(object entity, CancellationToken token)
 		{
-			this.DecoratedQueue.AddMessageEntity(entity, this);
-		}
-
-
-
-		internal override Task AddMessageEntityAsync(object entity, CancellationToken token, ExtendedQueueBase invoker)
-		{
-			return this.DecoratedQueue.AddMessageEntityAsync(entity, token, invoker);
-		}
-
-
-
-		internal override void AddMessageEntity(object entity, ExtendedQueueBase invoker)
-		{
-			this.DecoratedQueue.AddMessageEntity(entity, invoker);
+			return this.DecoratedQueue.AddMessageEntityAsync(entity, token);
 		}
 
 
 
 		public override Task AddMessageEntityAsync(object entity)
 		{
-			return this.DecoratedQueue.AddMessageEntityAsync(entity, CancellationToken.None, this);
+			return this.DecoratedQueue.AddMessageEntityAsync(entity, CancellationToken.None);
 		}
 
-
-
-		public override Task AddMessageEntityAsync(object entity, CancellationToken token)
-		{
-			return this.DecoratedQueue.AddMessageEntityAsync(entity, token, this);
-		}
-
-
+		
 
 		/// <summary>
 		///     Initiates an asynchronous operation to get a single message from the queue, and specifies how long the message should be reserved before it becomes visible, and therefore available for deletion.
@@ -285,9 +268,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker)
+		protected internal override Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{
-			return this.DecoratedQueue.MessageContentsToByteArray(serializedContents, invoker);
+			return this.DecoratedQueue.MessageContentsToByteArray(serializedContents);
 		}
 
 
@@ -373,16 +356,16 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 
 
-		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes, ExtendedQueueBase invoker)
+		protected internal override Task<string> ByteArrayToSerializedMessageContents(byte[] messageBytes)
 		{
-			return this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes, invoker);
+			return this.DecoratedQueue.ByteArrayToSerializedMessageContents(messageBytes);
 		}
 
 
 
 		public override Task<T> DecodeMessageAsync<T>(QueueMessageWrapper wrapper, CancellationToken token)
 		{
-			return this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token, this);
+			return this.DecoratedQueue.DecodeMessageAsync<T>(wrapper, token);
 		}
 
 

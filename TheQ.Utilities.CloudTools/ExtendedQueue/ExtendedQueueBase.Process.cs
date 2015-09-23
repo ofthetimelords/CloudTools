@@ -30,8 +30,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			[NotNull] HandleMessagesSerialOptions messageOptions,
 			[NotNull] QueueMessageWrapper message,
 			[NotNull] AsyncLock asyncLock,
-			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource,
-			ExtendedQueueBase invoker)
+			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 			Guard.NotNull(message, "message");
@@ -46,7 +45,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			this.Statistics.IncreasePoisonMessages();
 
-			await this.This(invoker).SyncDeleteMessage(asyncLock, message, messageSpecificCancellationTokenSource, this.This(invoker)).ConfigureAwait(false);
+			await this.Top.SyncDeleteMessage(asyncLock, message, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 
 			return true;
 		}
@@ -64,23 +63,22 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		private async Task SyncDeleteMessage(
 			[NotNull] AsyncLock asyncLock,
 			[NotNull] QueueMessageWrapper message,
-			[CanBeNull] CancellationTokenSource messageSpecificCancellationTokenSource,
-			ExtendedQueueBase invoker)
+			[CanBeNull] CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			Guard.NotNull(message, "message");
 			Guard.NotNull(asyncLock, "asyncLock");
 
 
-			using (await asyncLock.LockAsync(messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
+			using (await asyncLock.LockAsync())//messageSpecificCancellationTokenSource != null ? messageSpecificCancellationTokenSource.Token : CancellationToken.None))
 			{
 				// Cancel all other waiting operations before deleting.
-				this.This(invoker).DeleteMessage(message.ActualMessage);
+				this.Top.DeleteMessage(message.ActualMessage);
 
 				if (await message.GetWasOverflownAsync().ConfigureAwait(false))
 				{
 					try
 					{
-						await this.This(invoker).RemoveOverflownContentsAsync(message, messageSpecificCancellationTokenSource.Token).ConfigureAwait(false);
+						await this.Top.RemoveOverflownContentsAsync(message, messageSpecificCancellationTokenSource.Token).ConfigureAwait(false);
 					}
 					catch (CloudToolsStorageException ex)
 					{
@@ -107,8 +105,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		private async Task<Task> ProcessMessageInternal(
 			[NotNull] QueueMessageWrapper message,
 			[NotNull] HandleMessagesSerialOptions messageOptions,
-			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource,
-			ExtendedQueueBase invoker)
+			[NotNull] CancellationTokenSource messageSpecificCancellationTokenSource)
 		{
 			Guard.NotNull(message, "message");
 			Guard.NotNull(messageOptions, "messageOptions");
@@ -121,23 +118,23 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (messageOptions.TimeWindow.TotalSeconds > 0
 				&& (!message.ActualMessage.InsertionTime.HasValue || message.ActualMessage.InsertionTime.Value.UtcDateTime.Add(messageOptions.TimeWindow) < DateTime.UtcNow))
 			{
-				await this.This(invoker).SyncDeleteMessage(asynclock, message, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false);
+				await this.Top.SyncDeleteMessage(asynclock, message, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 				return Task.FromResult<Task>(null);
 			}
 
 			// Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
-			if (await this.This(invoker).WasPoisonMessageAndRemoved(messageOptions, message, asynclock, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false))
+			if (await this.Top.WasPoisonMessageAndRemoved(messageOptions, message, asynclock, messageSpecificCancellationTokenSource).ConfigureAwait(false))
 				return Task.FromResult<Task>(null);
 
 			// Starts the background thread which ensures message leases stay fresh.
-			var keepAliveTask = this.KeepMessageAlive(message.ActualMessage, messageOptions.MessageLeaseTime, messageSpecificCancellationTokenSource.Token, asynclock, this.This(invoker));
+			var keepAliveTask = this.KeepMessageAlive(message.ActualMessage, messageOptions.MessageLeaseTime, messageSpecificCancellationTokenSource.Token, asynclock);
 			using (var comboCancelToken = CancellationTokenSource.CreateLinkedTokenSource(messageSpecificCancellationTokenSource.Token, messageOptions.CancelToken))
 			{
 				// Execute the provided action and if successful, delete the message.
 				if (await messageOptions.MessageHandler(message).ConfigureAwait(false))
 				{
 					this.Statistics.IncreaseSuccessfulMessages();
-					await this.This(invoker).SyncDeleteMessage(asynclock, message, comboCancelToken, invoker).ConfigureAwait(false);
+					await this.Top.SyncDeleteMessage(asynclock, message, comboCancelToken).ConfigureAwait(false);
 				} else
 					this.Statistics.IncreaseReenqueuesCount();
 			}
@@ -160,8 +157,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		private async Task<IList<QueueMessageWrapper>> WerePoisonMessagesAndRemovedBatch(
 			[NotNull] HandleMessagesBatchOptions messageOptions,
 			[NotNull] IList<QueueMessageWrapper> messages,
-			[NotNull] AsyncLock asyncLock,
-			ExtendedQueueBase invoker)
+			[NotNull] AsyncLock asyncLock)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 			Guard.NotNull(messages, "messages");
@@ -176,7 +172,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 			foreach (var message in handledMessages)
-				await this.This(invoker).SyncDeleteMessage(asyncLock, message, null, invoker).ConfigureAwait(false);
+				await this.Top.SyncDeleteMessage(asyncLock, message, null).ConfigureAwait(false);
 
 
 			this.Statistics.IncreasePoisonMessages(poisonMessages.Count);
@@ -197,8 +193,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		private async Task<Task> ProcessMessageInternalBatch(
 			[NotNull] IList<QueueMessageWrapper> messages,
 			[NotNull] CancellationTokenSource batchCancellationToken,
-			[NotNull] HandleMessagesBatchOptions messageOptions,
-			ExtendedQueueBase invoker)
+			[NotNull] HandleMessagesBatchOptions messageOptions)
 		{
 			Guard.NotNull(messages, "messages");
 			Guard.NotNull(messageOptions, "messageOptions");
@@ -214,17 +209,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (oldMessages.Count > 0)
 			{
 				foreach (var message in messages)
-					await this.This(invoker).SyncDeleteMessage(asynclock, message, null, invoker).ConfigureAwait(false);
+					await this.Top.SyncDeleteMessage(asynclock, message, null).ConfigureAwait(false);
 			}
 
 			// Handles poison messages by either delegating it to a handler or deleting it if no handler is provided.
-			var toBeProcessedMessages = await this.This(invoker).WerePoisonMessagesAndRemovedBatch(messageOptions, timeValidMessages, asynclock, invoker).ConfigureAwait(false);
+			var toBeProcessedMessages = await this.Top.WerePoisonMessagesAndRemovedBatch(messageOptions, timeValidMessages, asynclock).ConfigureAwait(false);
 
 			if (toBeProcessedMessages.Count == 0)
 				return Task.FromResult<Task>(null);
 
 			var generalCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(batchCancellationToken.Token, messageOptions.CancelToken).Token;
-			var keepAliveTask = this.This(invoker).KeepMessageAlive(messages, messageOptions.MessageLeaseTime, generalCancellationToken, asynclock, invoker);
+			var keepAliveTask = this.Top.KeepMessageAlive(messages, messageOptions.MessageLeaseTime, generalCancellationToken, asynclock);
 
 			var handledMessages = await messageOptions.MessageHandler(messages).ConfigureAwait(false);
 			this.Statistics.IncreaseSuccessfulMessages(handledMessages.Count);
@@ -232,7 +227,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			// Execute the provided action and if successful, delete the message.
 			foreach (var message in handledMessages)
-				await this.This(invoker).SyncDeleteMessage(asynclock, message, null, invoker).ConfigureAwait(false);
+				await this.Top.SyncDeleteMessage(asynclock, message, null).ConfigureAwait(false);
 
 			var nonHandledMessages = messages.Except(handledMessages).Count();
 			this.Statistics.IncreaseReenqueuesCount(nonHandledMessages);

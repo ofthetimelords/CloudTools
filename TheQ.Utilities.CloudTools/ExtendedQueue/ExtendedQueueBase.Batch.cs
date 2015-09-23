@@ -19,14 +19,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public abstract partial class ExtendedQueueBase
 	{
 		/// <summary>
-		///     Begins a task that receives messages in a batch and automatically manages their lifetime.
-		/// </summary>
-		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
-		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		public Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions) { return this.HandleMessagesInBatchAsync(messageOptions, this); }
-
-
-		/// <summary>
 		///     Handles messages from the <paramref name="queue" /> in a serial manner, in an endless loop.
 		/// </summary>
 		/// <param name="queue">The queue to check for messages.</param>
@@ -37,7 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>.</para>
 		/// </returns>
 		[NotNull]
-		internal async Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions, ExtendedQueueBase invoker)
+		public async Task HandleMessagesInBatchAsync([NotNull] HandleMessagesBatchOptions messageOptions)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -74,7 +66,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 						IList<IQueueMessage> retrievedMessages;
 						
 						if (howManyMoreFit > 0)
-							retrievedMessages = (await this.This(invoker).GetMessagesAsync(
+							retrievedMessages = (await this.Top.GetMessagesAsync(
 							Math.Min(this.MaximumMessagesProvider.MaximumMessagesPerRequest, howManyMoreFit),
 							messageOptions.MessageLeaseTime,
 							messageOptions.CancelToken).ConfigureAwait(false)).ToList();
@@ -97,11 +89,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							}
 
 							// Have buffered messages and optionally some were retrieved from the cache. Proceed normally.
-							convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.This(invoker), m)));
+							convertedMessages.AddRange(rawMessages.Select(m => new QueueMessageWrapper(this.Top, m)));
 							//messageOptions.QuickLogDebug("HandleBatchMessages", "Started processing queue's '{0}' {1} messages", queue.Name, rawMessages.Count);
 
 							this.Statistics.IncreaseBusyMessageSlots(convertedMessages.Count);
-							keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions, invoker).ConfigureAwait(false);
+							keepAliveTask = await this.ProcessMessageInternalBatch(convertedMessages, batchCancellationToken, messageOptions).ConfigureAwait(false);
 
 							break;
 						}
@@ -120,15 +112,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					}
 					catch (CloudToolsStorageException ex)
 					{
-						this.This(invoker).HandleStorageExceptions(messageOptions, ex);
+						this.Top.HandleStorageExceptions(messageOptions, ex);
 					}
 					catch (Exception ex)
 					{
-						this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
+						this.Top.HandleGeneralExceptions(messageOptions, ex);
 					}
 					finally
 					{
-						this.This(invoker).BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
+						this.Top.BatchFinallyHandler(messageOptions, keepAliveTask, batchCancellationToken);
 					}
 
 

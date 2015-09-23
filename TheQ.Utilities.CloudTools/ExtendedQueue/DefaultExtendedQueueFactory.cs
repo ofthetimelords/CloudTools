@@ -85,6 +85,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </returns>
 		public IExtendedQueue Create(IQueue original)
 		{
+			var asExtended = original as IExtendedQueue;
+			if (asExtended != null)
+				return asExtended;
+				
 
 			var baseQueue = new ExtendedQueue(original, this.MessageProvider, this.MaximumMessageSizeProvider, this.MaximumMessagesProvider);
 

@@ -51,14 +51,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     Keeps the <paramref name="queue" /> <paramref name="message" /> enqueued by updating its invisible status and avoids accidental dequeuing.
 		/// </summary>
 		/// <param name="message">The message to ensure stays enqueued.</param>
-		/// <param name="queue">The queue the <paramref name="message" /> belongs to.</param>
 		/// <param name="messageLeaseTime">The amount of time renewals should occur for (note; actual checks will be performed at 50% of this value to ensure latency handling).</param>
 		/// <param name="cancelToken">A token used to allow cancellation of this operation.</param>
-		/// <param name="syncToken">
-		///     <para>A simple <see cref="Object" /></para>
-		///     <para>instance Used to synchronise delete and update operations.</para>
-		/// </param>
-		/// <param name="loggingService">The logging service.</param>
+		/// <param name="asyncLock">An object that's responsible for synchronising access to shared resources in an asynchronous manner.</param>
 		/// <exception cref="ArgumentNullException">queue;Parameter 'message' was null. or queue;Parameter 'queue' was not provided.</exception>
 		/// <returns>
 		///     <para>A <see cref="Task" /></para>
@@ -69,8 +64,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			[NotNull] IQueueMessage message,
 			TimeSpan messageLeaseTime,
 			CancellationToken cancelToken,
-			[CanBeNull] AsyncLock asyncLock,
-			ExtendedQueueBase invoker)
+			[CanBeNull] AsyncLock asyncLock)
 		{
 			Guard.NotNull(message, "message");
 
@@ -84,9 +78,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 					// Attempt to update the expiration of a message.
 					if (asyncLock != null)
-						using (await asyncLock.LockAsync(cancelToken))
-							await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
-					else await this.This(invoker).DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken, this.This(invoker)).ConfigureAwait(false);
+						using (await asyncLock.LockAsync())
+							await this.Top.DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken).ConfigureAwait(false);
+					else await this.Top.DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken).ConfigureAwait(false);
 
 					this.LogAction(LogSeverity.Debug, "Renewed queue message", "Queue's '{0}' message '{1}' completed renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 				}
@@ -114,8 +108,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			[NotNull] IList<QueueMessageWrapper> messages,
 			TimeSpan messageLeaseTime,
 			CancellationToken generalCancelToken,
-			[CanBeNull] AsyncLock asyncLock,
-			ExtendedQueueBase invoker)
+			[CanBeNull] AsyncLock asyncLock)
 		{
 			while (true)
 			{
@@ -129,9 +122,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 					// Attempt to update the expiration of a message.
 					if (asyncLock != null)
-						using (await asyncLock.LockAsync(generalCancelToken))
-							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
-					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken, this.This(invoker)).ConfigureAwait(false));
+						using (await asyncLock.LockAsync())
+							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken).ConfigureAwait(false));
+					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken).ConfigureAwait(false));
 
 					this.LogAction(LogSeverity.Debug, "Renewed batch queue messages", "Queue's '{0}' {1} messages completed renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
 				}
@@ -167,13 +160,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="cancelToken">The cancellation token.</param>
 		/// <returns>
 		/// </returns>
-		private async Task DoMessageExpirationUpdateAsync([NotNull] IQueueMessage message, TimeSpan messageLeaseTime, CancellationToken cancelToken, ExtendedQueueBase invoker)
+		private async Task DoMessageExpirationUpdateAsync([NotNull] IQueueMessage message, TimeSpan messageLeaseTime, CancellationToken cancelToken)
 		{
 			Guard.NotNull(message, "message");
 
 			if (cancelToken.IsCancellationRequested) return;
 
-			await this.This(invoker).UpdateMessageAsync(message, messageLeaseTime, QueueMessageUpdateFields.Visibility, cancelToken).ConfigureAwait(false);
+			await this.Top.UpdateMessageAsync(message, messageLeaseTime, QueueMessageUpdateFields.Visibility, cancelToken).ConfigureAwait(false);
 		}
 	}
 }

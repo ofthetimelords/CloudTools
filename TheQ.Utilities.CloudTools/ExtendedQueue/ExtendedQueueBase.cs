@@ -21,9 +21,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	/// </summary>
 	public abstract partial class ExtendedQueueBase : IExtendedQueue
 	{
+		private ExtendedQueueBase _top;
+
+
+
 		protected ExtendedQueueBase()
 		{
 			this.Statistics = new StatisticsContainer();
+			this._top = this;
 		}
 
 		/// <summary>
@@ -72,6 +77,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// An <see cref="IQueueMessageProvider"/> instance.
 		/// </value>
 		protected internal virtual IQueueMessageProvider MessageProvider { get; set; }
+
+
+		protected internal virtual ExtendedQueueBase Top
+		{
+			get { return this._top; }
+			set { this._top = value; }
+		}
 
 
 		/// <summary>

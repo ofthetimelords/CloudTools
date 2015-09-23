@@ -66,7 +66,6 @@
     <Compile Include="ExtendedQueue\Decorators\JsonSerialiserDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\OverflowHandlingDecorator.cs" />
     <Compile Include="ExtendedQueue\Decorators\CompressionDecorator.cs" />
-    <Compile Include="ExtendedQueue\ExtendedQueueHelpers.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Exceptions.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Batch.cs" />
     <Compile Include="ExtendedQueue\ExtendedQueueBase.Process.cs" />

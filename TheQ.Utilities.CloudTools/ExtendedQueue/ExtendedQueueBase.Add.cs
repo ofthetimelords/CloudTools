@@ -18,19 +18,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public abstract partial class ExtendedQueueBase
 	{
 		/// <summary>
-		///     Adds an object (message entity) to the list.
-		/// </summary>
-		/// <param name="entity">The entity to add.</param>
-		public virtual void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity).Wait(); }
-
-
-
-		/// <summary>
 		/// Adds an object (message entity) to the list.
 		/// </summary>
 		/// <param name="entity">The entity to add.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
-		internal virtual void AddMessageEntity(object entity, ExtendedQueueBase invoker) { this.AddMessageEntityAsync(entity, CancellationToken.None, invoker).Wait(); }
+		public virtual void AddMessageEntity(object entity) { this.AddMessageEntityAsync(entity, CancellationToken.None).Wait(); }
 
 
 
@@ -40,16 +32,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="entity">The entity to add.</param>
 		public virtual Task AddMessageEntityAsync(object entity) { return this.AddMessageEntityAsync(entity, CancellationToken.None); }
 
-
-
-		/// <summary>
-		/// Adds an object (message entity) to the list asynchronously
-		/// </summary>
-		/// <param name="entity">The entity to add.</param>
-		/// <param name="token">A cancellation token.</param>
-		/// <returns></returns>
-		public virtual Task AddMessageEntityAsync(object entity, CancellationToken token) { return this.AddMessageEntityAsync(entity, token, this); }
-
 		/// <summary>
 		/// Adds an object (message entity) to the list.
 		/// </summary>
@@ -57,7 +39,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="token">A cancellation token.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns></returns>
-		internal virtual async Task AddMessageEntityAsync(object entity, CancellationToken token, ExtendedQueueBase invoker)
+		public virtual async Task AddMessageEntityAsync(object entity, CancellationToken token)
 		{
 			Guard.NotNull(entity, "entity");
 
@@ -65,17 +47,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			var maxSize = this.MaximumSizeProvider.MaximumMessageSize;
 
 			var stringSource = entity as string;
-			var serialized = stringSource ?? await this.This(invoker).SerializeMessageEntity(entity).ConfigureAwait(false);
+			var serialized = stringSource ?? await this.Top.SerializeMessageEntity(entity).ConfigureAwait(false);
 
-			var messageAsBytes = await this.This(invoker).MessageContentsToByteArray(serialized, invoker).ConfigureAwait(false);
-			messageAsBytes = await this.This(invoker).PostProcessMessage(messageAsBytes).ConfigureAwait(false);
+			var messageAsBytes = await this.Top.MessageContentsToByteArray(serialized).ConfigureAwait(false);
+			messageAsBytes = await this.Top.PostProcessMessage(messageAsBytes).ConfigureAwait(false);
 
 			if (messageAsBytes.Length < maxSize)
-				await this.This(invoker).AddNonOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
+				await this.Top.AddNonOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
 			else
 			{
 				this.LogAction(LogSeverity.Debug, "Message will be overflown", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
-				await this.This(invoker).AddOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
+				await this.Top.AddOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
 			}
 		}
 
@@ -87,11 +69,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="serializedContents">The serialized message contents source.</param>
 		/// <param name="invoker">The (optional) decorator that called this method.</param>
 		/// <returns>A byte array representation of the serialised message contents.</returns>
-		protected internal virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents, ExtendedQueueBase invoker)
+		protected internal virtual async Task<byte[]> MessageContentsToByteArray(string serializedContents)
 		{
 			using (var converter = new MemoryStream(serializedContents.Length))
 			{
-				using (var decoratedConverter = await this.This(invoker).GetByteEncoder(converter).ConfigureAwait(false))
+				using (var decoratedConverter = await this.Top.GetByteEncoder(converter).ConfigureAwait(false))
 				using (var writer = new StreamWriter(decoratedConverter))
 				{
 					await writer.WriteAsync(serializedContents).ConfigureAwait(false);

@@ -18,19 +18,6 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 	public abstract partial class ExtendedQueueBase
 	{
 		/// <summary>
-		///     Begins a task that receives messages in parallel and automatically manages their lifetime.
-		/// </summary>
-		/// <param name="messageOptions">An options object used to initialise the procedure.</param>
-		/// <returns>A cancellable task representing the message processing procedure.</returns>
-		/// <exception cref="ArgumentNullException">queue;Parameter 'queue' was null. or messageOptions;Parameter 'messageOptions' was not provided.</exception>
-		public Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions)
-		{
-			return this.HandleMessagesInParallelAsync(messageOptions, this);
-		}
-
-
-
-		/// <summary>
 		///     Handles messages from the <paramref name="queue" /> in a parallel manner, in an endless loop.
 		/// </summary>
 		/// <param name="queue">The queue to check for messages.</param>
@@ -42,7 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		///     <para>.</para>
 		/// </returns>
 		[NotNull]
-		internal async Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions, ExtendedQueueBase invoker = null)
+		public async Task HandleMessagesInParallelAsync([NotNull] HandleMessagesParallelOptions messageOptions)
 		{
 			Guard.NotNull(messageOptions, "messageOptions");
 
@@ -78,7 +65,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					if (await this.DelayOnNoParallelMessages(freeMessageSlots, messageOptions.MaximumCurrentMessages, internalZeroThreadsWait).ConfigureAwait(false)) continue;
 
 					this.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
-					var messages = await this.This(invoker).GetMessagesAsync(messageOptions, freeMessageSlots, this.This(invoker)).ConfigureAwait(false);
+					var messages = await this.Top.GetMessagesAsync(messageOptions, freeMessageSlots).ConfigureAwait(false);
 
 					if (messages.Count == 0)
 					{
@@ -94,7 +81,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					this.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
 
 					foreach (var message in messages)
-						this.This(invoker).ProcessOneParallelMessage(messageOptions, message, activeMessageSlots, this.This(invoker));
+						this.Top.ProcessOneParallelMessage(messageOptions, message, activeMessageSlots);
 				}
 				catch (TaskCanceledException)
 				{
@@ -108,7 +95,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				}
 				catch (Exception ex)
 				{
-					this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
+					this.Top.HandleGeneralExceptions(messageOptions, ex);
 				}
 			}
 		}
@@ -133,7 +120,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal async Task ProcessOneParallelMessage(HandleMessagesParallelOptions messageOptions, IQueueMessage message, long[] activeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task ProcessOneParallelMessage(HandleMessagesParallelOptions messageOptions, IQueueMessage message, long[] activeMessageSlots)
 		{
 			var messageSpecificCancellationTokenSource = new CancellationTokenSource();
 			var currentMessage = message;
@@ -155,7 +142,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				keepAliveTask =
 					await
-						this.This(invoker).ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource, invoker).ConfigureAwait(false);
+						this.Top.ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 			}
 			catch (TaskCanceledException)
 			{
@@ -163,15 +150,15 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				this.This(invoker).HandleStorageExceptions(messageOptions, ex);
+				this.Top.HandleStorageExceptions(messageOptions, ex);
 			}
 			catch (Exception ex)
 			{
-				this.This(invoker).HandleGeneralExceptions(messageOptions, ex);
+				this.Top.HandleGeneralExceptions(messageOptions, ex);
 			}
 			finally
 			{
-				this.This(invoker).ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
+				this.Top.ParallelFinallyHandler(messageOptions, activeMessageSlots, keepAliveTask, currentMessage, messageSpecificCancellationTokenSource);
 			}
 
 			this.Statistics.DecreaseBusyMessageSlots();
@@ -179,10 +166,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 
 
-		protected internal async Task<List<IQueueMessage>> GetMessagesAsync(HandleMessagesParallelOptions messageOptions, int freeMessageSlots, ExtendedQueueBase invoker)
+		protected internal async Task<List<IQueueMessage>> GetMessagesAsync(HandleMessagesParallelOptions messageOptions, int freeMessageSlots)
 		{
-			return (await this.This(invoker).GetMessagesAsync(freeMessageSlots > this.This(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
-				? this.This(invoker).MaximumMessagesProvider.MaximumMessagesPerRequest
+			return (await this.Top.GetMessagesAsync(freeMessageSlots > this.Top.MaximumMessagesProvider.MaximumMessagesPerRequest
+				? this.Top.MaximumMessagesProvider.MaximumMessagesPerRequest
 				: freeMessageSlots,
 				messageOptions.MessageLeaseTime,
 				messageOptions.CancelToken).ConfigureAwait(false)).ToList();
