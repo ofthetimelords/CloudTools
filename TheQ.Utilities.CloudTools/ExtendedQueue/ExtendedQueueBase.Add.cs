@@ -41,7 +41,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			Guard.NotNull(entity, "entity");
 
-			this.LogAction(LogSeverity.Info, "Added a message", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
+			this.Top.LogAction(LogSeverity.Info, "Added a message", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
 			var maxSize = this.MaximumSizeProvider.MaximumMessageSize;
 
 			var stringSource = entity as string;
@@ -54,7 +54,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				await this.Top.AddNonOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
 			else
 			{
-				this.LogAction(LogSeverity.Debug, "Message will be overflown", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
+				this.Top.LogAction(LogSeverity.Debug, "Message will be overflown", "Queue name: {0}, Message payload: {1}", this.Name, entity.ToString());
 				await this.Top.AddOverflownMessageAsync(messageAsBytes, token).ConfigureAwait(false);
 			}
 		}

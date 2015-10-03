@@ -154,7 +154,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// </returns>
 		protected internal override Task AddOverflownMessageAsync(byte[] messageContents, CancellationToken token)
 		{
-			this.LogAction(LogSeverity.Error, "Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes.", "Check for misconfigured decorators.");
+			this.Top.LogAction(LogSeverity.Error, "Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes.", "Check for misconfigured decorators.");
 			throw new NotSupportedException("Message wouldn't fit in the Queue. The size of the message was " + messageContents.Length + " bytes.");
 		}
 
@@ -182,7 +182,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <returns>The contents of the message as a byte array.</returns>
 		protected internal override Task<byte[]> GetOverflownMessageContentsAsync(IQueueMessage message, string id, CancellationToken token)
 		{
-			this.LogAction(LogSeverity.Error, "Retrieving overflown messages is not supported by the default ExtendedQueue implementation", "Check for misconfigured decorators.");
+			this.Top.LogAction(LogSeverity.Error, "Retrieving overflown messages is not supported by the default ExtendedQueue implementation", "Check for misconfigured decorators.");
 			throw new NotSupportedException("Retrieving overflown messages is not supported by the default ExtendedQueue implementation.");
 		}
 

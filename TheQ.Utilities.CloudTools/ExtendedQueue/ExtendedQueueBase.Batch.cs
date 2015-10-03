@@ -59,7 +59,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				{
 					try
 					{
-						this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
+						this.Top.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
 
 						var howManyMoreFit = messageOptions.MaximumCurrentMessages - rawMessages.Count;
 
