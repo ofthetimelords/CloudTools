@@ -8,29 +8,38 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+7.0.1 | 2015/11/18
+! Fixed a potential task sequencing issue.
+
+7.0.0 | 2015/10/04
+/ Updated dependencies.
+
+6.2.4 | 2015/10/04
+! Bug with logging fixed.
+
 6.2.3 | 2015/09/23
 / Replaced the logging of the top-instance finder of the decorator implementation in order to simplify it.
 
 6.2.2 | 2015/08/13
-! Synchronisation bug while locking (duh)
+! Synchronisation bug while locking (duh).
 
 6.2.1 | 2015/08/05
-+ Added the ability to get the original queue in IExtendedQueue implementations
++ Added the ability to get the original queue in IExtendedQueue implementations.
 
 
 6.1.1 | 2015/07/29
-! Fixed an issue with unremoved messages on parallel processing
+! Fixed an issue with unremoved messages on parallel processing.
 
 
 6.1.0 | 2015/07/22
-+ Added some queue statistics for reference
++ Added some queue statistics for reference.
 
 
 6.0.0 | 2015/07/06
-! Bug on parallel processing; was actually performed serially (...)
+! Bug on parallel processing; was actually performed serially (...).
 / Replaced the logging mechanism with something more flexible.
-/ Renamed the message options classes
-+ Added some new To and From conversion methods
+/ Renamed the message options classes.
++ Added some new To and From conversion methods.
 
 
 5.0.0 | 2015/06/22
@@ -40,11 +49,7 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 
 
 4.0.2 | 2015/05/20
-! Removed unnecessary awaits
-
-
-4.0.2 | 2015/05/20
-! Removed unnecessary awaits
+! Removed unnecessary awaits.
 
 
 4.0.1 | 2015/04/29
@@ -56,8 +61,8 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 
 
 3.0.0 | 2015/03/23
-/ Converted the library to open source
-+ Introducing semantic versioning v2.0.0
+/ Converted the library to open source.
++ Introducing semantic versioning v2.0.0.
 ! Infinite lease time bug for the Azure implementation was inadvertently introduced.
 
 
@@ -76,23 +81,23 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 
 1.7.2.1	| 2014/11/07
 --------------------
-/ Updated Azure Storage to 4.3.0, Json.net to 6.0.6
+/ Updated Azure Storage to 4.3.0, Json.net to 6.0.6.
 
 
 1.7.2.0	| 2014/09/02
 --------------------
-| Fixed batch jobs cancellation and completion
+| Fixed batch jobs cancellation and completion.
 
 
 1.7.1.0	| 2014/08/26
 --------------------
-| Fixed an issue with Batch poison message handling
-| Batch processing caused thrashing
+| Fixed an issue with Batch poison message handling.
+| Batch processing caused thrashing.
 
 
 1.7.0.1	| 2014/08/24
 --------------------
-/ Updated Azure Storage to 4.2.1
+/ Updated Azure Storage to 4.2.1.
 
 
 1.7.0.0	| 2014/08/20
@@ -108,8 +113,8 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 
 1.6.5.0	| 2014/08/12
 --------------------
-/ Changed the implementation of batch messages to use only one update thread (insted of one per message)
-/ Allowed both Batch and Parallel message processing to retrieve more than 32 messages (Azure's maximum)
+/ Changed the implementation of batch messages to use only one update thread (insted of one per message).
+/ Allowed both Batch and Parallel message processing to retrieve more than 32 messages (Azure's maximum).
 
 
 1.6.0.0	| 2014/08/11
@@ -119,74 +124,74 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 
 1.5.3.0	| 2014/08/09
 --------------------
-| Fixed unnecessary stalling in parallel processing, introduced more a more aggressive approach
-/ Updated NuGet packages and Azure Storage to v4.2.0.0
+| Fixed unnecessary stalling in parallel processing, introduced more a more aggressive approach.
+/ Updated NuGet packages and Azure Storage to v4.2.0.0.
 
 
 1.5.2.0	| 2014/08/07
 --------------------
-| Bug in synchronous processing of messages; thrashing occurred
+| Bug in synchronous processing of messages; thrashing occurred.
 
 
 1.5.1.0	| 2014/07/22
 --------------------
-/ Changed the identification of overflown messages
+/ Changed the identification of overflown messages.
 
 
 1.5.0.0	| 2014/06/09
 --------------------
-/ Massively restructured the QueueMessageWrapper class
+/ Massively restructured the QueueMessageWrapper class.
 
 
 1.4.1.0	| 2014/06/08
 --------------------
-! Fixed a lingering poison message handling bug
-| Restructured the parameters
+! Fixed a lingering poison message handling bug.
+| Restructured the parameters.
 
 
 1.4.0.0	| 2014/06/08
 --------------------
-/ Redesigned the implementation to ensure creation and retrieval of compressible messages only
+/ Redesigned the implementation to ensure creation and retrieval of compressible messages only.
 
 
 1.3.1.0	| 2014/06/06
 --------------------
-+ Added Resharper annotations
++ Added Resharper annotations.
 
 
 1.3.0.0	| 2014/06/02
 --------------------
-+ Implemented parallel message handling in Queue extensions
++ Implemented parallel message handling in Queue extensions.
 
 
 1.2.0.0	| 2014/06/02
 --------------------
-+ Implemented Global Lock, a locking mechanism that uses a queue
-+ Implemented concurrency tests for Global Lock (Queue extensions tests are not implemented yet)
-! Minor corrections in logging in Queue Extensions
++ Implemented Global Lock, a locking mechanism that uses a queue.
++ Implemented concurrency tests for Global Lock (Queue extensions tests are not implemented yet).
+! Minor corrections in logging in Queue Extensions.
 
 
 1.1.2.0 | 2014/05/27
 --------------------
-! Minor corrections and refactoring
+! Minor corrections and refactoring.
 
 
 1.1.1.0
 -------
-+ Implemented logging capabilities
++ Implemented logging capabilities.
 
 
 1.1.0.0
 -------
-/ Redesigned the Handle() operations to increase robustness
+/ Redesigned the Handle() operations to increase robustness.
 
 
 1.0.1.0
 -------
-! Fixed a concurrency issue that could result in unexpected exceptions
+! Fixed a concurrency issue that could result in unexpected exceptions.
 
 
 1.0.0.0
 -------
-+ Initial release
-+ Implements a serialised & structured queue message handling
++ Initial release.
++ Implements a serialised & structured queue message handling.

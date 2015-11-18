@@ -52,13 +52,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 			switch (severity)
 			{
 				case LogSeverity.Critical:
-					this.LogService.Critical(exception, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Critical(exception, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 				case LogSeverity.Error:
-					this.LogService.Error(exception, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Error(exception, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 				default:
-					this.LogService.Debug(exception.Message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Debug(exception.Message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 			}
 		}
@@ -71,16 +71,16 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 			switch (severity)
 			{
 				case LogSeverity.Error:
-					this.LogService.Error(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Error(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 				case LogSeverity.Warning:
-					this.LogService.Warning(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Warning(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 				case LogSeverity.Info:
-					this.LogService.Info(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Info(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 				default:
-					this.LogService.Debug(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details, formatArguments));
+					this.LogService.Debug(message, "TheQ.CloudTools.ExtendedQueue", string.Format(CultureInfo.InvariantCulture, details ?? string.Empty, formatArguments));
 					break;
 			}
 		}

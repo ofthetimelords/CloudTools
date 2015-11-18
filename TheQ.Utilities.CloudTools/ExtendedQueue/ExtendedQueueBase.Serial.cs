@@ -49,13 +49,13 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 				try
 				{
-					this.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
+					this.Top.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
 
 					message = await this.Top.GetMessageFromQueue(messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					if (message != null)
 					{
 						this.Statistics.IncreaseBusyMessageSlots();
-						this.LogAction(LogSeverity.Debug, "One message found in the queue and will be processed", "Queue: {0}, Message ID: {1}", this.Name, message.Id);
+						this.Top.LogAction(LogSeverity.Debug, "One message found in the queue and will be processed", "Queue: {0}, Message ID: {1}", this.Name, message.Id);
 						receivedMessage = true;
 
 						keepAliveTask = await this.Top.ProcessMessageInternal(
@@ -63,7 +63,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							messageOptions,
 							messageSpecificCancellationTokenSource).ConfigureAwait(false);
 					}
-					else this.LogAction(LogSeverity.Debug, "No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
+					else this.Top.LogAction(LogSeverity.Debug, "No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
 				}
 				catch (TaskCanceledException)
 				{
@@ -104,7 +104,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		/// <param name="messageOptions">The message options object.</param>
 		protected internal virtual bool HandleTaskCancelled(HandleMessagesSerialOptions messageOptions)
 		{
-			this.LogAction(LogSeverity.Info, "Attempting to cancel No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
+			this.Top.LogAction(LogSeverity.Info, "Attempting to cancel No messages found when an attempt was made to read from a queue", "Queue: {0}", this.Name);
 			if (messageOptions.CancelToken.IsCancellationRequested)
 				return true;
 
@@ -146,7 +146,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			if (keepAliveTask != null && !keepAliveTask.IsCompleted)
 				if (message != null)
 				{
-					this.LogAction(LogSeverity.Warning, "Message was not processed successfully", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs", this.Name, message.Id);
+					this.Top.LogAction(LogSeverity.Warning, "Message was not processed successfully", "Queue's '{0}' message '{1}', processing faulted; cancelling related jobs", this.Name, message.Id);
 					messageSpecificCancellationTokenSource.Cancel();
 				}
 		}

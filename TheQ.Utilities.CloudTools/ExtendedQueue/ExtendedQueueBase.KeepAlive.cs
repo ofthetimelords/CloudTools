@@ -72,9 +72,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				try
 				{
-					this.LogAction(LogSeverity.Debug, "Waiting to renew a queue message", "Queue's '{0}' message '{1}' waiting to renew on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
+					this.Top.LogAction(LogSeverity.Debug, "Waiting to renew a queue message", "Queue's '{0}' message '{1}' waiting to renew on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 					await Task.Delay(TimeSpan.FromSeconds(messageLeaseTime.TotalSeconds * .75), cancelToken).ConfigureAwait(false);
-					this.LogAction(LogSeverity.Debug, "Started renewing a queue message", "Queue's '{0}' message '{1}' started renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
+					this.Top.LogAction(LogSeverity.Debug, "Started renewing a queue message", "Queue's '{0}' message '{1}' started renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
 					if (asyncLock != null)
@@ -82,17 +82,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							await this.Top.DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken).ConfigureAwait(false);
 					else await this.Top.DoMessageExpirationUpdateAsync(message, messageLeaseTime, cancelToken).ConfigureAwait(false);
 
-					this.LogAction(LogSeverity.Debug, "Renewed queue message", "Queue's '{0}' message '{1}' completed renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
+					this.Top.LogAction(LogSeverity.Debug, "Renewed queue message", "Queue's '{0}' message '{1}' completed renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 				}
 				catch (CloudToolsStorageException ex)
 				{
 					if (string.Equals(ex.ErrorCode, "MessageNotFound", StringComparison.OrdinalIgnoreCase))
 					{
-						this.LogAction(LogSeverity.Error, "Message not Found during keep-alive occurred", "A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.", this.Name);
+						this.Top.LogAction(LogSeverity.Error, "Message not Found during keep-alive occurred", "A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.", this.Name);
 						break;
 					}
 
-					this.LogAction(LogSeverity.Debug, "Error during keep-alive occurred", "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", this.Name);
+					this.Top.LogAction(LogSeverity.Debug, "Error during keep-alive occurred", "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", this.Name);
 					break;
 				}
 				catch (OperationCanceledException)
@@ -115,9 +115,9 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				try
 				{
 					var endingSooner = messages.Min(m => m.ActualMessage.NextVisibleTime.Value);
-					this.LogAction(LogSeverity.Debug, "Waiting to renew batch queue messages", "Queue's '{0}' for {1} batch messages waiting to renew on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
+					this.Top.LogAction(LogSeverity.Debug, "Waiting to renew batch queue messages", "Queue's '{0}' for {1} batch messages waiting to renew on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
 					await Task.Delay(TimeSpan.FromSeconds(endingSooner.UtcDateTime.Subtract(DateTime.UtcNow).TotalSeconds * .50), generalCancelToken).ConfigureAwait(false);
-					this.LogAction(LogSeverity.Debug, "Started renewing batch queue messages", "Queue's '{0}' for {1} batch messages started renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
+					this.Top.LogAction(LogSeverity.Debug, "Started renewing batch queue messages", "Queue's '{0}' for {1} batch messages started renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
 					//					loggingService.QuickLogDebug("KeepMessageAlive", "Queue's '{0}' for {1} batch messages started renewing on {2}", queue.Name, messages.Count, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.
@@ -126,7 +126,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken).ConfigureAwait(false));
 					else Parallel.ForEach(messages, async message => await this.DoMessageExpirationUpdateAsync(message.ActualMessage, messageLeaseTime, generalCancelToken).ConfigureAwait(false));
 
-					this.LogAction(LogSeverity.Debug, "Renewed batch queue messages", "Queue's '{0}' {1} messages completed renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
+					this.Top.LogAction(LogSeverity.Debug, "Renewed batch queue messages", "Queue's '{0}' {1} messages completed renewing on {2}", this.Name, messages.Count.ToString(), DateTimeOffset.Now.ToString("O"));
 				}
 				catch (CloudToolsStorageException ex)
 				{
@@ -135,11 +135,11 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 					if (string.Equals(ex.ErrorCode, "MessageNotFound", StringComparison.OrdinalIgnoreCase))
 					{
-						this.LogAction(LogSeverity.Error, "Message not Found during keep-alive occurred", "A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.", this.Name);
+						this.Top.LogAction(LogSeverity.Error, "Message not Found during keep-alive occurred", "A 'Message not Found' error occured while attempting to work on a message (this error should not occur under normal circumstances), on queue '{0}'.", this.Name);
 						break;
 					}
 
-					this.LogAction(LogSeverity.Debug, "Error during keep-alive occurred", "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", this.Name);
+					this.Top.LogAction(LogSeverity.Debug, "Error during keep-alive occurred", "An error occurred while trying to perform a Keep Alive operation on a Queue message on queue '{0}'.", this.Name);
 					break;
 				}
 				catch (OperationCanceledException)

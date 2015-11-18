@@ -21,7 +21,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 		protected internal override Task<Stream> GetByteEncoder(Stream originalConverter)
 		{
-			this.LogAction(LogSeverity.Debug, "Calling CompressionDecorator.GetByteEncoder");
+			this.Top.LogAction(LogSeverity.Debug, "Calling CompressionDecorator.GetByteEncoder");
 			return Task.FromResult<Stream>(new DeflateStream(originalConverter, CompressionMode.Compress, true));
 		}
 
@@ -29,7 +29,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 
 		protected internal override Task<Stream> GetByteDecoder(Stream originalConverter)
 		{
-			this.LogAction(LogSeverity.Debug, "Calling CompressionDecorator.GetByteDecoder");
+			this.Top.LogAction(LogSeverity.Debug, "Calling CompressionDecorator.GetByteDecoder");
 			return Task.FromResult<Stream>(new DeflateStream(originalConverter, CompressionMode.Decompress, true));
 		}
 	}

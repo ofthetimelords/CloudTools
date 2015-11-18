@@ -55,7 +55,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					}
 
 
-					this.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
+					this.Top.LogAction(LogSeverity.Debug, "Attempting to retrieve new messages from a queue", "Queue: {0}", this.Name);
 					var busySlots = (int) Interlocked.Read(ref activeMessageSlots[0]);
 					var freeMessageSlots = messageOptions.MaximumCurrentMessages - busySlots;
 
@@ -64,12 +64,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 					if (await this.DelayOnNoParallelMessages(freeMessageSlots, messageOptions.MaximumCurrentMessages, internalZeroThreadsWait).ConfigureAwait(false)) continue;
 
-					this.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
+					this.Top.LogAction(LogSeverity.Debug, "Attempting to read from a queue", "Queue: {0}", this.Name);
 					var messages = await this.Top.GetMessagesAsync(messageOptions, freeMessageSlots).ConfigureAwait(false);
 
 					if (messages.Count == 0)
 					{
-						this.LogAction(LogSeverity.Debug,
+						this.Top.LogAction(LogSeverity.Debug,
 							"No new messages are available",
 							"No new messages are available for processing in queue '{0}', will try again on {1}",
 							this.Name,
@@ -78,12 +78,12 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 						continue;
 					}
 
-					this.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
+					this.Top.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
 
 					foreach (var message in messages)
 					{
 						var task = this.Top.ProcessOneParallelMessage(messageOptions, message, activeMessageSlots);
-						task.ContinueWith(ptask => this.LogException(LogSeverity.Error, ptask.Exception, "Exception while parallel processing messages occurred"), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.NotOnCanceled);
+						task.ContinueWith(ptask => this.Top.LogException(LogSeverity.Error, ptask.Exception, "Exception while parallel processing messages occurred"), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.NotOnCanceled);
 					}
 				}
 				catch (TaskCanceledException)
@@ -109,7 +109,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 		{
 			if (freeMessageSlots <= 0)
 			{
-				this.LogAction(LogSeverity.Debug,
+				this.Top.LogAction(LogSeverity.Debug,
 					"No free threads for incoming messages are available",
 					"No free threads are available for processing messages in queue '{0}' (0 out of '{1}'), will try again on {2}",
 					this.Name,
@@ -134,7 +134,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			Task keepAliveTask = null;
 
-			this.LogAction(LogSeverity.Debug,
+			this.Top.LogAction(LogSeverity.Debug,
 				"Started processing a message",
 				"Started processing queue's '{0}' message with ID '{1}' ({2} slots remaining)",
 				this.Name,
@@ -196,7 +196,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			{
 				if (currentMessage != null)
 				{
-					this.LogAction(LogSeverity.Warning,
+					this.Top.LogAction(LogSeverity.Warning,
 						"Message processing was faulted; cancelling",
 						"Queue's '{0}' message '{1}', processing faulted; cancelling related jobs for this message",
 						this.Name,

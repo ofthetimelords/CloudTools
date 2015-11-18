@@ -26,16 +26,16 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				if (messageOptions.ExceptionHandler != null)
 				{
 					messageOptions.ExceptionHandler(exception);
-					this.LogException(LogSeverity.Info, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' and was handled", this.Name);
+					this.Top.LogException(LogSeverity.Info, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' and was handled", this.Name);
 				}
 				else
 				{
-					this.LogException(LogSeverity.Warning, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
+					this.Top.LogException(LogSeverity.Warning, exception, "An unexpected storage exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
 				}
 			}
 			catch (Exception innerEx)
 			{
-				this.LogException(LogSeverity.Error, innerEx, "An unexpected exception occurred within the storage exception handler on queue '{0}'", this.Name);
+				this.Top.LogException(LogSeverity.Error, innerEx, "An unexpected exception occurred within the storage exception handler on queue '{0}'", this.Name);
 			}
 		}
 
@@ -54,17 +54,17 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				if (messageOptions.ExceptionHandler != null)
 				{
 					messageOptions.ExceptionHandler(exception);
-					this.LogException(LogSeverity.Info, exception, "An unexpected exception occurred while processing messages on queue '{0}' and was handled", this.Name);
+					this.Top.LogException(LogSeverity.Info, exception, "An unexpected exception occurred while processing messages on queue '{0}' and was handled", this.Name);
 				}
 				else
 				{
-					this.LogException(LogSeverity.Error, exception, "An unexpected exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
+					this.Top.LogException(LogSeverity.Error, exception, "An unexpected exception occurred while processing messages on queue '{0}' but was not handled!", this.Name);
 				}
 
 			}
 			catch (Exception innerEx)
 			{
-				this.LogException(LogSeverity.Error, innerEx, "An unexpected exception occurred within the general exception handler on queue '{0}'", this.Name);
+				this.Top.LogException(LogSeverity.Error, innerEx, "An unexpected exception occurred within the general exception handler on queue '{0}'", this.Name);
 			}
 		}
 	}
