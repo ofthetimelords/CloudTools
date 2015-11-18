@@ -81,8 +81,10 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					this.LogAction(LogSeverity.Debug, "Messages were retrieved", "A total of '{0}' messages were retrieved on this batch from queue '{1}'", messages.Count.ToString(), this.Name);
 
 					foreach (var message in messages)
-						this.Top.ProcessOneParallelMessage(messageOptions, message, activeMessageSlots)
-							.ContinueWith(task => this.LogException(LogSeverity.Error, task.Exception, "Exception while parallel processing messages occurred"), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.NotOnCanceled);
+					{
+						var task = this.Top.ProcessOneParallelMessage(messageOptions, message, activeMessageSlots);
+						task.ContinueWith(ptask => this.LogException(LogSeverity.Error, ptask.Exception, "Exception while parallel processing messages occurred"), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.NotOnCanceled);
+					}
 				}
 				catch (TaskCanceledException)
 				{

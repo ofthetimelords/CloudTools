@@ -23,11 +23,29 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 	/// </summary>
 	public class JsonSerialiserDecorator : DecoratorBase
 	{
+		private JsonSerializerSettings Settings { get; set; }
+
+
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="JsonSerialiserDecorator"/> class.
 		/// </summary>
 		/// <param name="decoratedQueue">The queue to decorate.</param>
-		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) : base(decoratedQueue) { }
+		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue) : this(decoratedQueue, false)
+		{
+		}
+
+
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="JsonSerialiserDecorator" /> class.
+		/// </summary>
+		/// <param name="decoratedQueue">The queue to decorate.</param>
+		/// <param name="addTypeInformation">if set to <c>true</c> the serialiser will force-add type information on the serialised data.</param>
+		public JsonSerialiserDecorator(ExtendedQueueBase decoratedQueue, bool addTypeInformation) : base(decoratedQueue)
+		{
+			this.Settings = addTypeInformation ? new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All} : new JsonSerializerSettings ();
+		}
 
 
 
@@ -39,14 +57,14 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue.Decorators
 		protected internal override Task<string> SerializeMessageEntity(object messageEntity)
 		{
 			this.LogAction(LogSeverity.Debug, "Calling JsonSerialiserDecorator.SerializeMessageEntity");
-			return Task.FromResult(JsonConvert.SerializeObject(messageEntity, Formatting.None));
+			return Task.FromResult(JsonConvert.SerializeObject(messageEntity, Formatting.None, this.Settings));
 		}
 
 
 		protected internal override T DeserializeToObject<T>(string serializedContents)
 		{
 			this.LogAction(LogSeverity.Debug, "Calling JsonSerialiserDecorator.DeserializeToObject");
-			return JsonConvert.DeserializeObject<T>(serializedContents);
+			return JsonConvert.DeserializeObject<T>(serializedContents, this.Settings);
 		}
 	}
 }
