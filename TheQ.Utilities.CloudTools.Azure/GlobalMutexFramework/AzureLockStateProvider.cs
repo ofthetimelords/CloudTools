@@ -232,7 +232,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 			{
 				if (state.LockingBlob != null)
 				{
-					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).BreakLeaseAsync(null, cancelToken).ConfigureAwait(false);
+					await ((CloudBlockBlob) (AzureBlob) state.LockingBlob).BreakLeaseAsync(TimeSpan.Zero, cancelToken).ConfigureAwait(false);
 					state.LockingBlob = null;
 					state.LeaseId = null;
 				}

@@ -136,6 +136,8 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 					this.Statistics.IncreaseReenqueuesCount();
 			}
 
+
+			messageSpecificCancellationTokenSource.Cancel();
 			return keepAliveTask;
 		}
 

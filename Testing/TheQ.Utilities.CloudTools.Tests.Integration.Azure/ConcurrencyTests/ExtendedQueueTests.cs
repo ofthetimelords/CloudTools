@@ -797,5 +797,71 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				Assert.IsTrue(expected.All(c => result.Contains(c)));
 			}
 		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestSerial_FauledNormalProcessing()
+		{
+			// Arrange
+			const int runCount = 10;
+			var client = new CloudEnvironment();
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-1");
+			var queue = client.QueueClient.GetQueueReference("test1");
+			var result = string.Empty;
+			var expected = string.Empty;
+			var sw = new Stopwatch();
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factory.Create(new AzureQueue(queue));
+
+			for (var i = 0; i < runCount; i++) if (i != 5) expected += i.ToString(CultureInfo.InvariantCulture);
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleMessagesSerialOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					5,
+					new CancellationToken(),
+					message =>
+					{
+						if (message.GetMessageContents<string>() == "5")
+						{
+							throw new DivideByZeroException("Example Exception");
+						}
+
+
+							if (message.GetMessageContents<string>() == "END")
+						{
+							mre.Set();
+							return Task.FromResult(true);
+						}
+
+						result += message.GetMessageContents<string>();
+						return Task.FromResult(true);
+					},
+					null,
+					ex => { throw ex; });
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				for (var i = 0; i < runCount; i++) equeue.AddMessageEntity(i.ToString(CultureInfo.InvariantCulture));
+				equeue.AddMessageEntity("END");
+				equeue.HandleMessagesInSerialAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Trace.WriteLine(equeue.Statistics);
+				Assert.AreEqual(expected, result);
+			}
+		}
+
 	}
 }

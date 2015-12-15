@@ -299,8 +299,23 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 			}
 			catch (Exception ex)
 			{
-				this.LogService.QuickLogError("GlobalMutex", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
-				if (throwOnError) throw;
+				var aggEx = ex as AggregateException;
+				if (aggEx != null)
+				{
+					var ctEx = aggEx.InnerException as CloudToolsStorageException;
+
+					if (ctEx.StatusCode != 404 && ctEx.StatusCode != 409)
+					{
+						this.LogService.QuickLogError("GlobalMutex", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
+						if (throwOnError) throw;
+					}
+					else this.LogService.QuickLogDebug("GlobalMutex", "Attempting to force a global lock with name '{0}' failed; the lock must have been released already", this.LockName);
+				}
+				else
+				{
+					this.LogService.QuickLogError("GlobalMutex", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
+					if (throwOnError) throw;
+				}
 			}
 
 			return this;
