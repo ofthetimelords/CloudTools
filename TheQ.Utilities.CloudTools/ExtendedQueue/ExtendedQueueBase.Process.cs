@@ -229,7 +229,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 			var nonHandledMessages = messages.Except(handledMessages).Count();
 			this.Statistics.IncreaseReenqueuesCount(nonHandledMessages);
 
-
+			batchCancellationToken.Cancel();
 			return keepAliveTask;
 		}
 	}
