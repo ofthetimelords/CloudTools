@@ -184,7 +184,7 @@ namespace TheQ.Utilities.CloudTools.Azure
 		{
 			try
 			{
-				return (AzureQueueMessage) (await this._queueReference.GetMessageAsync(cancellationToken).ConfigureAwait(false));
+				return (AzureQueueMessage) (await this._queueReference.GetMessageAsync(visibilityTimeout, null, null, cancellationToken).ConfigureAwait(false));
 			}
 			catch (StorageException ex)
 			{
