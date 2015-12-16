@@ -8,8 +8,11 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+7.1.1 | 2015/12/16
+! Actually the previous fix was unrelated, the correct fix was to apply a change on a specific overload.
+
 7.1.0 | 2015/12/15
-! Fixed an unecessary error message that was generated (not affecting the actual library's operation)
+! Fixed an unecessary error message that was generated (not affecting the actual library's operation).
 
 7.0.1 | 2015/11/18
 ! Fixed a potential task sequencing issue.
