@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -85,14 +86,14 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 			}
 			catch (CloudToolsStorageException ex)
 			{
-				if (ex.StatusCode != 404 && ex.StatusCode != 409 && ex.StatusCode != 412)
+				if (ex.StatusCode != 404 && ex.StatusCode != (int)HttpStatusCode.PreconditionFailed && ex.StatusCode != (int)HttpStatusCode.Conflict)
 					throw;
 			}
 		}
 
 
 
-		/// <summary>
+		/// <summary>~
 		/// Retrieves the overflown message contents, asynchronously.
 		/// </summary>
 		/// <param name="id">The message identifier.</param>

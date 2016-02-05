@@ -73,7 +73,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 				try
 				{
 					this.Top.LogAction(LogSeverity.Debug, "Waiting to renew a queue message", "Queue's '{0}' message '{1}' waiting to renew on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
-					await Task.Delay(TimeSpan.FromSeconds(messageLeaseTime.TotalSeconds * .75), cancelToken).ConfigureAwait(false);
+					await Task.Delay(TimeSpan.FromSeconds((messageLeaseTime.TotalSeconds * 2)/3), cancelToken).ConfigureAwait(false);
 					this.Top.LogAction(LogSeverity.Debug, "Started renewing a queue message", "Queue's '{0}' message '{1}' started renewing on {2}", this.Name, message.Id, DateTimeOffset.Now.ToString("O"));
 
 					// Attempt to update the expiration of a message.

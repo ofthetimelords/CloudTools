@@ -59,7 +59,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure
 			}
 			catch (StorageException ex)
 			{
-				if (ex.RequestInformation.HttpStatusCode != 404 && ex.RequestInformation.HttpStatusCode != 409) throw;
+				if (ex.RequestInformation.HttpStatusCode != 404 && ex.RequestInformation.HttpStatusCode != 409 && ex.RequestInformation.HttpStatusCode != 412) throw;
 			}
 		}
 	}
