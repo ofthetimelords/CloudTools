@@ -98,7 +98,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 							break;
 						}
 					}
-					catch (TaskCanceledException)
+					catch (OperationCanceledException)
 					{
 						if (messageOptions.CancelToken.IsCancellationRequested)
 						{

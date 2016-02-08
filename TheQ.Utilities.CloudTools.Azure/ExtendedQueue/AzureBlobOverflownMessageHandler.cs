@@ -3,6 +3,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.WindowsAzure.Storage;
+
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Blob;
 using TheQ.Utilities.CloudTools.Storage.ExtendedQueue.ObjectModel;
@@ -84,10 +86,10 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, AzureBlobOverflownMessageHandler.OverflownBlobNameFormat, queueName, id));
 				await or.DeleteIfExistsAsync().ConfigureAwait(false);
 			}
-			catch (CloudToolsStorageException ex)
+			catch (StorageException ex)
 			{
-				if (ex.StatusCode != 404 && ex.StatusCode != (int)HttpStatusCode.PreconditionFailed && ex.StatusCode != (int)HttpStatusCode.Conflict)
-					throw;
+				if (ex.RequestInformation.HttpStatusCode != 404 && ex.RequestInformation.HttpStatusCode != (int)HttpStatusCode.PreconditionFailed && ex.RequestInformation.HttpStatusCode != (int)HttpStatusCode.Conflict)
+					throw ex.Wrap();
 			}
 		}
 

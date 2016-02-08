@@ -304,7 +304,7 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 				{
 					var ctEx = aggEx.InnerException as CloudToolsStorageException;
 
-					if (ctEx.StatusCode != 404 && ctEx.StatusCode != 409 && ctEx.StatusCode != 412)
+					if (ctEx == null || (ctEx.StatusCode != 404 && ctEx.StatusCode != 409 && ctEx.StatusCode != 412))
 					{
 						this.LogService.QuickLogError("GlobalMutex", ex, "Attempting to force-release global lock with name '{0}' failed due to an unexpected exception", this.LockName);
 						if (throwOnError) throw;
@@ -524,14 +524,15 @@ namespace TheQ.Utilities.CloudTools.Storage.GlobalMutexFramework
 			{
 				if (cancelToken.IsCancellationRequested) return;
 
-				await Task.Delay(TimeSpan.FromSeconds((leaseTime.TotalSeconds*2)/3), cancelToken).ConfigureAwait(false);
-
 				try
 				{
+					await Task.Delay(TimeSpan.FromSeconds((leaseTime.TotalSeconds * 2) / 3), cancelToken).ConfigureAwait(false);
+
 					if (this.LockName != null) this.LockState = await this.LockStateProvider.RenewLockAsync(this.LockState, cancelToken).ConfigureAwait(false);
 				}
 				catch (OperationCanceledException)
 				{
+					return;
 				}
 				catch (Exception ex)
 				{

@@ -41,14 +41,15 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					{
 						result += "1";
 
-						Thread.Sleep(5000);
+						Thread.Sleep(10000);
 					}
 				});
 			var thread2 = new Thread(
 				() =>
 				{
-					Thread.Sleep(2500); // Ensure it will enter later than the previous method
-					using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
+					using (var globalMutex = factory.CreateLock("test_lock"))
+						result += "2";
 				});
 
 			// Act
@@ -80,13 +81,13 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 					using (var globalMutex = factory.TryCreateLock("test_lock", out isLocked))
 					{
 						if (isLocked) result += "1";
-						Thread.Sleep(5000);
+						Thread.Sleep(10000);
 					}
 				});
 			var thread2 = new Thread(
 				() =>
 				{
-					Thread.Sleep(2500); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					bool isLocked;
 					using (var globalMutex = factory.TryCreateLock("test_lock", out isLocked)) if (isLocked) result += "2";
 				});
@@ -306,13 +307,13 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 						client.BreakAnyLeases("globalmutextests10", "test_lock");
 					}
 
-					Thread.Sleep(3000);
+					Thread.Sleep(5000);
 					result += "3";
 				});
 			var thread2 = new Thread(
 				() =>
 				{
-					Thread.Sleep(3000); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					using (var globalMutex = factory.CreateLock("test_lock")) 
 						result += "2";
 				});
@@ -354,35 +355,35 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			var thread2 = new Thread(
 				() =>
 				{
-					Thread.Sleep(4000); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					using (var globalMutex = factory.CreateLock("test_lock")) result += "2";
 				});
 
 			var thread3 = new Thread(
 				() =>
 				{
-					Thread.Sleep(4000); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					using (var globalMutex = factory.CreateLock("test_lock")) result += "3";
 				});
 
 			var thread4 = new Thread(
 				() =>
 				{
-					Thread.Sleep(4000); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					using (var globalMutex = factory.CreateLock("test_lock")) result += "4";
 				});
 
 			var thread5 = new Thread(
 				() =>
 				{
-					Thread.Sleep(4000); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					using (var globalMutex = factory.CreateLock("test_lock")) result += "5";
 				});
 
 			var thread6 = new Thread(
 				() =>
 				{
-					Thread.Sleep(2000); // Ensure it will enter later than the previous method
+					Thread.Sleep(5000); // Ensure it will enter later than the previous method
 					using (var globalMutex = factory.CreateLock("test_lock")) result += "6";
 				});
 

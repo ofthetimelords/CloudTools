@@ -100,9 +100,18 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 				// TODO: What if does not exist already, Exceptions
 				await (state.LeaseId != null ? this.UnregisterLockAsync(state, cancelToken) : this.BreakLockInternal(state, cancelToken)).ConfigureAwait(false);
 			}
-			catch (CloudToolsStorageException ex)
+			catch (AggregateException ex)
 			{
-				exception = ex;
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
 			}
 
 			if (exception != null && (exception.StatusCode == 409 || exception.StatusCode == 412))
@@ -131,6 +140,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 					state.LockingBlob = null;
 					state.LeaseId = null;
+				}
+				catch (AggregateException ex)
+				{
+					var convEx = ex.InnerException as StorageException;
+
+					if (convEx != null)
+						throw convEx.Wrap();
+
+					throw;
 				}
 				catch (StorageException ex)
 				{
@@ -171,6 +189,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 					cancelToken).ConfigureAwait(false);
 				state.LockName = newLockName;
 			}
+			catch (AggregateException ex)
+			{
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
+			}
 			catch (StorageException ex)
 			{
 				throw ex.Wrap();
@@ -195,6 +222,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 			{
 				if (state.LockingBlob != null)
 					await ((CloudBlockBlob) (state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+			}
+			catch (AggregateException ex)
+			{
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
 			}
 			catch (StorageException ex)
 			{
@@ -236,6 +272,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 					state.LockingBlob = null;
 					state.LeaseId = null;
 				}
+			}
+			catch (AggregateException ex)
+			{
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
 			}
 			catch (StorageException ex)
 			{
