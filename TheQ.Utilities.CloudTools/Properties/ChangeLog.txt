@@ -8,6 +8,9 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+7.1.3 | 2016/3/9
+! Fixed a potential issue with Lock Breaking
+
 7.1.2 | 2016/2/8
 ! Potential bug when using parallel processing on Queues.
 ! Potential bug due to not properly wrapped exceptions in GlobalMutex.

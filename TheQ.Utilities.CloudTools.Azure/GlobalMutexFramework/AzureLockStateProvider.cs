@@ -49,7 +49,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		/// <value>
 		/// An <see cref="ILogService"/> implementation.
 		/// </value>
-	private ILogService LogService { get; set; }
+		private ILogService LogService { get; set; }
 
 
 		/// <summary>
@@ -93,7 +93,6 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		public async Task<AzureLockState> BreakLockAsync(AzureLockState state, CancellationToken cancelToken)
 		{
 			Guard.NotNull(state, "state");
-			CloudToolsStorageException exception = null;
 
 			try
 			{
@@ -105,17 +104,20 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 				var convEx = ex.InnerException as StorageException;
 
 				if (convEx != null)
-					throw convEx.Wrap();
+					if (convEx.RequestInformation != null && (convEx.RequestInformation.HttpStatusCode == 409 || convEx.RequestInformation.HttpStatusCode == 412))
+						this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
+					else
+						throw convEx.Wrap();
 
 				throw;
 			}
 			catch (StorageException ex)
 			{
-				throw ex.Wrap();
+				if (ex.RequestInformation != null && (ex.RequestInformation.HttpStatusCode == 409 || ex.RequestInformation.HttpStatusCode == 412))
+					this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
+				else
+					throw ex.Wrap();
 			}
-
-			if (exception != null && (exception.StatusCode == 409 || exception.StatusCode == 412))
-				this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
 
 			return state;
 		}
