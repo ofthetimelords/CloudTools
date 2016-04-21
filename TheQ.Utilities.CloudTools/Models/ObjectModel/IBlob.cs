@@ -244,5 +244,53 @@ namespace TheQ.Utilities.CloudTools.Storage.Models.ObjectModel
 		///     Deletes the current BLOB if it already exists.
 		/// </summary>
 		Task<bool> DeleteIfExistsAsync();
+
+
+
+		/// <summary>
+		/// Initiates an asynchronous operation to upload a string of text to a blob. If the blob already exists, it will be overwritten.
+		/// 
+		/// </summary>
+		/// <param name="content">A string containing the text to upload.</param>
+		/// <returns>
+		/// A <see cref="T:System.Threading.Tasks.Task"/> object that represents the asynchronous operation.
+		/// </returns>
+		Task UploadTextAsync(string content);
+
+
+
+		/// <summary>
+		/// Initiates an asynchronous operation to upload a string of text to a blob. If the blob already exists, it will be overwritten.
+		/// 
+		/// </summary>
+		/// <param name="content">A string containing the text to upload.</param><param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for a task to complete.</param>
+		/// <returns>
+		/// A <see cref="T:System.Threading.Tasks.Task"/> object that represents the asynchronous operation.
+		/// </returns>
+		Task UploadTextAsync(string content, CancellationToken cancellationToken);
+
+
+
+
+		/// <summary>
+		/// Initiates an asynchronous operation to download the blob's contents as a string.
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>string</c> that represents the asynchronous operation.
+		/// </returns>
+		Task<string> DownloadTextAsync();
+
+
+
+		/// <summary>
+		/// Initiates an asynchronous operation to download the blob's contents as a string.
+		/// 
+		/// </summary>
+		/// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for a task to complete.</param>
+		/// <returns>
+		/// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>string</c> that represents the asynchronous operation.
+		/// </returns>
+		Task<string> DownloadTextAsync(CancellationToken cancellationToken);
 	}
 }

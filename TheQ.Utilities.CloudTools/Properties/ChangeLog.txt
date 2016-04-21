@@ -8,6 +8,12 @@ AssemblyFileVersion:			Project-specific changes that can deviate from AssemblyVe
 AssemblyInformationalVersion	For implementation-specific projects, use the version of the library used.
 ==============================================================================================================
 
+7.2.0 | 2016/04/21
++ Added the ability to upload/download test in BLOBs
+
+7.1.0 | 
+
+
 7.0.1 | 2015/11/18
 ! Fixed a potential task sequencing issue.
 
