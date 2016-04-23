@@ -472,6 +472,62 @@ namespace TheQ.Utilities.CloudTools.Azure
 
 
 
+		public Task UploadTextAsync(string content)
+		{
+			try
+			{
+				return this._blobReference.UploadTextAsync(content);
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
+		}
+
+
+
+		public Task UploadTextAsync(string content, CancellationToken cancellationToken)
+		{
+			try
+			{
+				return this._blobReference.UploadTextAsync(content, cancellationToken);
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
+		}
+
+
+
+		public Task<string> DownloadTextAsync()
+		{
+			try
+			{
+				return this._blobReference.DownloadTextAsync();
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
+		}
+
+
+
+		public Task<string> DownloadTextAsync(CancellationToken cancellationToken)
+		{
+			try
+			{
+				return this._blobReference.DownloadTextAsync(cancellationToken);
+			}
+			catch (StorageException ex)
+			{
+				throw ex.Wrap();
+			}
+		}
+
+
+
 		/// <summary>
 		///     <para>Performs an <see langword="implicit" /> conversion from <see cref="AzureBlob" /></para>
 		///     <para>to <see cref="CloudBlockBlob" /></para>
