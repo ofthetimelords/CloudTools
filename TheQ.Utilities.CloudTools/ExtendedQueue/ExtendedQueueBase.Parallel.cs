@@ -86,7 +86,7 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 						task.ContinueWith(ptask => this.Top.LogException(LogSeverity.Error, ptask.Exception, "Exception while parallel processing messages occurred"), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.NotOnCanceled);
 					}
 				}
-				catch (TaskCanceledException)
+				catch (OperationCanceledException)
 				{
 					if (messageOptions.CancelToken.IsCancellationRequested)
 					{
@@ -134,22 +134,29 @@ namespace TheQ.Utilities.CloudTools.Storage.ExtendedQueue
 
 			Task keepAliveTask = null;
 
-			this.Top.LogAction(LogSeverity.Debug,
+			try
+			{
+				this.Top.LogAction(LogSeverity.Debug,
 				"Started processing a message",
 				"Started processing queue's '{0}' message with ID '{1}' ({2} slots remaining)",
 				this.Name,
 				currentMessage.Id,
 				(messageOptions.MaximumCurrentMessages - Interlocked.Read(ref activeMessageSlots[0])).ToString());
 
-			try
-			{
 				keepAliveTask =
 					await
-						this.Top.ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource).ConfigureAwait(false);
+						this.Top.ProcessMessageInternal(new QueueMessageWrapper(this, currentMessage), messageOptions, messageSpecificCancellationTokenSource)
+							.ConfigureAwait(false);
 			}
-			catch (TaskCanceledException)
+			catch (OperationCanceledException)
 			{
-				throw;
+				if (this.Top.HandleTaskCancelled(messageOptions))
+				{
+					this.Statistics.DecreaseListeners();
+					this.Statistics.DecreaseAllMessageSlots();
+					this.Statistics.DecreaseBusyMessageSlots();
+					return;
+				}
 			}
 			catch (CloudToolsStorageException ex)
 			{

@@ -49,7 +49,7 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		/// <value>
 		/// An <see cref="ILogService"/> implementation.
 		/// </value>
-	private ILogService LogService { get; set; }
+		private ILogService LogService { get; set; }
 
 
 		/// <summary>
@@ -93,20 +93,31 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 		public async Task<AzureLockState> BreakLockAsync(AzureLockState state, CancellationToken cancelToken)
 		{
 			Guard.NotNull(state, "state");
-			CloudToolsStorageException exception = null;
 
 			try
 			{
 				// TODO: What if does not exist already, Exceptions
 				await (state.LeaseId != null ? this.UnregisterLockAsync(state, cancelToken) : this.BreakLockInternal(state, cancelToken)).ConfigureAwait(false);
 			}
-			catch (CloudToolsStorageException ex)
+			catch (AggregateException ex)
 			{
-				exception = ex;
-			}
+				var convEx = ex.InnerException as StorageException;
 
-			if (exception != null && (exception.StatusCode == 409 || exception.StatusCode == 412))
-				this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
+				if (convEx != null)
+					if (convEx.RequestInformation != null && (convEx.RequestInformation.HttpStatusCode == 409 || convEx.RequestInformation.HttpStatusCode == 412))
+						this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
+					else
+						throw convEx.Wrap();
+
+				throw;
+			}
+			catch (StorageException ex)
+			{
+				if (ex.RequestInformation != null && (ex.RequestInformation.HttpStatusCode == 409 || ex.RequestInformation.HttpStatusCode == 412))
+					this.BreakLockInternal(state, cancelToken).Wait(cancelToken);
+				else
+					throw ex.Wrap();
+			}
 
 			return state;
 		}
@@ -131,6 +142,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 
 					state.LockingBlob = null;
 					state.LeaseId = null;
+				}
+				catch (AggregateException ex)
+				{
+					var convEx = ex.InnerException as StorageException;
+
+					if (convEx != null)
+						throw convEx.Wrap();
+
+					throw;
 				}
 				catch (StorageException ex)
 				{
@@ -171,6 +191,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 					cancelToken).ConfigureAwait(false);
 				state.LockName = newLockName;
 			}
+			catch (AggregateException ex)
+			{
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
+			}
 			catch (StorageException ex)
 			{
 				throw ex.Wrap();
@@ -195,6 +224,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 			{
 				if (state.LockingBlob != null)
 					await ((CloudBlockBlob) (state.LockingBlob as AzureBlob)).RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(state.LeaseId), cancelToken).ConfigureAwait(false);
+			}
+			catch (AggregateException ex)
+			{
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
 			}
 			catch (StorageException ex)
 			{
@@ -236,6 +274,15 @@ namespace TheQ.Utilities.CloudTools.Azure.GlobalMutexFramework
 					state.LockingBlob = null;
 					state.LeaseId = null;
 				}
+			}
+			catch (AggregateException ex)
+			{
+				var convEx = ex.InnerException as StorageException;
+
+				if (convEx != null)
+					throw convEx.Wrap();
+
+				throw;
 			}
 			catch (StorageException ex)
 			{

@@ -1,6 +1,9 @@
 ﻿using System.Globalization;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.WindowsAzure.Storage;
 
 using TheQ.Utilities.CloudTools.Azure.ExtendedQueue.ObjectModel;
 using TheQ.Utilities.CloudTools.Storage.Blob;
@@ -83,16 +86,16 @@ namespace TheQ.Utilities.CloudTools.Azure.ExtendedQueue
 				var or = this.OverflowContainer.GetBlobReference(string.Format(CultureInfo.InvariantCulture, AzureBlobOverflownMessageHandler.OverflownBlobNameFormat, queueName, id));
 				await or.DeleteIfExistsAsync().ConfigureAwait(false);
 			}
-			catch (CloudToolsStorageException ex)
+			catch (StorageException ex)
 			{
-				if (ex.StatusCode != 404 && ex.StatusCode != 409 && ex.StatusCode != 412)
-					throw;
+				if (ex.RequestInformation.HttpStatusCode != 404 && ex.RequestInformation.HttpStatusCode != (int)HttpStatusCode.PreconditionFailed && ex.RequestInformation.HttpStatusCode != (int)HttpStatusCode.Conflict)
+					throw ex.Wrap();
 			}
 		}
 
 
 
-		/// <summary>
+		/// <summary>~
 		/// Retrieves the overflown message contents, asynchronously.
 		/// </summary>
 		/// <param name="id">The message identifier.</param>

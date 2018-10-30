@@ -11,8 +11,18 @@ AssemblyInformationalVersion	For implementation-specific projects, use the versi
 7.2.0 | 2016/04/21
 + Added the ability to upload/download test in BLOBs
 
-7.1.0 | 
+7.1.3 | 2016/3/9
+! Fixed a potential issue with Lock Breaking
 
+7.1.2 | 2016/2/8
+! Potential bug when using parallel processing on Queues.
+! Potential bug due to not properly wrapped exceptions in GlobalMutex.
+
+7.1.1 | 2015/12/16
+! Actually the previous fix was unrelated, the correct fix was to apply a change on a specific overload.
+
+7.1.0 | 2015/12/15
+! Fixed an unecessary error message that was generated (not affecting the actual library's operation).
 
 7.0.1 | 2015/11/18
 ! Fixed a potential task sequencing issue.

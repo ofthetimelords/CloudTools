@@ -807,7 +807,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 			// Arrange
 			const int runCount = 10;
 			var client = new CloudEnvironment();
-			var overflow = client.BlobClient.GetContainerReference("overflownqueues-1");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-13");
 			var queue = client.QueueClient.GetQueueReference("test1");
 			var result = string.Empty;
 			var expected = string.Empty;
@@ -833,7 +833,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 						}
 
 
-							if (message.GetMessageContents<string>() == "END")
+						if (message.GetMessageContents<string>() == "END")
 						{
 							mre.Set();
 							return Task.FromResult(true);
@@ -862,6 +862,75 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 				Assert.AreEqual(expected, result);
 			}
 		}
+
+
+
+		[TestCategory("Integration - ExtendedQueue")]
+		[TestMethod]
+		public void TestSerial_HeavyParallelProcessing()
+		{
+			// Arrange
+			const int runCount = 500;
+			var client = new CloudEnvironment();
+			var queue = client.QueueClient.GetQueueReference("test2");
+			var overflow = client.BlobClient.GetContainerReference("overflownqueues-14");
+			var locking = new object();
+			var result = string.Empty;
+			var expected = string.Empty;
+			var sw = new Stopwatch();
+			long actuallyRun = 0;
+			var factory = new AzureExtendedQueueFactory(new AzureBlobContainer(overflow), new ConsoleLogService());
+			var equeue = factory.Create(new AzureQueue(queue));
+			var lck = new AsyncLock();
+
+			for (var i = 1; i < runCount + 1; i++)
+				expected += ((char)(i)).ToString(CultureInfo.InvariantCulture);
+
+			using (var mre = new ManualResetEvent(false))
+			{
+				var options = new HandleMessagesParallelOptions(
+					TimeSpan.FromSeconds(0),
+					TimeSpan.FromMinutes(2),
+					TimeSpan.FromSeconds(30),
+					5,
+					3000,
+					new CancellationToken(),
+					async message =>
+					{
+						Trace.WriteLine(equeue.Statistics);
+
+						using (await lck.LockAsync())
+						{
+							var character = await message.GetMessageContentsAsync<string>().ConfigureAwait(false);
+							result += character;
+						}
+
+						if (Interlocked.Increment(ref actuallyRun) == runCount)
+							mre.Set();
+
+						return true;
+					},
+					null,
+					ex => { throw ex; });
+
+				// Act
+				sw.Start();
+				queue.CreateIfNotExists();
+				overflow.CreateIfNotExists();
+				queue.Clear();
+				for (var i = 1; i < runCount + 1; i++)
+					equeue.AddMessageEntity(((char)(i)).ToString(CultureInfo.InvariantCulture));
+				equeue.HandleMessagesInParallelAsync(options);
+
+				// Assert
+				mre.WaitOne();
+				sw.Stop();
+				Trace.WriteLine("Total execution time (in seconds): " + sw.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture));
+				Assert.IsTrue(expected.All(c => result.Contains(c)));
+			}
+		}
+
+
 
 	}
 }
