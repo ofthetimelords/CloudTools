@@ -870,7 +870,7 @@ namespace TheQ.Utilities.CloudTools.Tests.Integration.Azure.ConcurrencyTests
 		public void TestSerial_HeavyParallelProcessing()
 		{
 			// Arrange
-			const int runCount = 1000;
+			const int runCount = 500;
 			var client = new CloudEnvironment();
 			var queue = client.QueueClient.GetQueueReference("test2");
 			var overflow = client.BlobClient.GetContainerReference("overflownqueues-14");
