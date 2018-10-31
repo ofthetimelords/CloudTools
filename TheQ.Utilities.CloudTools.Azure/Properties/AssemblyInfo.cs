@@ -23,10 +23,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("TheQ.Utilities.CloudTools.Azure")]
 [assembly: AssemblyDescription("TheQ.Utilities.CloudTools wrappers for Windows Azure. The informational version number follows the specific Azure library it was built against.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TheQ Ltd.")]
+[assembly: AssemblyCompany("VTable Ltd.")]
 [assembly: AssemblyProduct("TheQ.Utilities.CloudTools.Azure")]
-[assembly: AssemblyCopyright("Copyright © TheQ Ltd 2014")]
-[assembly: AssemblyTrademark("TheQ")]
+[assembly: AssemblyCopyright("Copyright © james Kavakopoulos Ltd 2014")]
+[assembly: AssemblyTrademark("VTable")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -50,7 +50,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("7.2.0.0")]
-[assembly: AssemblyFileVersion("7.2.0.0")]
-[assembly: AssemblyInformationalVersion("7.0.0.0")]
+[assembly: AssemblyVersion("8.0.0.0")]
+[assembly: AssemblyFileVersion("8.0.0.0")]
+[assembly: AssemblyInformationalVersion("8.0.0.0")]
 [assembly: CLSCompliant(false)]
